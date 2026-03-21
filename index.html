@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>名片王 - Business Card Manager</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --primary: #0071e3; --primary-dark: #0063c9; --accent: #34c759; --danger: #ff3b30; --text: #1d1d1f; --text2: #86868b; --bg: #f5f5f7; --card: #fff; --border: #d2d2d7; }
+        body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        
+        .login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+        .login-screen.hidden { display: none; }
+        .login-box { background: var(--card); border-radius: 20px; padding: 32px; width: 100%; max-width: 380px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+        .login-box h1 { font-size: 24px; text-align: center; margin-bottom: 8px; }
+        .login-box .subtitle { text-align: center; color: var(--text2); font-size: 13px; margin-bottom: 24px; }
+        
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; }
+        .form-group input, .form-group select { width: 100%; padding: 14px; border: 2px solid var(--border); border-radius: 10px; font-size: 14px; font-family: inherit; }
+        .form-group input:focus { outline: none; border-color: var(--primary); }
+        
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-scan { background: var(--accent); color: #fff; margin-top: 12px; }
+        
+        .login-tabs { display: flex; margin-bottom: 20px; }
+        .login-tabs button { flex: 1; padding: 12px; border: none; background: var(--bg); font-size: 14px; font-weight: 500; cursor: pointer; }
+        .login-tabs button:first-child { border-radius: 10px 0 0 10px; }
+        .login-tabs button:last-child { border-radius: 0 10px 10px 0; }
+        .login-tabs button.active { background: var(--primary); color: #fff; }
+        
+        .error-msg { color: var(--danger); font-size: 12px; margin-top: 8px; display: none; }
+        .error-msg.show { display: block; }
+        
+        .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 16px 20px; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+        .header.hidden { display: none; }
+        .header h1 { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .header .logout-btn { padding: 6px 12px; background: rgba(255,255,255,0.2); border: none; border-radius: 6px; color: #fff; font-size: 12px; cursor: pointer; }
+        
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .container.hidden { display: none; }
+        
+        .scan-fab { position: fixed; bottom: 90px; right: 24px; width: 56px; height: 56px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff; box-shadow: 0 4px 20px rgba(52,199,89,0.4); cursor: pointer; z-index: 100; }
+        .scan-fab.hidden { display: none; }
+        
+        .add-btn { position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: #fff; box-shadow: 0 4px 20px rgba(0,113,227,0.4); cursor: pointer; z-index: 100; }
+        .add-btn.hidden { display: none; }
+        
+        .search-box { background: var(--card); border-radius: 14px; padding: 16px; margin-bottom: 16px; display: flex; gap: 10px; }
+        .search-box input { flex: 1; padding: 12px; border: 2px solid var(--border); border-radius: 10px; font-size: 14px; }
+        
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+        .stat-card { background: var(--card); border-radius: 14px; padding: 16px; text-align: center; }
+        .stat-card .num { font-size: 24px; font-weight: 700; color: var(--primary); }
+        .stat-card .label { font-size: 11px; color: var(--text2); margin-top: 4px; }
+        
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .card-item { background: var(--card); border-radius: 16px; padding: 20px; }
+        .card-name { font-size: 18px; font-weight: 700; }
+        .card-title { font-size: 13px; color: var(--primary); margin-top: 2px; }
+        .card-company { font-size: 14px; color: var(--text2); margin-top: 4px; }
+        .card-info { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 13px; }
+        .card-info div { margin-bottom: 6px; }
+        .card-info span { color: var(--text2); width: 50px; display: inline-block; }
+        .card-actions { display: flex; gap: 8px; margin-top: 16px; }
+        .card-actions button { flex: 1; padding: 10px; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; }
+        .btn-edit { background: var(--bg); }
+        .btn-delete { background: rgba(255,59,48,0.1); color: var(--danger); }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+        .modal.show { display: flex; }
+        .modal-content { background: var(--card); border-radius: 20px; padding: 24px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-close { width: 32px; height: 32px; border: none; background: var(--bg); border-radius: 50%; font-size: 18px; cursor: pointer; }
+        
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .modal-actions { display: flex; gap: 12px; margin-top: 20px; }
+        .modal-actions button { flex: 1; padding: 14px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .btn-save { background: var(--primary); color: #fff; }
+        .btn-cancel { background: var(--bg); }
+        
+        .scan-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 300; }
+        .scan-modal.show { display: block; }
+        .scan-view { width: 100%; height: 100%; position: relative; }
+        .scan-view video { width: 100%; height: 100%; object-fit: cover; }
+        .scan-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; height: 50%; border: 2px dashed var(--accent); border-radius: 12px; pointer-events: none; }
+        .scan-hint { position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); color: #fff; font-size: 14px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .scan-buttons { position: absolute; bottom: 40px; left: 0; right: 0; display: flex; justify-content: center; gap: 20px; }
+        .scan-btn { width: 70px; height: 70px; border-radius: 50%; border: 3px solid #fff; background: transparent; cursor: pointer; }
+        .scan-btn.capture { width: 80px; height: 80px; background: #fff; }
+        .scan-btn.close { position: absolute; top: 20px; left: 20px; width: 44px; height: 44px; border-radius: 50%; background: rgba(0,0,0,0.5); color: #fff; border: none; font-size: 20px; }
+        
+        .scan-progress { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 350; align-items: center; justify-content: center; flex-direction: column; color: #fff; }
+        .scan-progress.show { display: flex; }
+        .scan-progress .spinner { width: 60px; height: 60px; border: 4px solid rgba(255,255,255,0.3); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+        .scan-progress .text { margin-top: 20px; font-size: 16px; }
+        .scan-progress .percent { margin-top: 10px; font-size: 24px; font-weight: 700; color: var(--accent); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .empty { text-align: center; padding: 60px 20px; color: var(--text2); }
+        .empty div:first-child { font-size: 50px; margin-bottom: 16px; }
+        
+        .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(100px); background: #333; color: #fff; padding: 14px 24px; border-radius: 10px; font-size: 14px; opacity: 0; transition: all 0.3s; z-index: 300; }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <h1>💼 名片王</h1>
+            <p class="subtitle">AI 辨識版 - 掃描名片自動輸入</p>
+            <div class="login-tabs">
+                <button class="active" id="tabLogin" onclick="showTab('login')">登入</button>
+                <button id="tabRegister" onclick="showTab('register')">註冊</button>
+            </div>
+            <div id="loginForm">
+                <div class="form-group"><label>帳號</label><input type="text" id="loginUsername" placeholder="輸入帳號"></div>
+                <div class="form-group"><label>密碼</label><input type="password" id="loginPassword" placeholder="輸入密碼"></div>
+                <div class="error-msg" id="loginError"></div>
+                <button class="btn btn-primary" onclick="login()">登入</button>
+            </div>
+            <div id="registerForm" style="display:none;">
+                <div class="form-group"><label>帳號</label><input type="text" id="regUsername" placeholder="設定帳號"></div>
+                <div class="form-group"><label>密碼</label><input type="password" id="regPassword" placeholder="設定密碼"></div>
+                <div class="form-group"><label>確認密碼</label><input type="password" id="regConfirm" placeholder="再次輸入密碼"></div>
+                <div class="error-msg" id="regError"></div>
+                <button class="btn btn-primary" onclick="register()">註冊</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="header hidden" id="header">
+        <h1>💼 名片王</h1>
+        <div class="user-info"><span id="welcomeUser"></span><button onclick="openSyncModal()" style="padding:6px 10px;background:rgba(52,199,89,0.3);border:none;border-radius:6px;color:#fff;font-size:11px;cursor:pointer;margin-right:8px;">🔄</button><button class="logout-btn" onclick="logout()">登出</button></div>
+    </div>
+    
+    <div class="container hidden" id="mainContent">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="搜尋姓名、公司、職稱..." oninput="filterCards()">
+            <button class="btn btn-primary" style="width:auto;padding:12px 20px;" onclick="filterCards()">搜尋</button>
+        </div>
+        <div class="stats">
+            <div class="stat-card"><div class="num" id="totalCount">0</div><div class="label">總名片數</div></div>
+            <div class="stat-card"><div class="num" id="companyCount">0</div><div class="label">公司數</div></div>
+            <div class="stat-card"><div class="num" id="thisMonth">0</div><div class="label">本月新增</div></div>
+        </div>
+        <div class="cards-grid" id="cardsGrid">
+            <div class="empty"><div>📇</div><p>尚未建立名片</p><p>點擊下方 + 按鈕新增名片</p></div>
+        </div>
+    </div>
+    
+    <div class="scan-fab hidden" id="scanFab" onclick="startScan()">📷</div>
+    
+    <!-- 分享 Modal -->
+    <div class="modal" id="shareModal">
+        <div class="modal-content" style="text-align:center">
+            <div class="modal-header"><h2>分享名片</h2><button class="modal-close" onclick="closeShare()">×</button></div>
+            <div id="qrContainer" style="margin:20px auto"></div>
+            <div style="display:flex;gap:10px;justify-content:center;margin-top:20px">
+                <button class="btn btn-primary" style="width:auto;padding:12px 24px" onclick="downloadVCard()">📥 下載 vCard</button>
+                <button class="btn" style="width:auto;padding:12px 24px;background:var(--bg)" onclick="copyVCard()">📋 複製</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="cardModal">
+        <div class="modal-content">
+            <div class="modal-header"><h2 id="modalTitle">新增名片</h2><button class="modal-close" onclick="closeModal()">×</button></div>
+            <div class="form-row">
+                <div class="form-group"><label>姓名 *</label><input type="text" id="inputName" placeholder="王大明"></div>
+                <div class="form-group"><label>職稱</label><input type="text" id="inputTitle" placeholder="業務經理"></div>
+            </div>
+            <div class="form-group"><label>公司</label><input type="text" id="inputCompany" placeholder="ABC 股份有限公司"></div>
+            <div class="form-row">
+                <div class="form-group"><label>電話</label><input type="tel" id="inputPhone" placeholder="+886 912 345 678"></div>
+                <div class="form-group"><label>Email</label><input type="email" id="inputEmail" placeholder="example@company.com"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>LINE</label><input type="text" id="inputLine" placeholder="lineid"></div>
+                <div class="form-group"><label>分類</label><select id="inputCategory"><option value="客戶">客戶</option><option value="供應商">供應商</option><option value="同事">同事</option><option value="潛在客戶">潛在客戶</option><option value="其他">其他</option></select></div>
+            </div>
+            <div class="form-group"><label>地址</label><input type="text" id="inputAddress" placeholder="台北市信義區忠孝東路一段"></div>
+            <button class="btn btn-scan" onclick="startScanFromModal()">📷 掃描名片自動輸入</button>
+            <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-save" onclick="saveCard()">儲存名片</button></div>
+        </div>
+    </div>
+    
+    <div class="scan-modal" id="scanModal">
+        <div class="scan-view">
+            <video id="video" autoplay playsinline></video>
+            <canvas id="canvas" style="display:none;"></canvas>
+            <div class="scan-overlay"></div>
+            <div class="scan-hint">將名片放入框內</div>
+            <div class="scan-buttons">
+                <button class="scan-btn close" onclick="closeScan()">×</button>
+                <button class="scan-btn capture" onclick="captureImage()"></button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="scan-progress" id="scanProgress">
+        <div class="spinner"></div>
+        <div class="text">正在辨識名片...</div>
+        <div class="percent" id="scanPercent">0%</div>
+    </div>
+    
+    <div class="add-btn hidden" id="addBtn" onclick="openModal()">+</div>
+    <div class="toast" id="toast"></div>
+    
+    <!-- Sync Modal -->
+    <div class="modal" id="syncModal">
+        <div class="modal-content">
+            <div class="modal-header"><h2>🔗 Telegram 同步</h2><button class="modal-close" onclick="closeSyncModal()">×</button></div>
+            <div style="margin-bottom:20px;">
+                <div style="font-size:14px;color:var(--text2);margin-bottom:16px;">
+                    綁定 Telegram 後，可以透過 Bot 上傳名片照片自動辨識並同步到此帳戶
+                </div>
+                <div style="background:var(--bg);border-radius:10px;padding:16px;margin-bottom:16px;">
+                    <div style="font-size:13px;margin-bottom:8px;">綁定狀態</div>
+                    <div id="telegramStatus">載入中...</div>
+                </div>
+                <div class="form-group">
+                    <label>Telegram 使用者名稱</label>
+                    <input type="text" id="telegramUsername" placeholder="輸入 @username（不含 @）">
+                </div>
+                <button class="btn btn-primary" onclick="linkTelegram()">綁定帳戶</button>
+                <hr style="margin:20px 0;border:none;border-top:1px solid var(--border);">
+                <div style="font-size:14px;margin-bottom:12px;">從 Telegram 同步名片</div>
+                <button class="btn" style="background:var(--accent);color:#fff;" onclick="syncFromTelegram()">🔄 同步名片</button>
+                <div style="font-size:12px;color:var(--text2);margin-top:12px;">
+                    或在 Telegram 搜尋 <b>@CardKingBot</b> 來上傳名片
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentUser = null, cards = [], editingId = null, videoStream = null;
+        
+        function getUsers() { return JSON.parse(localStorage.getItem('cardUsers')) || {}; }
+        function saveUsers(users) { localStorage.setItem('cardUsers', JSON.stringify(users)); }
+        function getUserCards() { if (!currentUser) return []; return (JSON.parse(localStorage.getItem('businessCards')) || {})[currentUser] || []; }
+        function saveUserCards(cards) { if (!currentUser) return; const all = JSON.parse(localStorage.getItem('businessCards')) || {}; all[currentUser] = cards; localStorage.setItem('businessCards', JSON.stringify(all)); }
+        
+        function showTab(tab) { document.getElementById('tabLogin').classList.toggle('active', tab==='login'); document.getElementById('tabRegister').classList.toggle('active', tab==='register'); document.getElementById('loginForm').style.display=tab==='login'?'block':'none'; document.getElementById('registerForm').style.display=tab==='register'?'block':'none'; hideError(); }
+        
+        function hashPassword(raw){try{return btoa(unescape(encodeURIComponent(raw)));}catch(e){return raw;}}
+        function register() { const u=document.getElementById('regUsername').value.trim(), p=document.getElementById('regPassword').value, c=document.getElementById('regConfirm').value; if(!u||!p){showError('regError','請填寫所有欄位');return;} if(p.length<6){showError('regError','密碼至少 6 碼');return;} if(p!==c){showError('regError','兩次密碼不一致');return;} const users=getUsers(); if(users[u]){showError('regError','帳號已被註冊');return;} users[u]={password:hashPassword(p), createdAt:new Date().toISOString()}; saveUsers(users); showToast('註冊成功！請登入'); showTab('login'); }
+        
+        function login() { const u=document.getElementById('loginUsername').value.trim(), p=document.getElementById('loginPassword').value; const users=getUsers(); const candidate=users[u]; const hashed=hashPassword(p); if(!candidate||![candidate.password,p].includes(hashed)&&candidate.password!==p){showError('loginError','帳號或密碼錯誤');return;} if(candidate.password===p){candidate.password=hashed; saveUsers(users);} currentUser=u; localStorage.setItem('currentUser',u); document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('header').classList.remove('hidden'); document.getElementById('mainContent').classList.remove('hidden'); document.getElementById('addBtn').classList.remove('hidden'); document.getElementById('scanFab').classList.remove('hidden'); document.getElementById('welcomeUser').textContent='你好，'+u; cards=getUserCards(); renderCards(); updateStats(); }
+        
+        function logout(){currentUser=null;localStorage.removeItem('currentUser');document.getElementById('loginScreen').classList.remove('hidden');document.getElementById('header').classList.add('hidden');document.getElementById('mainContent').classList.add('hidden');document.getElementById('addBtn').classList.add('hidden');document.getElementById('scanFab').classList.add('hidden');hideError();}
+        function showError(id,msg){document.getElementById(id).textContent=msg;document.getElementById(id).classList.add('show');}
+        function hideError(){document.getElementById('loginError').classList.remove('show');document.getElementById('regError').classList.remove('show');}
+        
+        function updateStats(){document.getElementById('totalCount').textContent=cards.length;document.getElementById('companyCount').textContent=[...new Set(cards.map(c=>c.company).filter(c=>c))].length;document.getElementById('thisMonth').textContent=cards.filter(c=>c.createdAt&&new Date(c.createdAt).getMonth()===new Date().getMonth()&&new Date(c.createdAt).getFullYear()===new Date().getFullYear()).length;}
+        
+        function escapeHtml(text){return String(text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
+        function renderCards(f=''){const grid=document.getElementById('cardsGrid');const q=(f||'').toLowerCase();const filtered=cards.filter(c=>!q||(c.name||'').toLowerCase().includes(q)||(c.company||'').toLowerCase().includes(q)||(c.title||'').toLowerCase().includes(q)||(c.email||'').toLowerCase().includes(q));if(filtered.length===0){grid.innerHTML='<div class="empty"><div>📇</div><p>'+(q?'找不到符合的名片':'尚未建立名片')+'</p></div>';return;}grid.innerHTML=filtered.map(c=>'<div class="card-item"><div class="card-name">'+escapeHtml(c.name||'未命名')+'</div><div class="card-title">'+escapeHtml(c.title||'')+'</div><div class="card-company">'+escapeHtml(c.company||'')+'</div><div class="card-info">'+(c.phone?'<div><span>電話</span>'+escapeHtml(c.phone)+'</div>':'')+(c.email?'<div><span>Email</span>'+escapeHtml(c.email)+'</div>':'')+(c.line?'<div><span>LINE</span>'+escapeHtml(c.line)+'</div>':'')+'</div><div class="card-actions"><button class="btn-edit" onclick="editCard(\''+c.id+'\')">編輯</button><button class="btn-edit" onclick="showShareModal(\''+c.id+'\')">分享</button><button class="btn-delete" onclick="deleteCard(\''+c.id+'\')">刪除</button></div></div>').join('');}
+        
+        function filterCards(){renderCards(document.getElementById('searchInput').value);}
+        
+        function openModal(card=null){editingId=card?.id||null;document.getElementById('modalTitle').textContent=card?'編輯名片':'新增名片';document.getElementById('inputName').value=card?.name||'';document.getElementById('inputTitle').value=card?.title||'';document.getElementById('inputCompany').value=card?.company||'';document.getElementById('inputPhone').value=card?.phone||'';document.getElementById('inputEmail').value=card?.email||'';document.getElementById('inputLine').value=card?.line||'';document.getElementById('inputCategory').value=card?.category||'客戶';document.getElementById('inputAddress').value=card?.address||'';document.getElementById('cardModal').classList.add('show');}
+        function closeModal(){document.getElementById('cardModal').classList.remove('show');editingId=null;}
+        
+        function saveCard(){const name=document.getElementById('inputName').value.trim();if(!name){showToast('請輸入姓名');return;}const cardData={id:editingId||Date.now().toString(),name:name,title:document.getElementById('inputTitle').value.trim(),company:document.getElementById('inputCompany').value.trim(),phone:document.getElementById('inputPhone').value.trim(),email:document.getElementById('inputEmail').value.trim(),line:document.getElementById('inputLine').value.trim(),category:document.getElementById('inputCategory').value,address:document.getElementById('inputAddress').value.trim(),createdAt:editingId?cards.find(c=>c.id===editingId)?.createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};if(editingId){cards[cards.findIndex(c=>c.id===editingId)]=cardData;showToast('名片已更新');}else{cards.unshift(cardData);showToast('名片已新增');}saveUserCards(cards);renderCards();updateStats();closeModal();}
+        function editCard(id){const c=cards.find(x=>x.id===id);if(c)openModal(c);}
+        function deleteCard(id){if(confirm('確定要刪除這張名片嗎？')){cards=cards.filter(x=>x.id!==id);saveUserCards(cards);renderCards();updateStats();showToast('名片已刪除');}}
+        function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+        
+        // 分享功能
+        let currentShareCard = null;
+        function showShareModal(id) { currentShareCard = cards.find(c => c.id === id); if (!currentShareCard) return; const container = document.getElementById('qrContainer'); container.innerHTML = ''; const vcard = generateVCard(currentShareCard); QRCode.toCanvas(vcard, { width: 200, margin: 2 }, (err, canvas) => { if (!err) container.appendChild(canvas); }); document.getElementById('shareModal').classList.add('show'); }
+        function closeShare() { document.getElementById('shareModal').classList.remove('show'); currentShareCard = null; }
+        function generateVCard(card) { return `BEGIN:VCARD\nVERSION:3.0\nFN:${card.name||''}\nTITLE:${card.title||''}\nORG:${card.company||''}\nTEL:${card.phone||''}\nEMAIL:${card.email||''}\nADR:${card.address||''}\nNOTE:${card.note||''}\nEND:VCARD`; }
+        function downloadVCard() { if (!currentShareCard) return; const vcard = generateVCard(currentShareCard); const blob = new Blob([vcard], { type: 'text/vcard' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `${currentShareCard.name||'contact'}.vcf`; a.click(); URL.revokeObjectURL(url); showToast('已下載 vCard'); }
+        function copyVCard() { if (!currentShareCard) return; const vcard = generateVCard(currentShareCard); navigator.clipboard.writeText(vcard).then(() => showToast('已複製 vCard')); }
+        
+        async function startScan(){await openScanCamera();}
+        async function startScanFromModal(){await openScanCamera();}
+        async function openScanCamera(){document.getElementById('scanModal').classList.add('show');const v=document.getElementById('video');try{v.srcObject=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});videoStream=v.srcObject;}catch(e){showToast('無法開啟相機：'+e.message);closeScan();}}
+        function closeScan(){document.getElementById('scanModal').classList.remove('show');if(videoStream){videoStream.getTracks().forEach(t=>t.stop());videoStream=null;}document.getElementById('scanProgress').classList.remove('show');}
+        
+        async function captureImage(){const v=document.getElementById('video'),c=document.getElementById('canvas'),ctx=c.getContext('2d');c.width=v.videoWidth;c.height=v.videoHeight;ctx.drawImage(v,0,0);closeScan();const progress=document.getElementById('scanProgress'),percent=document.getElementById('scanPercent');progress.classList.add('show');percent.textContent='0%';try{const result=await Tesseract.recognize(c.toDataURL('image/jpeg'),'chi_tra+eng',{logger:m=>{if(m.status==='recognizing text')percent.textContent=Math.round(m.progress*100)+'%'}});parseCardInfo(result.data.text);}catch(e){showToast('辨識失敗：'+e.message);}progress.classList.remove('show');}
+        
+        function parseCardInfo(text){const lines=text.split('\n').map(l=>l.trim()).filter(l=>l.length>0);let name='',title='',company='',phone='',email='',address='';const phoneRegex=/(\+?886|0)[-\s]?[0-9]{1,4}[-\s]?[0-9]{3,4}[-\s]?[0-9]{3,4}/,emailRegex=/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;lines.forEach(l=>{if(phoneRegex.test(l)&&!phone)phone=l.match(phoneRegex)[0];else if(emailRegex.test(l)&&!email)email=l.match(emailRegex)[0];else if(!name)name=l;else if(!title)title=l;else if(!company)company=l;else address+=l+' ';});document.getElementById('inputName').value=name;document.getElementById('inputTitle').value=title;document.getElementById('inputCompany').value=company;document.getElementById('inputPhone').value=phone;document.getElementById('inputEmail').value=email;document.getElementById('inputAddress').value=address.trim();showToast('已自動填入名片資訊');document.getElementById('cardModal').classList.add('show');}
+        
+        // ========== Telegram Sync ==========
+        function openSyncModal() { document.getElementById('syncModal').classList.add('show'); renderTelegramLink(); }
+        function closeSyncModal() { document.getElementById('syncModal').classList.remove('show'); }
+        function getTelegramLink() { return JSON.parse(localStorage.getItem('telegramLink')) || {}; }
+        function saveTelegramLink(data) { localStorage.setItem('telegramLink', JSON.stringify(data)); }
+        function renderTelegramLink() { const link = getTelegramLink(); document.getElementById('telegramStatus').innerHTML = link.username ? '<span style="color:var(--accent)">✅ 已綁定: @' + link.username + '</span>' : '<span style="color:var(--text2)">尚未綁定</span>'; }
+        async function linkTelegram() { const username = document.getElementById('telegramUsername').value.trim(); if (!username) { showToast('請輸入 Telegram 使用者名稱'); return; } saveTelegramLink({ username: username, linkedAt: new Date().toISOString() }); showToast('✅ 已綁定 Telegram'); renderTelegramLink(); }
+        async function syncFromTelegram() { showToast('🔄 正在同步...'); const link = getTelegramLink(); if (!link.username) { showToast('請先綁定 Telegram'); return; } const saved = localStorage.getItem('telegramCards_' + currentUser); if (saved) { const tCards = JSON.parse(saved); if (tCards.length > 0) { cards = [...tCards, ...cards]; saveUserCards(cards); renderCards(); updateStats(); showToast('✅ 同步 ' + tCards.length + ' 張名片'); } else { showToast('沒有新名片'); } } else { showToast('沒有 Telegram 名片資料'); } }
+    </script>
+</body>
+</html>
