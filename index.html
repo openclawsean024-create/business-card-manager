@@ -261,7 +261,11 @@
                 <div class="form-group"><label>分類</label><select id="inputCategory"><option value="客戶">客戶</option><option value="供應商">供應商</option><option value="同事">同事</option><option value="潛在客戶">潛在客戶</option><option value="其他">其他</option></select></div>
             </div>
             <div class="form-group"><label>地址</label><input type="text" id="inputAddress" placeholder="台北市信義區忠孝東路一段"></div>
-            <button class="btn btn-scan" onclick="startScanFromModal()">📷 掃描名片自動輸入</button>
+            <div style="display:flex;gap:10px;margin-top:12px;">
+                <button class="btn btn-scan" onclick="startScanFromModal()" style="flex:1;">📷 拍照掃描</button>
+                <button class="btn" onclick="document.getElementById('fileUpload').click()" style="flex:1;background:var(--accent);color:#fff;">📁 上傳圖片</button>
+            </div>
+            <input type="file" id="fileUpload" accept="image/*" style="display:none;" onchange="handleFileUpload(event)">
             <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-save" onclick="saveCard()">儲存名片</button></div>
         </div>
     </div>
@@ -377,6 +381,31 @@
         function renderTelegramLink() { const link = getTelegramLink(); document.getElementById('telegramStatus').innerHTML = link.username ? '<span style="color:var(--accent)">✅ 已綁定: @' + link.username + '</span>' : '<span style="color:var(--text2)">尚未綁定</span>'; }
         async function linkTelegram() { const username = document.getElementById('telegramUsername').value.trim(); if (!username) { showToast('請輸入 Telegram 使用者名稱'); return; } saveTelegramLink({ username: username, linkedAt: new Date().toISOString() }); showToast('✅ 已綁定 Telegram'); renderTelegramLink(); }
         async function syncFromTelegram() { showToast('🔄 正在同步...'); const link = getTelegramLink(); if (!link.username) { showToast('請先綁定 Telegram'); return; } const saved = localStorage.getItem('telegramCards_' + currentUser); if (saved) { const tCards = JSON.parse(saved); if (tCards.length > 0) { cards = [...tCards, ...cards]; saveUserCards(cards); renderCards(); updateStats(); showToast('✅ 同步 ' + tCards.length + ' 張名片'); } else { showToast('沒有新名片'); } } else { showToast('沒有 Telegram 名片資料'); } }
+        
+        // Handle file upload for OCR
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const progress = document.getElementById('scanProgress');
+            const percent = document.getElementById('scanPercent');
+            progress.classList.add('show');
+            percent.textContent = '0%';
+            try {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    try {
+                        const result = await Tesseract.recognize(e.target.result, 'chi_tra+eng', {
+                            logger: m => { if (m.status === 'recognizing text') percent.textContent = Math.round(m.progress * 100) + '%'; }
+                        });
+                        parseCardInfo(result.data.text);
+                    } catch(err) { showToast('辨識失敗：' + err.message); }
+                    progress.classList.remove('show');
+                };
+                reader.onerror = function() { showToast('檔案讀取失敗'); progress.classList.remove('show'); };
+                reader.readAsDataURL(file);
+            } catch(e) { showToast('上傳失敗：' + e.message); progress.classList.remove('show'); }
+            event.target.value = '';
+        }
     </script>
 </body>
 </html>
