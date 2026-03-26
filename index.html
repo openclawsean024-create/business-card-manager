@@ -267,6 +267,7 @@
             </div>
             <div id="imagePreviewContainer" style="display:none;margin-top:12px;text-align:center;">
                 <img id="imagePreview" style="max-width:100%;max-height:150px;border-radius:10px;border:2px solid var(--border);" />
+                <div id="imageSizeHint" style="font-size:11px;color:var(--text2);margin-top:4px;"></div>
                 <button onclick="clearCardImage()" style="margin-top:6px;padding:4px 12px;background:var(--danger);color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;">✕ 移除圖片</button>
             </div>
             <input type="file" id="fileUpload" accept="image/*" style="display:none;" onchange="handleFileUpload(event)">
@@ -329,7 +330,7 @@
         function getUsers() { return JSON.parse(localStorage.getItem('cardUsers')) || {}; }
         function saveUsers(users) { localStorage.setItem('cardUsers', JSON.stringify(users)); }
         function getUserCards() { if (!currentUser) return []; return (JSON.parse(localStorage.getItem('businessCards')) || {})[currentUser] || []; }
-        function saveUserCards(cards) { if (!currentUser) return; const all = JSON.parse(localStorage.getItem('businessCards')) || {}; all[currentUser] = cards; localStorage.setItem('businessCards', JSON.stringify(all)); }
+        function saveUserCards(cards) { if (!currentUser) return; const all = JSON.parse(localStorage.getItem('businessCards')) || {}; all[currentUser] = cards; try { localStorage.setItem('businessCards', JSON.stringify(all)); } catch (e) { if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_FILE_CANCELED') { showToast('儲存空間已滿！建議移除部分名片圖片或減少圖片數量'); } else { showToast('儲存失敗：' + e.message); } } }
         
         function showTab(tab) { document.getElementById('tabLogin').classList.toggle('active', tab==='login'); document.getElementById('tabRegister').classList.toggle('active', tab==='register'); document.getElementById('loginForm').style.display=tab==='login'?'block':'none'; document.getElementById('registerForm').style.display=tab==='register'?'block':'none'; hideError(); }
         
@@ -387,33 +388,67 @@
         async function syncFromTelegram() { showToast('🔄 正在同步...'); const link = getTelegramLink(); if (!link.username) { showToast('請先綁定 Telegram'); return; } const saved = localStorage.getItem('telegramCards_' + currentUser); if (saved) { const tCards = JSON.parse(saved); if (tCards.length > 0) { cards = [...tCards, ...cards]; saveUserCards(cards); renderCards(); updateStats(); showToast('✅ 同步 ' + tCards.length + ' 張名片'); } else { showToast('沒有新名片'); } } else { showToast('沒有 Telegram 名片資料'); } }
         
         // Handle file upload for OCR
+        // Image compression helper: resize + JPEG compress to keep localStorage usage low
+        async function compressImage(file, maxWidth = 800, quality = 0.7) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let w = img.width, h = img.height;
+                        if (w > maxWidth) { h = Math.round((maxWidth / w) * h); w = maxWidth; }
+                        canvas.width = w; canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+        
         async function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
+            // Validate file type
+            if (!file.type.startsWith('image/')) { showToast('請上傳圖片檔案'); return; }
+            // Warn if file is very large (>3MB original)
+            if (file.size > 3 * 1024 * 1024) { showToast('圖片較大，正在壓縮...'); }
             const progress = document.getElementById('scanProgress');
             const percent = document.getElementById('scanPercent');
             progress.classList.add('show');
             percent.textContent = '0%';
             try {
-                const reader = new FileReader();
-                reader.onload = async function(e) {
-                    try {
-                        // Store image for card saving
-                        currentCardImage = e.target.result;
-                        // Show image preview
-                        document.getElementById('imagePreview').src = currentCardImage;
-                        document.getElementById('imagePreviewContainer').style.display = 'block';
-                        // Run OCR
-                        const result = await Tesseract.recognize(e.target.result, 'chi_tra+eng', {
-                            logger: m => { if (m.status === 'recognizing text') percent.textContent = Math.round(m.progress * 100) + '%'; }
-                        });
-                        parseCardInfo(result.data.text);
-                    } catch(err) { showToast('辨識失敗：' + err.message); }
-                    progress.classList.remove('show');
-                };
-                reader.onerror = function() { showToast('檔案讀取失敗'); progress.classList.remove('show'); };
-                reader.readAsDataURL(file);
-            } catch(e) { showToast('上傳失敗：' + e.message); progress.classList.remove('show'); }
+                // Compress image first before storing
+                const compressedData = await compressImage(file);
+                // Estimate localStorage usage (base64 is ~1.37x larger)
+                const estimatedSize = compressedData.length * 0.75; // Approximate original size
+                if (estimatedSize > 4 * 1024 * 1024) {
+                    // Try more aggressive compression
+                    const moreCompressed = await compressImage(file, 600, 0.5);
+                    currentCardImage = moreCompressed;
+                } else {
+                    currentCardImage = compressedData;
+                }
+                // Show image size hint
+                const origKB = Math.round(file.size / 1024);
+                const storedKB = Math.round(currentCardImage.length * 0.75 / 1024);
+                document.getElementById('imageSizeHint').textContent = `📦 原圖: ${origKB}KB → 儲存: ${storedKB}KB`;
+                // Show image preview
+                document.getElementById('imagePreview').src = currentCardImage;
+                document.getElementById('imagePreviewContainer').style.display = 'block';
+                // Run OCR on the compressed image (faster too)
+                const result = await Tesseract.recognize(currentCardImage, 'chi_tra+eng', {
+                    logger: m => { if (m.status === 'recognizing text') percent.textContent = Math.round(m.progress * 100) + '%'; }
+                });
+                parseCardInfo(result.data.text);
+                showToast('✅ 圖片上傳成功');
+            } catch(e) { showToast('上傳失敗：' + e.message); }
+            progress.classList.remove('show');
             event.target.value = '';
         }
         
