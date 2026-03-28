@@ -572,6 +572,154 @@
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+        /* ===== Landing Page ===== */
+        .landing { width: 100%; background: var(--bg); }
+        .landing-nav {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+        .landing-nav-inner {
+            max-width: 1100px; margin: 0 auto;
+            padding: 0 24px; height: 60px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .landing-logo {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 1.1rem; font-weight: 700; color: var(--primary);
+        }
+        .landing-logo i { font-size: 1.3rem; }
+        .landing-cta-btn {
+            padding: 8px 20px;
+            background: var(--primary); color: #fff;
+            border: none; border-radius: 8px;
+            font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .landing-cta-btn:hover { background: var(--primary-mid); transform: translateY(-1px); }
+
+        .landing-hero {
+            position: relative; overflow: hidden;
+            padding: 80px 24px 100px;
+            text-align: center;
+            background: var(--bg);
+        }
+        .landing-hero-bg {
+            position: absolute; inset: 0; pointer-events: none;
+            background:
+                radial-gradient(ellipse 80% 60% at 50% 0%, rgba(27,58,107,0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 60% 40% at 80% 100%, rgba(26,122,74,0.05) 0%, transparent 60%);
+        }
+        .landing-hero-content { position: relative; max-width: 720px; margin: 0 auto; }
+        .landing-hero-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: var(--primary-light); color: var(--primary);
+            border-radius: 100px; font-size: 0.78rem; font-weight: 600;
+            letter-spacing: 0.06em; margin-bottom: 24px;
+        }
+        .landing-hero-title {
+            font-size: clamp(2.4rem, 6vw, 3.8rem);
+            font-weight: 700; line-height: 1.15;
+            color: var(--text); letter-spacing: -0.02em;
+            margin-bottom: 20px;
+        }
+        .landing-hero-sub {
+            font-size: clamp(1rem, 2vw, 1.15rem);
+            color: var(--text2); line-height: 1.75;
+            max-width: 540px; margin: 0 auto 36px;
+        }
+        .landing-hero-actions {
+            display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+            margin-bottom: 48px;
+        }
+        .landing-btn-primary {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 13px 28px;
+            background: var(--primary); color: #fff;
+            border: none; border-radius: 10px;
+            font-size: 1rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .landing-btn-primary:hover { background: var(--primary-mid); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(27,58,107,0.25); }
+        .landing-btn-ghost {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 13px 28px;
+            background: transparent; color: var(--text2);
+            border: 1.5px solid var(--border-strong); border-radius: 10px;
+            font-size: 1rem; font-weight: 500;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .landing-btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+        .landing-hero-stats {
+            display: flex; align-items: center; justify-content: center; gap: 24px;
+        }
+        .landing-stat { text-align: center; }
+        .landing-stat-num { display: block; font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+        .landing-stat-label { font-size: 0.75rem; color: var(--text3); }
+        .landing-stat-div { width: 1px; height: 28px; background: var(--border); }
+
+        .landing-features { background: #fff; padding: 80px 24px; }
+        .landing-features-inner { max-width: 1100px; margin: 0 auto; }
+        .landing-section-label {
+            display: inline-block;
+            font-size: 0.72rem; font-weight: 700;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--primary); margin-bottom: 12px;
+        }
+        .landing-section-title {
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+            font-weight: 700; color: var(--text);
+            margin-bottom: 48px; letter-spacing: -0.02em;
+        }
+        .landing-features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+        .landing-feature-card {
+            padding: 28px 24px;
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: 14px; text-align: left;
+            transition: all 0.2s;
+        }
+        .landing-feature-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-3px);
+        }
+        .landing-feature-icon {
+            width: 44px; height: 44px;
+            background: var(--primary-light);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 16px;
+            color: var(--primary); font-size: 1.1rem;
+        }
+        .landing-feature-card h3 { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+        .landing-feature-card p { font-size: 0.875rem; color: var(--text2); line-height: 1.65; }
+
+        .landing-cta-section { background: var(--primary); padding: 80px 24px; text-align: center; }
+        .landing-cta-inner { max-width: 540px; margin: 0 auto; }
+        .landing-cta-section h2 { font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 12px; }
+        .landing-cta-section p { color: rgba(255,255,255,0.7); margin-bottom: 28px; font-size: 1rem; }
+        .landing-cta-section .landing-btn-primary { background: #fff; color: var(--primary); }
+        .landing-cta-section .landing-btn-primary:hover { background: var(--primary-light); transform: translateY(-2px); }
+
+        .landing-footer {
+            background: var(--primary); border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 20px 24px; text-align: center;
+            color: rgba(255,255,255,0.45); font-size: 0.8rem;
+        }
+
+        @media (max-width: 700px) {
+            .landing-features-grid { grid-template-columns: 1fr; }
+            .landing-hero { padding: 60px 20px 70px; }
+            .landing-hero-stats { flex-direction: column; gap: 12px; }
+            .landing-stat-div { display: none; }
+        }
+
         /* ===== Mobile ===== */
         @media (max-width: 700px) {
           .cards-list { gap: 8px; }
@@ -591,6 +739,102 @@
     </style>
 </head>
 <body>
+
+    <!-- ===== LANDING PAGE ===== -->
+    <div class="landing" id="landingPage">
+        <!-- Nav -->
+        <nav class="landing-nav">
+            <div class="landing-nav-inner">
+                <div class="landing-logo">
+                    <i class="fa-solid fa-id-card"></i>
+                    <span>名片王</span>
+                </div>
+                <button class="landing-cta-btn" onclick="document.getElementById('loginScreen').scrollIntoView({behavior:'smooth'})">開始使用</button>
+            </div>
+        </nav>
+
+        <!-- Hero -->
+        <section class="landing-hero">
+            <div class="landing-hero-bg"></div>
+            <div class="landing-hero-content">
+                <div class="landing-hero-badge">專業名片管理</div>
+                <h1 class="landing-hero-title">不再遺漏<br任何重要人脈</h1>
+                <p class="landing-hero-sub">AI OCR 一秒掃描名片，自動整理、終身留存。支援 Telegram 同步，讓你的名片庫隨時隨地都能取用。</p>
+                <div class="landing-hero-actions">
+                    <button class="landing-btn-primary" onclick="document.getElementById('loginScreen').scrollIntoView({behavior:'smooth'})">
+                        <i class="fa-solid fa-arrow-right"></i> 免費開始
+                    </button>
+                    <button class="landing-btn-ghost" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">
+                        了解更多
+                    </button>
+                </div>
+                <div class="landing-hero-stats">
+                    <div class="landing-stat"><span class="landing-stat-num">100%</span><span class="landing-stat-label">本地儲存</span></div>
+                    <div class="landing-stat-div"></div>
+                    <div class="landing-stat"><span class="landing-stat-num">AI</span><span class="landing-stat-label">OCR 辨識</span></div>
+                    <div class="landing-stat-div"></div>
+                    <div class="landing-stat"><span class="landing-stat-num">Telegram</span><span class="landing-stat-label">同步備份</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section class="landing-features" id="features">
+            <div class="landing-features-inner">
+                <div class="landing-section-label">核心功能</div>
+                <h2 class="landing-section-title">一行名片，掌控所有人脈</h2>
+                <div class="landing-features-grid">
+                    <div class="landing-feature-card">
+                        <div class="landing-feature-icon"><i class="fa-solid fa-camera"></i></div>
+                        <h3>AI OCR 掃描</h3>
+                        <p>一拍即識別！相機對準名片，AI 自動提取姓名、公司、職稱、電話、Email，零誤差入庫。</p>
+                    </div>
+                    <div class="landing-feature-card">
+                        <div class="landing-feature-icon"><i class="fa-solid fa-mobile-screen"></i></div>
+                        <h3>Telegram 同步</h3>
+                        <p>綁定 Telegram Bot，名片資料雲端備份，隨時查詢、分享，再也不怕資料遺失。</p>
+                    </div>
+                    <div class="landing-feature-card">
+                        <div class="landing-feature-icon"><i class="fa-solid fa-qrcode"></i></div>
+                        <h3>QR Code 分享</h3>
+                        <p>一鍵生成個人 QR Code 名片，別人掃描即可存入聯絡人，交換名片面對面 instant。</p>
+                    </div>
+                    <div class="landing-feature-card">
+                        <div class="landing-feature-icon"><i class="fa-solid fa-folder-open"></i></div>
+                        <h3>分類管理</h3>
+                        <p>公司、產業標籤自訂維護，多維度檢索，找名片不再大海撈針。</p>
+                    </div>
+                    <div class="landing-feature-card">
+                        <div class="landing-feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                        <h3>資料安全</h3>
+                        <p>100% 本地儲存，僅你自己可存取。支援匯出 vCard，跨平台通用。</p>
+                    </div>
+                    <div class="landing-feature-card">
+                        <div class="landing-feature-icon"><i class="fa-solid fa-language"></i></div>
+                        <h3>多語言支援</h3>
+                        <p>繁體中文、簡體中文、英文、日文、韓文名片，AI 智能識別語言自動轉寫。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bottom CTA -->
+        <section class="landing-cta-section">
+            <div class="landing-cta-inner">
+                <h2>準備好管理你的人脈了嗎？</h2>
+                <p>完全免費，無需信用卡，立即開始</p>
+                <button class="landing-btn-primary" onclick="document.getElementById('loginScreen').scrollIntoView({behavior:'smooth'})">
+                    <i class="fa-solid fa-arrow-right"></i> 開始使用
+                </button>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="landing-footer">
+            <span>© 2026 名片王 Business Card Manager</span>
+        </footer>
+    </div>
+
     <div class="login-screen" id="loginScreen">
         <div class="login-box">
             <div class="login-logo">
