@@ -6,251 +6,598 @@
     <title>名片王 - Business Card Manager</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <style>
-        /* ===== Premium Design System ===== */
+        /* ===== Design System — Professional Corporate ===== */
         :root {
-          --primary: #0071e3;
-          --primary-dark: #0055b8;
-          --primary-light: #e8f2fd;
-          --accent: #30d158;
-          --accent-light: #e8f9eb;
-          --danger: #ff3b30;
-          --danger-light: #fff0ef;
-          --text: #1d1d1f;
-          --text2: #6e6e73;
-          --text3: #86868b;
-          --bg: #f5f5f7;
-          --bg2: #e8e8ed;
+          --primary: #1b3a6b;
+          --primary-mid: #244f9a;
+          --primary-light: #e8edf7;
+          --accent: #c0392b;
+          --accent-light: #fdf0ef;
+          --green: #1a7a4a;
+          --green-light: #edf7f2;
+          --text: #1a1a2e;
+          --text2: #4a4a6a;
+          --text3: #9090a8;
+          --bg: #f0f2f5;
+          --bg2: #e2e6ed;
           --card: #ffffff;
-          --border: #d2d2d7;
-          --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-          --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.05);
-          --shadow-lg: 0 12px 40px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.07);
-          --shadow-xl: 0 24px 64px rgba(0,0,0,0.15), 0 8px 24px rgba(0,0,0,0.09);
-          --radius-sm: 8px;
-          --radius-md: 14px;
-          --radius-lg: 20px;
-          --radius-xl: 28px;
-          --header-bg: linear-gradient(135deg, #0f1117 0%, #1a1a2e 50%, #16213e 100%);
+          --border: #dde1e9;
+          --border-strong: #c4cad6;
+          --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
+          --shadow-sm: 0 1px 4px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+          --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.05);
+          --shadow-lg: 0 8px 28px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
+          --radius-sm: 4px;
+          --radius-md: 8px;
+          --radius-lg: 12px;
+          --header-bg: #ffffff;
+          --header-border: #dde1e9;
+          --font-main: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+        body {
+          font-family: var(--font-main);
+          background: var(--bg);
+          color: var(--text);
+          min-height: 100vh;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
 
-        /* Subtle transitions */
-        *, *::before, *::after { transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease; }
+        *, *::before, *::after { transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease; }
 
-        /* Custom scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--bg2); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
 
-        /* Focus visible */
-        :focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; border-radius: var(--radius-sm); }
+        :focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
         /* ===== Login Screen ===== */
-        .login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; background: linear-gradient(160deg, #f0f4ff 0%, #f5f5f7 40%, #e8f9eb 100%); }
+        .login-screen {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 100vh;
+          padding: 20px;
+          background: linear-gradient(145deg, #e8edf7 0%, #f0f2f5 50%, #edf7f2 100%);
+        }
         .login-screen.hidden { display: none; }
-        .login-box { background: var(--card); border-radius: var(--radius-xl); padding: 40px; width: 100%; max-width: 420px; box-shadow: var(--shadow-xl); border: 1px solid rgba(0,113,227,0.08); }
-        .login-box h1 { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 10px; letter-spacing: -0.3px; }
-        .login-box .subtitle { text-align: center; color: var(--text2); font-size: 13px; margin-bottom: 28px; letter-spacing: 0.2px; }
-
-        /* ===== Form Elements ===== */
-        .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .form-group input, .form-group select { width: 100%; padding: 13px 15px; border: 1.5px solid var(--border); border-radius: var(--radius-md); font-size: 14px; font-family: inherit; background: var(--card); color: var(--text); }
-        .form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(0,113,227,0.1); }
+        .login-box {
+          background: var(--card);
+          border-radius: var(--radius-lg);
+          padding: 44px 40px;
+          width: 100%;
+          max-width: 400px;
+          box-shadow: var(--shadow-lg);
+          border: 1px solid var(--border);
+        }
+        .login-logo {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 8px;
+        }
+        .login-logo-icon {
+          width: 40px;
+          height: 40px;
+          background: var(--primary);
+          border-radius: var(--radius-md);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #fff;
+          font-size: 18px;
+        }
+        .login-logo-text {
+          font-size: 20px;
+          font-weight: 700;
+          color: var(--text);
+          letter-spacing: -0.3px;
+        }
+        .login-subtitle {
+          color: var(--text3);
+          font-size: 13px;
+          margin-bottom: 32px;
+          padding-left: 52px;
+          letter-spacing: 0.2px;
+        }
+        .login-tabs {
+          display: flex;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-md);
+          overflow: hidden;
+          margin-bottom: 28px;
+        }
+        .login-tabs button {
+          flex: 1;
+          padding: 11px;
+          border: none;
+          background: transparent;
+          font-size: 13.5px;
+          font-weight: 500;
+          cursor: pointer;
+          color: var(--text2);
+          font-family: inherit;
+        }
+        .login-tabs button.active {
+          background: var(--primary);
+          color: #fff;
+        }
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+          display: block;
+          font-size: 12px;
+          font-weight: 600;
+          color: var(--text2);
+          margin-bottom: 6px;
+          letter-spacing: 0.3px;
+          text-transform: uppercase;
+        }
+        .form-group input, .form-group select {
+          width: 100%;
+          padding: 11px 14px;
+          border: 1.5px solid var(--border);
+          border-radius: var(--radius-sm);
+          font-size: 14px;
+          font-family: inherit;
+          background: var(--card);
+          color: var(--text);
+        }
+        .form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(27,58,107,0.08); }
         .form-group input::placeholder { color: var(--text3); }
-
-        /* ===== Buttons ===== */
-        .btn { width: 100%; padding: 14px 20px; border: none; border-radius: var(--radius-md); font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; letter-spacing: 0.2px; }
-        .btn:active { transform: scale(0.97); }
-        .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 2px 8px rgba(0,113,227,0.3); }
-        .btn-primary:hover { background: var(--primary-dark); box-shadow: 0 4px 16px rgba(0,113,227,0.4); }
-        .btn-scan { background: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(48,209,88,0.3); margin-top: 12px; }
-        .btn-scan:hover { background: #28b84a; box-shadow: 0 4px 16px rgba(48,209,88,0.4); }
-
-        .login-tabs { display: flex; margin-bottom: 24px; background: var(--bg); border-radius: var(--radius-md); padding: 4px; }
-        .login-tabs button { flex: 1; padding: 10px; border: none; background: transparent; font-size: 14px; font-weight: 500; cursor: pointer; border-radius: calc(var(--radius-md) - 4px); color: var(--text2); }
-        .login-tabs button.active { background: var(--card); color: var(--text); box-shadow: var(--shadow-sm); }
-
-        .error-msg { color: var(--danger); font-size: 12px; margin-top: 8px; display: none; font-weight: 500; }
+        .btn { width: 100%; padding: 12px 20px; border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; letter-spacing: 0.2px; }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-mid); }
+        .btn-accent { background: var(--accent); color: #fff; }
+        .btn-accent:hover { background: #a93226; }
+        .btn-ghost { background: var(--bg); color: var(--text2); border: 1px solid var(--border); }
+        .btn-ghost:hover { background: var(--bg2); }
+        .error-msg { color: var(--accent); font-size: 12px; margin-top: 6px; display: none; font-weight: 500; }
         .error-msg.show { display: block; }
 
         /* ===== Header ===== */
-        .header { background: var(--header-bg); padding: 14px 20px; color: #fff; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); backdrop-filter: blur(20px); }
+        .header {
+          background: var(--header-bg);
+          border-bottom: 1px solid var(--header-border);
+          padding: 0 24px;
+          height: 60px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          position: sticky;
+          top: 0;
+          z-index: 50;
+          box-shadow: var(--shadow-xs);
+        }
         .header.hidden { display: none; }
-        .header h1 { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; letter-spacing: -0.2px; }
-        .header-brand { display: flex; align-items: center; gap: 10px; }
-        .header-brand-icon { width: 34px; height: 34px; background: linear-gradient(135deg, var(--accent) 0%, #20b04d 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 2px 8px rgba(48,209,88,0.4); }
-        .header-divider { width: 1px; height: 20px; background: rgba(255,255,255,0.15); margin: 0 4px; }
-        .logout-btn { padding: 7px 14px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.12); border-radius: var(--radius-sm); color: #fff; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; backdrop-filter: blur(8px); }
-        .logout-btn:hover { background: rgba(255,255,255,0.18); }
-        .header-sync-btn { padding: 7px 14px; background: rgba(48,209,88,0.2); border: 1px solid rgba(48,209,88,0.25); border-radius: var(--radius-sm); color: var(--accent); font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; backdrop-filter: blur(8px); }
-        .header-sync-btn:hover { background: rgba(48,209,88,0.28); }
+        .header-left { display: flex; align-items: center; gap: 14px; }
+        .header-logo {
+          width: 34px;
+          height: 34px;
+          background: var(--primary);
+          border-radius: var(--radius-sm);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #fff;
+          font-size: 16px;
+        }
+        .header-title {
+          font-size: 15px;
+          font-weight: 700;
+          color: var(--text);
+          letter-spacing: -0.2px;
+        }
+        .header-right { display: flex; align-items: center; gap: 8px; }
+        .header-user {
+          font-size: 13px;
+          color: var(--text2);
+          margin-right: 4px;
+        }
+        .header-btn {
+          padding: 7px 14px;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-sm);
+          background: transparent;
+          font-size: 12.5px;
+          font-weight: 500;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          color: var(--text2);
+          font-family: inherit;
+        }
+        .header-btn:hover { background: var(--bg); border-color: var(--border-strong); color: var(--text); }
+        .header-btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .header-btn.primary:hover { background: var(--primary-mid); }
 
         /* ===== Container ===== */
-        .container { max-width: 880px; margin: 0 auto; padding: 24px 20px 120px; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 28px 24px 120px; }
         .container.hidden { display: none; }
 
-        /* ===== FABs ===== */
-        .scan-fab { position: fixed; bottom: 92px; right: 24px; width: 52px; height: 52px; background: var(--card); border: 1.5px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--text2); box-shadow: var(--shadow-lg); cursor: pointer; z-index: 100; }
-        .scan-fab:hover { color: var(--accent); border-color: var(--accent); box-shadow: 0 6px 24px rgba(48,209,88,0.2); transform: scale(1.08); }
-        .scan-fab.hidden { display: none; }
+        /* ===== Toolbar ===== */
+        .toolbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          margin-bottom: 24px;
+          flex-wrap: wrap;
+        }
+        .search-box {
+          background: var(--card);
+          border: 1.5px solid var(--border);
+          border-radius: var(--radius-md);
+          padding: 10px 14px;
+          display: flex;
+          gap: 8px;
+          flex: 1;
+          min-width: 240px;
+          max-width: 480px;
+          box-shadow: var(--shadow-xs);
+        }
+        .search-box:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(27,58,107,0.07); }
+        .search-box input {
+          flex: 1;
+          border: none;
+          outline: none;
+          font-size: 13.5px;
+          font-family: inherit;
+          color: var(--text);
+          background: transparent;
+        }
+        .search-box input::placeholder { color: var(--text3); }
+        .search-box i { color: var(--text3); font-size: 13px; align-self: center; }
+        .toolbar-right { display: flex; gap: 8px; align-items: center; }
+        .toolbar-btn {
+          padding: 9px 16px;
+          border: 1.5px solid var(--border);
+          border-radius: var(--radius-sm);
+          background: var(--card);
+          font-size: 13px;
+          font-weight: 500;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          color: var(--text2);
+          font-family: inherit;
+          box-shadow: var(--shadow-xs);
+        }
+        .toolbar-btn:hover { background: var(--bg); border-color: var(--border-strong); color: var(--text); }
+        .toolbar-btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 2px 6px rgba(27,58,107,0.25); }
+        .toolbar-btn.primary:hover { background: var(--primary-mid); border-color: var(--primary-mid); }
 
-        .add-btn { position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #fff; box-shadow: 0 6px 24px rgba(0,113,227,0.4); cursor: pointer; z-index: 100; }
-        .add-btn:hover { transform: scale(1.08); box-shadow: 0 10px 32px rgba(0,113,227,0.5); }
-        .add-btn:active { transform: scale(0.95); }
-        .add-btn.hidden { display: none; }
+        /* ===== Stats Row ===== */
+        .stats-row {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
+          margin-bottom: 28px;
+        }
+        .stat-card {
+          background: var(--card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-md);
+          padding: 20px 22px;
+          box-shadow: var(--shadow-xs);
+          display: flex;
+          align-items: center;
+          gap: 16px;
+        }
+        .stat-icon {
+          width: 40px;
+          height: 40px;
+          border-radius: var(--radius-sm);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+          flex-shrink: 0;
+        }
+        .stat-icon.blue { background: var(--primary-light); color: var(--primary); }
+        .stat-icon.green { background: var(--green-light); color: var(--green); }
+        .stat-icon.red { background: var(--accent-light); color: var(--accent); }
+        .stat-info .stat-num { font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; line-height: 1; }
+        .stat-info .stat-label { font-size: 12px; color: var(--text3); margin-top: 4px; font-weight: 500; }
 
-        /* ===== Search Box ===== */
-        .search-box { background: var(--card); border-radius: var(--radius-lg); padding: 14px 16px; margin-bottom: 20px; display: flex; gap: 10px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); }
-        .search-box input { flex: 1; padding: 10px 14px; border: 1.5px solid var(--bg2); border-radius: var(--radius-md); font-size: 14px; background: var(--bg); }
-        .search-box input:focus { outline: none; border-color: var(--primary); background: var(--card); }
+        /* ===== Section Header ===== */
+        .section-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 14px;
+        }
+        .section-title { font-size: 13px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; }
 
-        /* ===== Stats ===== */
-        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
-        .stat-card { background: var(--card); border-radius: var(--radius-lg); padding: 20px 16px; text-align: center; box-shadow: var(--shadow-sm); border: 1px solid rgba(0,0,0,0.04); }
-        .stat-card-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 15px; }
-        .stat-card .num { font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
-        .stat-card .label { font-size: 11px; color: var(--text3); margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+        /* ===== Cards Table/List ===== */
+        .cards-list { display: flex; flex-direction: column; gap: 10px; }
+        .card-item {
+          background: var(--card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-md);
+          padding: 20px 22px;
+          box-shadow: var(--shadow-xs);
+          display: flex;
+          align-items: center;
+          gap: 18px;
+          cursor: default;
+        }
+        .card-item:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); }
 
-        /* ===== Cards Grid ===== */
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
-        .card-item { background: var(--card); border-radius: var(--radius-lg); padding: 22px; box-shadow: var(--shadow-md); border: 1px solid rgba(0,0,0,0.04); cursor: default; }
-        .card-item:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: rgba(0,113,227,0.08); }
-
-        /* Card avatar initials */
-        .card-avatar { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; color: #fff; flex-shrink: 0; }
-        .card-header-row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
-        .card-header-info { flex: 1; min-width: 0; }
-        .card-name { font-size: 17px; font-weight: 700; letter-spacing: -0.2px; }
-        .card-title { font-size: 13px; color: var(--primary); margin-top: 3px; font-weight: 500; }
-        .card-company { font-size: 13px; color: var(--text3); margin-top: 3px; }
-
-        /* Category badge */
-        .card-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; margin-top: 10px; letter-spacing: 0.2px; }
+        .card-avatar {
+          width: 48px;
+          height: 48px;
+          border-radius: var(--radius-sm);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          font-size: 15px;
+          color: #fff;
+          flex-shrink: 0;
+          letter-spacing: -0.3px;
+        }
+        .card-body { flex: 1; min-width: 0; }
+        .card-name-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .card-name { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
+        .card-badge {
+          display: inline-flex;
+          align-items: center;
+          padding: 2px 9px;
+          border-radius: 3px;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.2px;
+        }
         .badge-client { background: var(--primary-light); color: var(--primary); }
-        .badge-supplier { background: var(--accent-light); color: #1a9c3a; }
-        .badge-colleague { background: rgba(255,149,0,0.1); color: #d68000; }
-        .badge-prospect { background: rgba(175,82,222,0.1); color: #8a3dc4; }
+        .badge-supplier { background: var(--green-light); color: var(--green); }
+        .badge-colleague { background: #fef3e2; color: #b36000; }
+        .badge-prospect { background: #f3e8fe; color: #7c3aed; }
         .badge-other { background: var(--bg); color: var(--text3); }
+        .card-meta { display: flex; align-items: center; gap: 16px; margin-top: 5px; flex-wrap: wrap; }
+        .card-meta-item { display: flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--text2); }
+        .card-meta-item i { width: 13px; text-align: center; color: var(--text3); font-size: 11px; }
+        .card-image-thumb {
+          width: 56px;
+          height: 40px;
+          object-fit: cover;
+          border-radius: var(--radius-sm);
+          border: 1px solid var(--border);
+          flex-shrink: 0;
+        }
+        .card-actions { display: flex; gap: 6px; flex-shrink: 0; margin-left: auto; }
+        .card-actions button {
+          width: 34px;
+          height: 34px;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-sm);
+          background: transparent;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12.5px;
+          color: var(--text2);
+        }
+        .card-actions button:hover { background: var(--bg); color: var(--text); }
+        .card-actions .btn-delete-action:hover { background: var(--accent-light); color: var(--accent); border-color: #f5c6c3; }
+        .btn:active { transform: scale(0.97); }
 
-        /* Card info rows with icons */
-        .card-info { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--bg); }
-        .card-info-row { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; font-size: 13px; color: var(--text2); }
-        .card-info-row i { width: 16px; text-align: center; color: var(--text3); font-size: 12px; flex-shrink: 0; }
-        .card-info-row span.val { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-        .card-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 16px; }
-        .card-actions button { padding: 9px; border: none; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .btn-edit { background: var(--bg); color: var(--text2); }
-        .btn-edit:hover { background: var(--bg2); color: var(--text); }
-        .btn-share { background: var(--primary-light); color: var(--primary); }
-        .btn-share:hover { background: #d4e9fc; }
-        .btn-delete { background: var(--danger-light); color: var(--danger); }
-        .btn-delete:hover { background: #ffe0df; }
-
-        /* Button press effect */
-        .btn:active, .card-actions button:active { transform: scale(0.95); }
+        /* ===== FAB ===== */
+        .fab {
+          position: fixed;
+          bottom: 28px;
+          right: 28px;
+          width: 52px;
+          height: 52px;
+          background: var(--primary);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 20px;
+          color: #fff;
+          box-shadow: 0 4px 16px rgba(27,58,107,0.35);
+          cursor: pointer;
+          z-index: 100;
+          border: none;
+        }
+        .fab:hover { background: var(--primary-mid); box-shadow: 0 6px 24px rgba(27,58,107,0.4); transform: scale(1.06); }
+        .fab:active { transform: scale(0.96); }
+        .fab.hidden { display: none; }
 
         /* ===== Modal ===== */
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,20,40,0.45); backdrop-filter: blur(4px); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
         .modal.show { display: flex; }
-        .modal-content { background: var(--card); border-radius: var(--radius-xl); padding: 28px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-xl); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--bg); }
-        .modal-header h2 { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-        .modal-close { width: 32px; height: 32px; border: none; background: var(--bg); border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text2); }
-        .modal-close:hover { background: var(--bg2); color: var(--text); }
-
+        .modal-content {
+          background: var(--card);
+          border-radius: var(--radius-lg);
+          padding: 32px;
+          width: 100%;
+          max-width: 520px;
+          max-height: 90vh;
+          overflow-y: auto;
+          box-shadow: var(--shadow-lg);
+          border: 1px solid var(--border);
+          animation: modalIn 0.22s cubic-bezier(0.34, 1.4, 0.64, 1);
+        }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+        .modal-header h2 { font-size: 16px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+        .modal-header h2 i { color: var(--primary); }
+        .modal-close {
+          width: 30px;
+          height: 30px;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-sm);
+          background: transparent;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+          color: var(--text2);
+        }
+        .modal-close:hover { background: var(--bg); color: var(--text); }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        .modal-actions { display: flex; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--bg); }
-        .modal-actions button { flex: 1; padding: 14px; border: none; border-radius: var(--radius-md); font-size: 14px; font-weight: 600; cursor: pointer; }
-        .btn-save { background: var(--primary); color: #fff; box-shadow: 0 2px 8px rgba(0,113,227,0.3); }
-        .btn-save:hover { background: var(--primary-dark); }
-        .btn-cancel { background: var(--bg); color: var(--text2); }
+        .modal-actions { display: flex; gap: 10px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+        .modal-actions button { flex: 1; padding: 12px; border: none; border-radius: var(--radius-sm); font-size: 13.5px; font-weight: 600; cursor: pointer; font-family: inherit; }
+        .btn-save { background: var(--primary); color: #fff; }
+        .btn-save:hover { background: var(--primary-mid); }
+        .btn-cancel { background: var(--bg); color: var(--text2); border: 1px solid var(--border); }
         .btn-cancel:hover { background: var(--bg2); color: var(--text); }
+        .btn-scan-modal { background: var(--accent); color: #fff; }
+        .btn-scan-modal:hover { background: #a93226; }
+
+        /* ===== Image Upload ===== */
+        .image-upload-row { display: flex; gap: 10px; margin-top: 10px; }
+        .image-upload-row button { flex: 1; padding: 10px; border: 1.5px dashed var(--border-strong); border-radius: var(--radius-sm); background: var(--bg); font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--text2); font-family: inherit; }
+        .image-upload-row button:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+        #fileUpload { display: none; }
+        #imagePreviewContainer { display: none; margin-top: 12px; }
+        .image-preview-wrap { position: relative; display: inline-block; }
+        #imagePreview { max-width: 200px; max-height: 130px; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+        .image-preview-wrap .remove-img {
+          position: absolute;
+          top: -8px;
+          right: -8px;
+          width: 22px;
+          height: 22px;
+          background: var(--accent);
+          color: #fff;
+          border: none;
+          border-radius: 50%;
+          font-size: 11px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
 
         /* ===== Scan Modal ===== */
         .scan-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 300; }
         .scan-modal.show { display: block; }
         .scan-view { width: 100%; height: 100%; position: relative; }
         .scan-view video { width: 100%; height: 100%; object-fit: cover; }
-        .scan-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; height: 50%; border: 2px dashed var(--accent); border-radius: 16px; pointer-events: none; }
-        .scan-hint { position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); color: #fff; font-size: 14px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .scan-frame {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 88%;
+          height: 48%;
+          border: 2px solid rgba(255,255,255,0.6);
+          border-radius: 8px;
+        }
+        .scan-corner { position: absolute; width: 24px; height: 24px; border-color: #fff; border-style: solid; }
+        .scan-corner.tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
+        .scan-corner.tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; border-radius: 0 4px 0 0; }
+        .scan-corner.bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; border-radius: 0 0 0 4px; }
+        .scan-corner.br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
+        .scan-hint { position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.85); font-size: 13px; white-space: nowrap; letter-spacing: 0.3px; }
         .scan-buttons { position: absolute; bottom: 40px; left: 0; right: 0; display: flex; justify-content: center; gap: 20px; }
-        .scan-btn { width: 70px; height: 70px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.5); background: transparent; cursor: pointer; }
-        .scan-btn.capture { width: 80px; height: 80px; background: #fff; border-color: #fff; }
-        .scan-btn.close { position: absolute; top: 20px; left: 20px; width: 44px; height: 44px; border-radius: 50%; background: rgba(0,0,0,0.5); color: #fff; border: none; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+        .scan-btn { width: 64px; height: 64px; border-radius: 50%; border: 2.5px solid rgba(255,255,255,0.5); background: transparent; cursor: pointer; }
+        .scan-btn.capture { width: 74px; height: 74px; background: #fff; border-color: #fff; }
+        .scan-btn.close-btn { position: absolute; top: 20px; left: 20px; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.45); color: #fff; border: none; font-size: 18px; display: flex; align-items: center; justify-content: center; }
 
         .scan-progress { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.92); z-index: 350; align-items: center; justify-content: center; flex-direction: column; color: #fff; }
         .scan-progress.show { display: flex; }
-        .scan-progress .spinner { width: 60px; height: 60px; border: 4px solid rgba(255,255,255,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
-        .scan-progress .text { margin-top: 20px; font-size: 16px; }
-        .scan-progress .percent { margin-top: 10px; font-size: 28px; font-weight: 700; color: var(--accent); }
+        .scan-progress .spinner { width: 52px; height: 52px; border: 3px solid rgba(255,255,255,0.15); border-top-color: var(--primary-light); border-radius: 50%; animation: spin 0.9s linear infinite; }
+        .scan-progress .text { margin-top: 18px; font-size: 14px; color: rgba(255,255,255,0.7); }
+        .scan-progress .percent { margin-top: 10px; font-size: 28px; font-weight: 700; color: #fff; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ===== Empty State ===== */
-        .empty { text-align: center; padding: 80px 20px; color: var(--text3); }
-        .empty-icon { width: 72px; height: 72px; background: var(--bg); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 28px; color: var(--text3); border: 1.5px dashed var(--border); }
-        .empty p { font-size: 14px; margin-top: 4px; }
-
-        /* ===== Toast ===== */
-        .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(120px); background: #1d1d1f; color: #fff; padding: 13px 22px; border-radius: 12px; font-size: 13px; opacity: 0; transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 400; box-shadow: 0 8px 32px rgba(0,0,0,0.25); pointer-events: none; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-        /* ===== Skeleton Loading ===== */
-        .skeleton-card { background: var(--card); border-radius: var(--radius-lg); padding: 22px; animation: shimmer 1.5s infinite; }
-        .skeleton-line { height: 14px; border-radius: 6px; background: linear-gradient(90deg, var(--bg) 25%, #e8e8ed 50%, var(--bg) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
-        .skeleton-line.w-50 { width: 50%; }
-        .skeleton-line.w-70 { width: 70%; }
-        .skeleton-line.w-40 { width: 40%; }
-        .skeleton-line.mt-8 { margin-top: 8px; }
-        .skeleton-line.mt-12 { margin-top: 12px; }
-        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
-        /* ===== Modal Animations ===== */
-        .modal-content { animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        @keyframes modalIn { from { opacity: 0; transform: scale(0.92) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-
-        /* ===== Card Entrance Animation ===== */
-        .cards-grid .card-item { animation: cardIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
-        @keyframes cardIn { from { opacity: 0; transform: translateY(16px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
-
-        /* ===== Scan Overlay Corners ===== */
-        .scan-overlay .corner-tl, .scan-overlay .corner-tr, .scan-overlay .corner-bl, .scan-overlay .corner-br { content: ''; position: absolute; width: 28px; height: 28px; border-color: var(--accent); border-style: solid; border-width: 0; }
-        .scan-overlay .corner-tl { top: -2px; left: -2px; border-top-width: 3px; border-left-width: 3px; border-top-left-radius: 16px; }
-        .scan-overlay .corner-tr { top: -2px; right: -2px; border-top-width: 3px; border-right-width: 3px; border-top-right-radius: 16px; }
-        .scan-overlay .corner-bl { bottom: -2px; left: -2px; border-bottom-width: 3px; border-left-width: 3px; border-bottom-left-radius: 16px; }
-        .scan-overlay .corner-br { bottom: -2px; right: -2px; border-bottom-width: 3px; border-right-width: 3px; border-bottom-right-radius: 16px; }
+        /* ===== Share Modal ===== */
+        .share-qr { display: flex; justify-content: center; margin: 20px 0; }
+        .share-actions { display: flex; gap: 10px; justify-content: center; margin-top: 16px; }
+        .share-actions button { flex: 1; max-width: 160px; padding: 11px; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; }
+        .btn-download { background: var(--primary); color: #fff; }
+        .btn-download:hover { background: var(--primary-mid); }
+        .btn-copy { background: var(--bg); color: var(--text2); border: 1px solid var(--border); }
+        .btn-copy:hover { background: var(--bg2); color: var(--text); }
 
         /* ===== Sync Modal ===== */
-        .sync-info-block { background: var(--bg); border-radius: var(--radius-md); padding: 16px; margin-bottom: 16px; }
+        .sync-info-block { background: var(--bg); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px; border: 1px solid var(--border); }
         .sync-info-block .row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; color: var(--text2); }
         .sync-info-block .row:last-child { margin-bottom: 0; }
-        .sync-info-block .row i { width: 16px; text-align: center; color: var(--text3); }
+        .sync-info-block .row i { width: 14px; text-align: center; color: var(--text3); }
+        .sync-divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
 
-        /* ===== Mobile Responsive ===== */
-        @media (max-width: 600px) {
-          .cards-grid { grid-template-columns: 1fr; }
+        /* ===== Empty State ===== */
+        .empty-state { text-align: center; padding: 80px 20px; color: var(--text3); }
+        .empty-icon {
+          width: 64px;
+          height: 64px;
+          background: var(--bg);
+          border-radius: var(--radius-md);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 18px;
+          font-size: 26px;
+          color: var(--text3);
+          border: 1.5px dashed var(--border-strong);
+        }
+        .empty-state p { font-size: 14px; }
+        .empty-state p.title { font-size: 15px; font-weight: 600; color: var(--text2); margin-bottom: 4px; }
+
+        /* ===== Toast ===== */
+        .toast {
+          position: fixed;
+          bottom: 96px;
+          left: 50%;
+          transform: translateX(-50%) translateY(80px);
+          background: #1a1a2e;
+          color: #fff;
+          padding: 12px 22px;
+          border-radius: var(--radius-md);
+          font-size: 13px;
+          opacity: 0;
+          transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+          z-index: 400;
+          box-shadow: 0 6px 24px rgba(0,0,0,0.2);
+          pointer-events: none;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          white-space: nowrap;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* ===== Mobile ===== */
+        @media (max-width: 700px) {
+          .cards-list { gap: 8px; }
+          .card-item { flex-wrap: wrap; padding: 16px 18px; }
+          .card-body { flex: 1 0 calc(100% - 66px); }
+          .card-image-thumb { display: none; }
+          .card-actions { margin-left: 0; width: 100%; justify-content: flex-end; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+          .stats-row { grid-template-columns: 1fr; gap: 10px; }
           .form-row { grid-template-columns: 1fr; }
-          .stats { gap: 8px; }
-          .stat-card { padding: 14px 10px; }
-          .stat-card .num { font-size: 22px; }
-          .header h1 { font-size: 16px; }
-          .login-box { padding: 28px 24px; }
-          .modal-content { padding: 22px 18px; }
+          .toolbar { flex-direction: column; align-items: stretch; }
+          .search-box { max-width: 100%; }
+          .toolbar-right { justify-content: flex-end; }
+          .login-box { padding: 32px 24px; }
+          .login-subtitle { padding-left: 0; }
+          .modal-content { padding: 24px 18px; }
         }
     </style>
 </head>
 <body>
     <div class="login-screen" id="loginScreen">
         <div class="login-box">
-            <h1><i class="fa-solid fa-id-card-clip" style="color:#0071e3;margin-right:8px;"></i> 名片王</h1>
-            <p class="subtitle">AI 辨識版 - 掃描名片自動輸入</p>
+            <div class="login-logo">
+                <div class="login-logo-icon"><i class="fa-solid fa-id-card"></i></div>
+                <span class="login-logo-text">名片王</span>
+            </div>
+            <p class="login-subtitle">專業名片管理平台</p>
             <div class="login-tabs">
                 <button class="active" id="tabLogin" onclick="showTab('login')">登入</button>
                 <button id="tabRegister" onclick="showTab('register')">註冊</button>
@@ -259,74 +606,94 @@
                 <div class="form-group"><label>帳號</label><input type="text" id="loginUsername" placeholder="輸入帳號"></div>
                 <div class="form-group"><label>密碼</label><input type="password" id="loginPassword" placeholder="輸入密碼"></div>
                 <div class="error-msg" id="loginError"></div>
-                <button class="btn btn-primary" onclick="login()"><i class="fa-solid fa-right-to-bracket" style="margin-right:6px;"></i>登入</button>
+                <button class="btn btn-primary" onclick="login()"><i class="fa-solid fa-arrow-right-to-bracket" style="margin-right:6px;"></i>登入</button>
             </div>
             <div id="registerForm" style="display:none;">
                 <div class="form-group"><label>帳號</label><input type="text" id="regUsername" placeholder="設定帳號"></div>
-                <div class="form-group"><label>密碼</label><input type="password" id="regPassword" placeholder="設定密碼"></div>
+                <div class="form-group"><label>密碼</label><input type="password" id="regPassword" placeholder="設定密碼（至少6碼）"></div>
                 <div class="form-group"><label>確認密碼</label><input type="password" id="regConfirm" placeholder="再次輸入密碼"></div>
                 <div class="error-msg" id="regError"></div>
                 <button class="btn btn-primary" onclick="register()"><i class="fa-solid fa-user-plus" style="margin-right:6px;"></i>註冊</button>
             </div>
         </div>
     </div>
-    
+
     <div class="header hidden" id="header">
-        <h1>
-            <div class="header-brand-icon"><i class="fa-solid fa-id-card-clip"></i></div>
-            <span>名片王</span>
-        </h1>
-        <div style="display:flex;align-items:center;gap:8px;">
-            <span id="welcomeUser" style="font-size:13px;opacity:0.8;"></span>
-            <button class="header-sync-btn" onclick="openSyncModal()" title="Telegram 同步"><i class="fa-brands fa-telegram" style="font-size:13px;"></i> 同步</button>
-            <button class="logout-btn" onclick="logout()"><i class="fa-solid fa-right-from-bracket" style="margin-right:3px;"></i> 登出</button>
+        <div class="header-left">
+            <div class="header-logo"><i class="fa-solid fa-id-card"></i></div>
+            <span class="header-title">名片王</span>
+        </div>
+        <div class="header-right">
+            <span class="header-user" id="welcomeUser"></span>
+            <button class="header-btn" onclick="openSyncModal()"><i class="fa-brands fa-telegram" style="font-size:12px;"></i> 同步</button>
+            <button class="header-btn" onclick="logout()"><i class="fa-solid fa-arrow-right-from-bracket" style="font-size:12px;"></i> 登出</button>
         </div>
     </div>
-    
+
     <div class="container hidden" id="mainContent">
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="搜尋姓名、公司、職稱..." oninput="filterCards()">
-            <button class="btn btn-primary" style="width:auto;padding:12px 20px;" onclick="filterCards()"><i class="fa-solid fa-magnifying-glass" style="margin-right:6px;"></i>搜尋</button>
-        </div>
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-card-icon" style="background:var(--primary-light);color:var(--primary);"><i class="fa-solid fa-address-card"></i></div>
-                <div class="num" id="totalCount">0</div>
-                <div class="label">總名片數</div>
+        <div class="toolbar">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="搜尋姓名、公司、職稱..." oninput="filterCards()">
             </div>
-            <div class="stat-card">
-                <div class="stat-card-icon" style="background:var(--accent-light);color:#1a9c3a;"><i class="fa-solid fa-building"></i></div>
-                <div class="num" id="companyCount">0</div>
-                <div class="label">公司數</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-card-icon" style="background:rgba(255,149,0,0.1);color:#d68000;"><i class="fa-solid fa-calendar-plus"></i></div>
-                <div class="num" id="thisMonth">0</div>
-                <div class="label">本月新增</div>
+            <div class="toolbar-right">
+                <button class="toolbar-btn primary" onclick="openModal()"><i class="fa-solid fa-plus" style="font-size:12px;"></i>新增名片</button>
+                <button class="toolbar-btn" onclick="startScan()"><i class="fa-solid fa-camera" style="font-size:12px;"></i> 掃描</button>
             </div>
         </div>
-        <div class="cards-grid" id="cardsGrid">
-            <div class="empty"><div class="empty-icon"><i class="fa-solid fa-address-card"></i></div><p>尚未建立名片</p><p style="font-size:12px;margin-top:6px;">點擊下方 <i class="fa-solid fa-plus" style="font-size:10px;"></i> 新增名片</p></div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="fa-solid fa-id-card"></i></div>
+                <div class="stat-info"><div class="stat-num" id="totalCount">0</div><div class="stat-label">總名片數</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="fa-solid fa-building"></i></div>
+                <div class="stat-info"><div class="stat-num" id="companyCount">0</div><div class="stat-label">公司數</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon red"><i class="fa-solid fa-calendar-plus"></i></div>
+                <div class="stat-info"><div class="stat-num" id="thisMonth">0</div><div class="stat-label">本月新增</div></div>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <span class="section-title" id="cardsSectionTitle">全部名片</span>
+        </div>
+        <div class="cards-list" id="cardsGrid">
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fa-solid fa-address-card"></i></div>
+                <p class="title">尚無名片</p>
+                <p>點擊「新增名片」開始建立，或使用「掃描」透過相機讀取</p>
+            </div>
         </div>
     </div>
-    
-    <div class="scan-fab hidden" id="scanFab" onclick="startScan()"><i class="fa-solid fa-camera"></i></div>
-    
-    <!-- 分享 Modal -->
+
+    <button class="fab hidden" id="addBtn" onclick="openModal()"><i class="fa-solid fa-plus"></i></button>
+    <div class="toast" id="toast"></div>
+
+    <!-- Share Modal -->
     <div class="modal" id="shareModal">
-        <div class="modal-content" style="text-align:center">
-            <div class="modal-header"><h2><i class="fa-solid fa-share-nodes" style="color:var(--primary);margin-right:8px;"></i> 分享名片</h2><button class="modal-close" onclick="closeShare()">×</button></div>
-            <div id="qrContainer" style="margin:20px auto"></div>
-            <div style="display:flex;gap:10px;justify-content:center;margin-top:20px">
-                <button class="btn btn-primary" style="width:auto;padding:12px 24px" onclick="downloadVCard()"><i class="fa-solid fa-download" style="margin-right:6px;"></i>下載 vCard</button>
-                <button class="btn" style="width:auto;padding:12px 24px;background:var(--bg)" onclick="copyVCard()"><i class="fa-regular fa-copy" style="margin-right:6px;"></i>複製</button>
+        <div class="modal-content" style="text-align:center; max-width:420px;">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-share-nodes"></i> 分享名片</h2>
+                <button class="modal-close" onclick="closeShare()">×</button>
+            </div>
+            <div id="qrContainer" class="share-qr"></div>
+            <div class="share-actions">
+                <button class="btn-download" onclick="downloadVCard()"><i class="fa-solid fa-download"></i> 下載 vCard</button>
+                <button class="btn-copy" onclick="copyVCard()"><i class="fa-regular fa-copy"></i> 複製</button>
             </div>
         </div>
     </div>
-    
+
+    <!-- Card Modal -->
     <div class="modal" id="cardModal">
         <div class="modal-content">
-            <div class="modal-header"><h2 id="modalTitle"><i class="fa-solid fa-pen" style="color:var(--primary);margin-right:8px;"></i>新增名片</h2><button class="modal-close" onclick="closeModal()">×</button></div>
+            <div class="modal-header">
+                <h2 id="modalTitle"><i class="fa-solid fa-pen-to-square"></i>新增名片</h2>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
             <div class="form-row">
                 <div class="form-group"><label>姓名 *</label><input type="text" id="inputName" placeholder="王大明"></div>
                 <div class="form-group"><label>職稱</label><input type="text" id="inputTitle" placeholder="業務經理"></div>
@@ -338,136 +705,461 @@
             </div>
             <div class="form-row">
                 <div class="form-group"><label>LINE</label><input type="text" id="inputLine" placeholder="lineid"></div>
-                <div class="form-group"><label>分類</label><select id="inputCategory"><option value="客戶">客戶</option><option value="供應商">供應商</option><option value="同事">同事</option><option value="潛在客戶">潛在客戶</option><option value="其他">其他</option></select></div>
+                <div class="form-group"><label>分類</label>
+                    <select id="inputCategory">
+                        <option value="客戶">客戶</option>
+                        <option value="供應商">供應商</option>
+                        <option value="同事">同事</option>
+                        <option value="潛在客戶">潛在客戶</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
             </div>
             <div class="form-group"><label>地址</label><input type="text" id="inputAddress" placeholder="台北市信義區忠孝東路一段"></div>
-            <div style="display:flex;gap:10px;margin-top:12px;">
-                <button class="btn btn-scan" onclick="startScanFromModal()" style="flex:1;"><i class="fa-solid fa-camera" style="margin-right:6px;"></i>拍照掃描</button>
-                <button class="btn" onclick="document.getElementById('fileUpload').click()" style="flex:1;background:var(--accent);color:#fff;"><i class="fa-solid fa-image" style="margin-right:6px;"></i>上傳圖片</button>
+            <div class="image-upload-row">
+                <button onclick="startScanFromModal()"><i class="fa-solid fa-camera"></i> 相機掃描</button>
+                <button onclick="document.getElementById('fileUpload').click()"><i class="fa-solid fa-image"></i> 上傳圖片</button>
             </div>
-            <div id="imagePreviewContainer" style="display:none;margin-top:12px;text-align:center;">
-                <img id="imagePreview" style="max-width:100%;max-height:150px;border-radius:10px;border:2px solid var(--border);" />
-                <div id="imageSizeHint" style="font-size:11px;color:var(--text2);margin-top:4px;"></div>
-                <button onclick="clearCardImage()" style="margin-top:6px;padding:4px 12px;background:var(--danger);color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;"><i class="fa-solid fa-xmark" style="margin-right:4px;"></i>移除圖片</button>
+            <div id="imagePreviewContainer">
+                <div class="image-preview-wrap">
+                    <img id="imagePreview" />
+                    <button class="remove-img" onclick="clearCardImage()">×</button>
+                </div>
             </div>
-            <input type="file" id="fileUpload" accept="image/*" style="display:none;" onchange="handleFileUpload(event)">
-            <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-save" onclick="saveCard()"><i class="fa-solid fa-floppy-disk" style="margin-right:6px;"></i>儲存名片</button></div>
+            <input type="file" id="fileUpload" accept="image/*" onchange="handleFileUpload(event)">
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal()">取消</button>
+                <button class="btn-save" onclick="saveCard()"><i class="fa-solid fa-floppy-disk" style="margin-right:5px;"></i>儲存</button>
+            </div>
         </div>
     </div>
-    
+
+    <!-- Scan Modal -->
     <div class="scan-modal" id="scanModal">
         <div class="scan-view">
             <video id="video" autoplay playsinline></video>
             <canvas id="canvas" style="display:none;"></canvas>
-            <div class="scan-overlay"></div>
-            <div class="scan-hint">將名片放入框內</div>
+            <div class="scan-frame">
+                <div class="scan-corner tl"></div>
+                <div class="scan-corner tr"></div>
+                <div class="scan-corner bl"></div>
+                <div class="scan-corner br"></div>
+            </div>
+            <div class="scan-hint">將名片置於框內</div>
             <div class="scan-buttons">
-                <button class="scan-btn close" onclick="closeScan()"><i class="fa-solid fa-xmark"></i></button>
+                <button class="scan-btn close-btn" onclick="closeScan()">×</button>
                 <button class="scan-btn capture" onclick="captureImage()"></button>
             </div>
         </div>
     </div>
-    
     <div class="scan-progress" id="scanProgress">
         <div class="spinner"></div>
         <div class="text">正在辨識名片...</div>
         <div class="percent" id="scanPercent">0%</div>
     </div>
-    
-    <div class="add-btn hidden" id="addBtn" onclick="openModal()"><i class="fa-solid fa-plus"></i></div>
-    <div class="toast" id="toast"></div>
-    
+
     <!-- Sync Modal -->
     <div class="modal" id="syncModal">
         <div class="modal-content">
-            <div class="modal-header"><h2><i class="fa-brands fa-telegram" style="color:#34c759;margin-right:8px;font-size:18px;"></i> Telegram 同步</h2><button class="modal-close" onclick="closeSyncModal()">×</button></div>
+            <div class="modal-header">
+                <h2><i class="fa-brands fa-telegram" style="color:#34c759;"></i> Telegram 同步</h2>
+                <button class="modal-close" onclick="closeSyncModal()">×</button>
+            </div>
             <div style="margin-bottom:20px;">
-                <div style="font-size:14px;color:var(--text2);margin-bottom:16px;">
-                    綁定 Telegram 後，可以透過 Bot 上傳名片照片自動辨識並同步到此帳戶
+                <div style="font-size:14px;color:var(--text2);margin-bottom:16px;line-height:1.6;">
+                    綁定 Telegram Bot，可將拍攝的名片照片自動辨識並同步至此帳戶。
                 </div>
                 <div class="sync-info-block">
-                    <div class="row"><i class="fa-solid fa-circle-check"></i><span>綁定狀態：</span><span id="telegramStatus">載入中...</span></div>
+                    <div class="row"><i class="fa-solid fa-link"></i><span>綁定狀態：</span><span id="telegramStatus">載入中...</span></div>
                 </div>
-                <div class="form-group">
-                    <label>Telegram 使用者名稱</label>
+                <div class="form-group"><label>Telegram 使用者名稱</label>
                     <input type="text" id="telegramUsername" placeholder="輸入 @username（不含 @）">
                 </div>
-                <button class="btn btn-primary" onclick="linkTelegram()">綁定帳戶</button>
-                <hr style="margin:20px 0;border:none;border-top:1px solid var(--border);">
-                <div style="font-size:14px;margin-bottom:12px;">從 Telegram 同步名片</div>
-                <button class="btn" style="background:var(--accent);color:#fff;" onclick="syncFromTelegram()"><i class="fa-solid fa-rotate" style="margin-right:6px;"></i>同步名片</button>
-                <div style="font-size:12px;color:var(--text2);margin-top:12px;">
-                    或在 Telegram 搜尋 <b>@CardKingBot</b> 來上傳名片
+                <button class="btn btn-primary" onclick="linkTelegram()"><i class="fa-solid fa-link" style="margin-right:6px;"></i>綁定帳戶</button>
+                <hr class="sync-divider">
+                <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:12px;">同步名片</div>
+                <button class="btn btn-accent" onclick="syncFromTelegram()"><i class="fa-solid fa-rotate" style="margin-right:6px;"></i>從 Telegram 同步名片</button>
+                <div style="font-size:12px;color:var(--text3);margin-top:12px;">
+                    或在 Telegram 搜尋 <b>@CardKingBot</b> 上傳名片照片
                 </div>
             </div>
         </div>
     </div>
-    
+
     <script>
         let currentUser = null, cards = [], editingId = null, videoStream = null, currentCardImage = null;
-        
+
         function getUsers() { return JSON.parse(localStorage.getItem('cardUsers')) || {}; }
         function saveUsers(users) { localStorage.setItem('cardUsers', JSON.stringify(users)); }
         function getUserCards() { if (!currentUser) return []; return (JSON.parse(localStorage.getItem('businessCards')) || {})[currentUser] || []; }
-        function saveUserCards(cards) { if (!currentUser) return; const all = JSON.parse(localStorage.getItem('businessCards')) || {}; all[currentUser] = cards; try { localStorage.setItem('businessCards', JSON.stringify(all)); } catch (e) { if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_FILE_CANCELED') { showToast('儲存空間已滿！建議移除部分名片圖片或減少圖片數量'); } else { showToast('儲存失敗：' + e.message); } } }
-        
-        function showTab(tab) { document.getElementById('tabLogin').classList.toggle('active', tab==='login'); document.getElementById('tabRegister').classList.toggle('active', tab==='register'); document.getElementById('loginForm').style.display=tab==='login'?'block':'none'; document.getElementById('registerForm').style.display=tab==='register'?'block':'none'; hideError(); }
-        
-        function hashPassword(raw){try{return btoa(unescape(encodeURIComponent(raw)));}catch(e){return raw;}}
-        function register() { const u=document.getElementById('regUsername').value.trim(), p=document.getElementById('regPassword').value, c=document.getElementById('regConfirm').value; if(!u||!p){showError('regError','請填寫所有欄位');return;} if(p.length<6){showError('regError','密碼至少 6 碼');return;} if(p!==c){showError('regError','兩次密碼不一致');return;} const users=getUsers(); if(users[u]){showError('regError','帳號已被註冊');return;} users[u]={password:hashPassword(p), createdAt:new Date().toISOString()}; saveUsers(users); showToast('註冊成功！請登入'); showTab('login'); }
-        
-        function login() { const u=document.getElementById('loginUsername').value.trim(), p=document.getElementById('loginPassword').value; const users=getUsers(); const candidate=users[u]; const hashed=hashPassword(p); if(!candidate||![candidate.password,p].includes(hashed)&&candidate.password!==p){showError('loginError','帳號或密碼錯誤');return;} if(candidate.password===p){candidate.password=hashed; saveUsers(users);} currentUser=u; localStorage.setItem('currentUser',u); document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('header').classList.remove('hidden'); document.getElementById('mainContent').classList.remove('hidden'); document.getElementById('addBtn').classList.remove('hidden'); document.getElementById('scanFab').classList.remove('hidden'); document.getElementById('welcomeUser').textContent='你好，'+u; cards=getUserCards(); renderCards(); updateStats(); }
-        
-        function logout(){currentUser=null;localStorage.removeItem('currentUser');document.getElementById('loginScreen').classList.remove('hidden');document.getElementById('header').classList.add('hidden');document.getElementById('mainContent').classList.add('hidden');document.getElementById('addBtn').classList.add('hidden');document.getElementById('scanFab').classList.add('hidden');hideError();}
-        function showError(id,msg){document.getElementById(id).textContent=msg;document.getElementById(id).classList.add('show');}
-        function hideError(){document.getElementById('loginError').classList.remove('show');document.getElementById('regError').classList.remove('show');}
-        
-        function updateStats(){document.getElementById('totalCount').textContent=cards.length;document.getElementById('companyCount').textContent=[...new Set(cards.map(c=>c.company).filter(c=>c))].length;document.getElementById('thisMonth').textContent=cards.filter(c=>c.createdAt&&new Date(c.createdAt).getMonth()===new Date().getMonth()&&new Date(c.createdAt).getFullYear()===new Date().getFullYear()).length;}
-        
-        function escapeHtml(text){return String(text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
-        function getAvatarColor(name){const colors=['#0071e3','#34c759','#ff9500','#af52de','#ff3b30','#5ac8fa','#ffcc00'];let hash=0;for(let i=0;i<(name||'').length;i++)hash=name.charCodeAt(i)+((hash<<5)-hash);return colors[Math.abs(hash)%colors.length];}
-        function getInitials(name){return (name||'未知').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();}
-        function getBadgeClass(category){return{客戶:'badge-client',供應商:'badge-supplier',同事:'badge-colleague',潛在客戶:'badge-prospect',其他:'badge-other'}[category]||'badge-other';}
-        function renderCards(f=''){const grid=document.getElementById('cardsGrid');const q=(f||'').toLowerCase();const filtered=cards.filter(c=>!q||(c.name||'').toLowerCase().includes(q)||(c.company||'').toLowerCase().includes(q)||(c.title||'').toLowerCase().includes(q)||(c.email||'').toLowerCase().includes(q));if(filtered.length===0){grid.innerHTML='<div class="empty"><div class="empty-icon"><i class="fa-solid fa-address-card"></i></div><p>'+(q?'找不到符合的名片':'尚未建立名片')+'</p></div>';return;}grid.innerHTML=filtered.map((c,i)=>'<div class="card-item" style="animation-delay:'+(i*60)+'ms">'+(c.image?'<div style="text-align:center;margin-bottom:12px;"><img src="'+c.image+'" style="width:100%;max-height:120px;object-fit:cover;border-radius:10px;" /></div>':'')+'<div class="card-header-row"><div class="card-avatar" style="background:'+getAvatarColor(c.name)+'">'+getInitials(c.name)+'</div><div class="card-header-info"><div class="card-name">'+escapeHtml(c.name||'未命名')+'</div><div class="card-title">'+escapeHtml(c.title||'')+'</div><div class="card-company">'+escapeHtml(c.company||'')+'</div></div></div><div><span class="card-badge '+getBadgeClass(c.category)+'"><i class="fa-solid fa-tag" style="font-size:9px;"></i> '+escapeHtml(c.category||'其他')+'</span></div><div class="card-info">'+(c.phone?'<div class="card-info-row"><i class="fa-solid fa-phone"></i><span class="val">'+escapeHtml(c.phone)+'</span></div>':'')+(c.email?'<div class="card-info-row"><i class="fa-solid fa-envelope"></i><span class="val">'+escapeHtml(c.email)+'</span></div>':'')+(c.line?'<div class="card-info-row"><i class="fa-brands fa-line"></i><span class="val">'+escapeHtml(c.line)+'</span></div>':'')+'</div><div class="card-actions"><button class="btn-edit" onclick="editCard(\''+c.id+'\')"><i class="fa-solid fa-pen" style="font-size:11px;"></i> 編輯</button><button class="btn-share" onclick="showShareModal(\''+c.id+'\')"><i class="fa-solid fa-share-nodes" style="font-size:11px;"></i> 分享</button><button class="btn-delete" onclick="deleteCard(\''+c.id+'\')"><i class="fa-solid fa-trash" style="font-size:11px;"></i> 刪除</button></div></div>').join('');}
-        
-        function filterCards(){renderCards(document.getElementById('searchInput').value);}
-        
-        function openModal(card=null){editingId=card?.id||null;document.getElementById('modalTitle').innerHTML='<i class="fa-solid fa-pen" style="color:var(--primary);margin-right:8px;"></i>'+(card?'編輯名片':'新增名片');document.getElementById('inputName').value=card?.name||'';document.getElementById('inputTitle').value=card?.title||'';document.getElementById('inputCompany').value=card?.company||'';document.getElementById('inputPhone').value=card?.phone||'';document.getElementById('inputEmail').value=card?.email||'';document.getElementById('inputLine').value=card?.line||'';document.getElementById('inputCategory').value=card?.category||'客戶';document.getElementById('inputAddress').value=card?.address||'';if(card?.image){currentCardImage=card.image;document.getElementById('imagePreview').src=card.image;document.getElementById('imagePreviewContainer').style.display='block';}else{clearCardImage();}document.getElementById('cardModal').classList.add('show');}
-        function closeModal(){document.getElementById('cardModal').classList.remove('show');editingId=null;clearCardImage();}
-        
-        function saveCard(){const name=document.getElementById('inputName').value.trim();if(!name){showToast('請輸入姓名');return;}const existingCard=editingId?cards.find(c=>c.id===editingId):null;const cardData={id:editingId||Date.now().toString(),name:name,title:document.getElementById('inputTitle').value.trim(),company:document.getElementById('inputCompany').value.trim(),phone:document.getElementById('inputPhone').value.trim(),email:document.getElementById('inputEmail').value.trim(),line:document.getElementById('inputLine').value.trim(),category:document.getElementById('inputCategory').value,address:document.getElementById('inputAddress').value.trim(),image:currentCardImage||existingCard?.image||null,createdAt:editingId?cards.find(c=>c.id===editingId)?.createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};if(editingId){cards[cards.findIndex(c=>c.id===editingId)]=cardData;showToast('名片已更新');}else{cards.unshift(cardData);showToast('名片已新增');}saveUserCards(cards);renderCards();updateStats();closeModal();}
-        function editCard(id){const c=cards.find(x=>x.id===id);if(c)openModal(c);}
-        function deleteCard(id){if(confirm('確定要刪除這張名片嗎？')){cards=cards.filter(x=>x.id!==id);saveUserCards(cards);renderCards();updateStats();showToast('名片已刪除');}}
-        function showToast(msg){const t=document.getElementById('toast');t.innerHTML=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
-        
-        // 分享功能
+        function saveUserCards(cards) {
+            if (!currentUser) return;
+            const all = JSON.parse(localStorage.getItem('businessCards')) || {};
+            all[currentUser] = cards;
+            try { localStorage.setItem('businessCards', JSON.stringify(all)); }
+            catch (e) {
+                if (e.name === 'QuotaExceededError') showToast('儲存空間已滿，請移除部分名片圖片');
+                else showToast('儲存失敗：' + e.message);
+            }
+        }
+
+        function showTab(tab) {
+            document.getElementById('tabLogin').classList.toggle('active', tab==='login');
+            document.getElementById('tabRegister').classList.toggle('active', tab==='register');
+            document.getElementById('loginForm').style.display=tab==='login'?'block':'none';
+            document.getElementById('registerForm').style.display=tab==='register'?'block':'none';
+            hideError();
+        }
+
+        function hashPassword(raw) {
+            try { return btoa(unescape(encodeURIComponent(raw))); }
+            catch(e) { return raw; }
+        }
+
+        function register() {
+            const u = document.getElementById('regUsername').value.trim();
+            const p = document.getElementById('regPassword').value;
+            const c = document.getElementById('regConfirm').value;
+            if (!u || !p) { showError('regError', '請填寫所有欄位'); return; }
+            if (p.length < 6) { showError('regError', '密碼至少 6 碼'); return; }
+            if (p !== c) { showError('regError', '兩次密碼不一致'); return; }
+            const users = getUsers();
+            if (users[u]) { showError('regError', '帳號已被註冊'); return; }
+            users[u] = { password: hashPassword(p), createdAt: new Date().toISOString() };
+            saveUsers(users);
+            showToast('註冊成功！請登入');
+            showTab('login');
+        }
+
+        function login() {
+            const u = document.getElementById('loginUsername').value.trim();
+            const p = document.getElementById('loginPassword').value;
+            const users = getUsers();
+            const candidate = users[u];
+            const hashed = hashPassword(p);
+            if (!candidate || ![candidate.password, p].includes(hashed) && candidate.password !== p) {
+                showError('loginError', '帳號或密碼錯誤');
+                return;
+            }
+            if (candidate.password === p) { candidate.password = hashed; saveUsers(users); }
+            currentUser = u;
+            localStorage.setItem('currentUser', u);
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('header').classList.remove('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+            document.getElementById('addBtn').classList.remove('hidden');
+            document.getElementById('welcomeUser').textContent = '你好，' + u;
+            cards = getUserCards();
+            renderCards();
+            updateStats();
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('header').classList.add('hidden');
+            document.getElementById('mainContent').classList.add('hidden');
+            document.getElementById('addBtn').classList.add('hidden');
+            hideError();
+        }
+
+        function showError(id, msg) {
+            document.getElementById(id).textContent = msg;
+            document.getElementById(id).classList.add('show');
+        }
+        function hideError() {
+            document.getElementById('loginError').classList.remove('show');
+            document.getElementById('regError').classList.remove('show');
+        }
+
+        function updateStats() {
+            document.getElementById('totalCount').textContent = cards.length;
+            document.getElementById('companyCount').textContent = [...new Set(cards.map(c => c.company).filter(Boolean))].length;
+            const now = new Date();
+            document.getElementById('thisMonth').textContent = cards.filter(c =>
+                c.createdAt && new Date(c.createdAt).getMonth() === now.getMonth() && new Date(c.createdAt).getFullYear() === now.getFullYear()
+            ).length;
+        }
+
+        function escapeHtml(text) {
+            return String(text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+        }
+
+        function getAvatarColor(name) {
+            const colors = ['#1b3a6b','#1a7a4a','#c0392b','#6c3483','#b7600a','#1a5276','#6e2f1a'];
+            let hash = 0;
+            for (let i = 0; i < (name||'').length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            return colors[Math.abs(hash) % colors.length];
+        }
+
+        function getInitials(name) {
+            return (name || '未知').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+        }
+
+        function getBadgeClass(cat) {
+            return { '客戶':'badge-client', '供應商':'badge-supplier', '同事':'badge-colleague', '潛在客戶':'badge-prospect', '其他':'badge-other' }[cat] || 'badge-other';
+        }
+
+        function renderCards(filter = '') {
+            const grid = document.getElementById('cardsGrid');
+            const q = (filter || '').toLowerCase();
+            const filtered = cards.filter(c =>
+                !q || (c.name||'').toLowerCase().includes(q) || (c.company||'').toLowerCase().includes(q) ||
+                (c.title||'').toLowerCase().includes(q) || (c.email||'').toLowerCase().includes(q)
+            );
+
+            const sectionTitle = document.getElementById('cardsSectionTitle');
+            sectionTitle.textContent = q ? `搜尋結果（${filtered.length}）` : `全部名片（${cards.length}）`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-address-card"></i></div><p class="title">${q ? '找不到符合的名片' : '尚無名片'}</p><p>${q ? '嘗試其他關鍵字' : '點擊「新增名片」開始建立，或使用「掃描」透過相機讀取'}</p></div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(c => {
+                const name = escapeHtml(c.name || '未命名');
+                const title = escapeHtml(c.title || '');
+                const company = escapeHtml(c.company || '');
+                const email = escapeHtml(c.email || '');
+                const phone = escapeHtml(c.phone || '');
+                const line = escapeHtml(c.line || '');
+                const badge = getBadgeClass(c.category || '其他');
+                const initials = getInitials(c.name);
+                const color = getAvatarColor(c.name);
+                const thumb = c.image ? `<img src="${c.image}" class="card-image-thumb" alt="名片圖片">` : '';
+
+                return `<div class="card-item">
+                    <div class="card-avatar" style="background:${color}">${initials}</div>
+                    <div class="card-body">
+                        <div class="card-name-row">
+                            <span class="card-name">${name}</span>
+                            <span class="card-badge ${badge}">${escapeHtml(c.category || '其他')}</span>
+                        </div>
+                        <div class="card-meta">
+                            ${title ? `<div class="card-meta-item"><i class="fa-solid fa-briefcase"></i>${title}</div>` : ''}
+                            ${company ? `<div class="card-meta-item"><i class="fa-solid fa-building"></i>${company}</div>` : ''}
+                            ${phone ? `<div class="card-meta-item"><i class="fa-solid fa-phone"></i>${phone}</div>` : ''}
+                            ${email ? `<div class="card-meta-item"><i class="fa-solid fa-envelope"></i>${email}</div>` : ''}
+                            ${line ? `<div class="card-meta-item"><i class="fa-brands fa-line"></i>${line}</div>` : ''}
+                        </div>
+                    </div>
+                    ${thumb}
+                    <div class="card-actions">
+                        <button onclick="editCard('${c.id}')" title="編輯"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="showShareModal('${c.id}')" title="分享"><i class="fa-solid fa-share-nodes"></i></button>
+                        <button class="btn-delete-action" onclick="deleteCard('${c.id}')" title="刪除"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function filterCards() { renderCards(document.getElementById('searchInput').value); }
+
+        function openModal(card) {
+            editingId = card?.id || null;
+            document.getElementById('modalTitle').innerHTML = `<i class="fa-solid fa-pen-to-square"></i>${card ? '編輯名片' : '新增名片'}`;
+            document.getElementById('inputName').value = card?.name || '';
+            document.getElementById('inputTitle').value = card?.title || '';
+            document.getElementById('inputCompany').value = card?.company || '';
+            document.getElementById('inputPhone').value = card?.phone || '';
+            document.getElementById('inputEmail').value = card?.email || '';
+            document.getElementById('inputLine').value = card?.line || '';
+            document.getElementById('inputCategory').value = card?.category || '客戶';
+            document.getElementById('inputAddress').value = card?.address || '';
+            if (card?.image) {
+                currentCardImage = card.image;
+                document.getElementById('imagePreview').src = card.image;
+                document.getElementById('imagePreviewContainer').style.display = 'inline-block';
+            } else {
+                clearCardImage();
+            }
+            document.getElementById('cardModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('cardModal').classList.remove('show');
+            editingId = null;
+            clearCardImage();
+        }
+
+        function saveCard() {
+            const name = document.getElementById('inputName').value.trim();
+            if (!name) { showToast('請輸入姓名'); return; }
+            const existingCard = editingId ? cards.find(x => x.id === editingId) : null;
+            const cardData = {
+                id: editingId || Date.now().toString(),
+                name,
+                title: document.getElementById('inputTitle').value.trim(),
+                company: document.getElementById('inputCompany').value.trim(),
+                phone: document.getElementById('inputPhone').value.trim(),
+                email: document.getElementById('inputEmail').value.trim(),
+                line: document.getElementById('inputLine').value.trim(),
+                category: document.getElementById('inputCategory').value,
+                address: document.getElementById('inputAddress').value.trim(),
+                image: currentCardImage || existingCard?.image || null,
+                createdAt: editingId ? cards.find(x => x.id === editingId)?.createdAt : new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            if (editingId) {
+                cards[cards.findIndex(x => x.id === editingId)] = cardData;
+                showToast('名片已更新');
+            } else {
+                cards.unshift(cardData);
+                showToast('名片已新增');
+            }
+            saveUserCards(cards);
+            renderCards();
+            updateStats();
+            closeModal();
+        }
+
+        function editCard(id) { const c = cards.find(x => x.id === id); if (c) openModal(c); }
+
+        function deleteCard(id) {
+            if (confirm('確定要刪除這張名片嗎？')) {
+                cards = cards.filter(x => x.id !== id);
+                saveUserCards(cards);
+                renderCards();
+                updateStats();
+                showToast('名片已刪除');
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerHTML = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        // Share
         let currentShareCard = null;
-        function showShareModal(id) { currentShareCard = cards.find(c => c.id === id); if (!currentShareCard) return; const container = document.getElementById('qrContainer'); container.innerHTML = ''; const vcard = generateVCard(currentShareCard); QRCode.toCanvas(vcard, { width: 200, margin: 2 }, (err, canvas) => { if (!err) container.appendChild(canvas); }); document.getElementById('shareModal').classList.add('show'); }
+        function showShareModal(id) {
+            currentShareCard = cards.find(c => c.id === id);
+            if (!currentShareCard) return;
+            const container = document.getElementById('qrContainer');
+            container.innerHTML = '';
+            const vcard = generateVCard(currentShareCard);
+            QRCode.toCanvas(vcard, { width: 180, margin: 2 }, (err, canvas) => {
+                if (!err) container.appendChild(canvas);
+            });
+            document.getElementById('shareModal').classList.add('show');
+        }
         function closeShare() { document.getElementById('shareModal').classList.remove('show'); currentShareCard = null; }
-        function generateVCard(card) { return `BEGIN:VCARD\nVERSION:3.0\nFN:${card.name||''}\nTITLE:${card.title||''}\nORG:${card.company||''}\nTEL:${card.phone||''}\nEMAIL:${card.email||''}\nADR:${card.address||''}\nNOTE:${card.note||''}\nEND:VCARD`; }
-        function downloadVCard() { if (!currentShareCard) return; const vcard = generateVCard(currentShareCard); const blob = new Blob([vcard], { type: 'text/vcard' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `${currentShareCard.name||'contact'}.vcf`; a.click(); URL.revokeObjectURL(url); showToast('已下載 vCard'); }
-        function copyVCard() { if (!currentShareCard) return; const vcard = generateVCard(currentShareCard); navigator.clipboard.writeText(vcard).then(() => showToast('已複製 vCard')); }
-        
-        async function startScan(){await openScanCamera();}
-        async function startScanFromModal(){await openScanCamera();}
-        async function openScanCamera(){document.getElementById('scanModal').classList.add('show');const v=document.getElementById('video');try{v.srcObject=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});videoStream=v.srcObject;}catch(e){showToast('無法開啟相機：'+e.message);closeScan();}}
-        function closeScan(){document.getElementById('scanModal').classList.remove('show');if(videoStream){videoStream.getTracks().forEach(t=>t.stop());videoStream=null;}document.getElementById('scanProgress').classList.remove('show');}
-        
-        async function captureImage(){const v=document.getElementById('video'),c=document.getElementById('canvas'),ctx=c.getContext('2d');c.width=v.videoWidth;c.height=v.videoHeight;ctx.drawImage(v,0,0);closeScan();const progress=document.getElementById('scanProgress'),percent=document.getElementById('scanPercent');progress.classList.add('show');percent.textContent='0%';try{const result=await Tesseract.recognize(c.toDataURL('image/jpeg'),'chi_tra+eng',{logger:m=>{if(m.status==='recognizing text')percent.textContent=Math.round(m.progress*100)+'%'}});parseCardInfo(result.data.text);}catch(e){showToast('辨識失敗：'+e.message);}progress.classList.remove('show');}
-        
-        function parseCardInfo(text){const lines=text.split('\n').map(l=>l.trim()).filter(l=>l.length>0);let name='',title='',company='',phone='',email='',address='';const phoneRegex=/(\+?886|0)[-\s]?[0-9]{1,4}[-\s]?[0-9]{3,4}[-\s]?[0-9]{3,4}/,emailRegex=/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;lines.forEach(l=>{if(phoneRegex.test(l)&&!phone)phone=l.match(phoneRegex)[0];else if(emailRegex.test(l)&&!email)email=l.match(emailRegex)[0];else if(!name)name=l;else if(!title)title=l;else if(!company)company=l;else address+=l+' ';});document.getElementById('inputName').value=name;document.getElementById('inputTitle').value=title;document.getElementById('inputCompany').value=company;document.getElementById('inputPhone').value=phone;document.getElementById('inputEmail').value=email;document.getElementById('inputAddress').value=address.trim();showToast('已自動填入名片資訊');document.getElementById('cardModal').classList.add('show');}
-        
-        // ========== Telegram Sync ==========
+        function generateVCard(card) {
+            return `BEGIN:VCARD\nVERSION:3.0\nFN:${card.name||''}\nTITLE:${card.title||''}\nORG:${card.company||''}\nTEL:${card.phone||''}\nEMAIL:${card.email||''}\nADR:${card.address||''}\nEND:VCARD`;
+        }
+        function downloadVCard() {
+            if (!currentShareCard) return;
+            const blob = new Blob([generateVCard(currentShareCard)], { type: 'text/vcard' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentShareCard.name || 'contact'}.vcf`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('已下載 vCard');
+        }
+        function copyVCard() {
+            if (!currentShareCard) return;
+            navigator.clipboard.writeText(generateVCard(currentShareCard)).then(() => showToast('已複製 vCard'));
+        }
+
+        // Camera / Scan
+        async function startScan() { await openScanCamera(); }
+        async function startScanFromModal() { await openScanCamera(); }
+        async function openScanCamera() {
+            document.getElementById('scanModal').classList.add('show');
+            const v = document.getElementById('video');
+            try {
+                v.srcObject = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                videoStream = v.srcObject;
+            } catch(e) {
+                showToast('無法開啟相機：' + e.message);
+                closeScan();
+            }
+        }
+        function closeScan() {
+            document.getElementById('scanModal').classList.remove('show');
+            if (videoStream) { videoStream.getTracks().forEach(t => t.stop()); videoStream = null; }
+            document.getElementById('scanProgress').classList.remove('show');
+        }
+        async function captureImage() {
+            const v = document.getElementById('video'), c = document.getElementById('canvas'), ctx = c.getContext('2d');
+            c.width = v.videoWidth; c.height = v.videoHeight;
+            ctx.drawImage(v, 0, 0);
+            closeScan();
+            const progress = document.getElementById('scanProgress'), percent = document.getElementById('scanPercent');
+            progress.classList.add('show');
+            percent.textContent = '0%';
+            try {
+                const result = await Tesseract.recognize(c.toDataURL('image/jpeg'), 'chi_tra+eng', {
+                    logger: m => { if (m.status === 'recognizing text') percent.textContent = Math.round(m.progress * 100) + '%'; }
+                });
+                parseCardInfo(result.data.text);
+            } catch(e) { showToast('辨識失敗：' + e.message); }
+            progress.classList.remove('show');
+        }
+        function parseCardInfo(text) {
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            let name = '', title = '', company = '', phone = '', email = '', address = '';
+            const phoneRegex = /(\+?886|0)[-\s]?[0-9]{1,4}[-\s]?[0-9]{3,4}[-\s]?[0-9]{3,4}/;
+            const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+            lines.forEach(l => {
+                if (phoneRegex.test(l) && !phone) phone = l.match(phoneRegex)[0];
+                else if (emailRegex.test(l) && !email) email = l.match(emailRegex)[0];
+                else if (!name) name = l;
+                else if (!title) title = l;
+                else if (!company) company = l;
+                else address += l + ' ';
+            });
+            document.getElementById('inputName').value = name;
+            document.getElementById('inputTitle').value = title;
+            document.getElementById('inputCompany').value = company;
+            document.getElementById('inputPhone').value = phone;
+            document.getElementById('inputEmail').value = email;
+            document.getElementById('inputAddress').value = address.trim();
+            showToast('已自動填入名片資訊');
+            document.getElementById('cardModal').classList.add('show');
+        }
+
+        // Telegram Sync
         function openSyncModal() { document.getElementById('syncModal').classList.add('show'); renderTelegramLink(); }
         function closeSyncModal() { document.getElementById('syncModal').classList.remove('show'); }
         function getTelegramLink() { return JSON.parse(localStorage.getItem('telegramLink')) || {}; }
         function saveTelegramLink(data) { localStorage.setItem('telegramLink', JSON.stringify(data)); }
-        function renderTelegramLink() { const link = getTelegramLink(); document.getElementById('telegramStatus').innerHTML = link.username ? '<span style="color:var(--accent);font-weight:600;"><i class="fa-solid fa-circle-check" style="margin-right:5px;"></i>@' + link.username + '</span>' : '<span style="color:var(--text3);">尚未綁定</span>'; }
-        async function linkTelegram() { const username = document.getElementById('telegramUsername').value.trim(); if (!username) { showToast('請輸入 Telegram 使用者名稱'); return; } saveTelegramLink({ username: username, linkedAt: new Date().toISOString() }); showToast('<i class="fa-solid fa-circle-check" style="color:#34c759;margin-right:6px;"></i>已綁定 Telegram'); renderTelegramLink(); }
-        async function syncFromTelegram() { showToast('<i class="fa-solid fa-rotate" style="margin-right:6px;"></i>正在同步...'); const link = getTelegramLink(); if (!link.username) { showToast('請先綁定 Telegram'); return; } const saved = localStorage.getItem('telegramCards_' + currentUser); if (saved) { const tCards = JSON.parse(saved); if (tCards.length > 0) { cards = [...tCards, ...cards]; saveUserCards(cards); renderCards(); updateStats(); showToast('<i class="fa-solid fa-circle-check" style="color:#34c759;margin-right:6px;"></i>同步 ' + tCards.length + ' 張名片'); } else { showToast('沒有新名片'); } } else { showToast('沒有 Telegram 名片資料'); } }
-        
-        // Handle file upload for OCR
-        // Image compression helper: resize + JPEG compress to keep localStorage usage low
+        function renderTelegramLink() {
+            const link = getTelegramLink();
+            document.getElementById('telegramStatus').innerHTML = link.username
+                ? `<span style="color:var(--green);font-weight:600;"><i class="fa-solid fa-circle-check" style="margin-right:5px;"></i>@${link.username}</span>`
+                : `<span style="color:var(--text3);">尚未綁定</span>`;
+        }
+        function linkTelegram() {
+            const username = document.getElementById('telegramUsername').value.trim();
+            if (!username) { showToast('請輸入 Telegram 使用者名稱'); return; }
+            saveTelegramLink({ username, linkedAt: new Date().toISOString() });
+            showToast('已綁定 Telegram');
+            renderTelegramLink();
+        }
+        async function syncFromTelegram() {
+            const link = getTelegramLink();
+            if (!link.username) { showToast('請先綁定 Telegram'); return; }
+            showToast('正在同步...');
+            const saved = localStorage.getItem('telegramCards_' + currentUser);
+            if (saved) {
+                const tCards = JSON.parse(saved);
+                if (tCards.length > 0) {
+                    cards = [...tCards, ...cards];
+                    saveUserCards(cards);
+                    renderCards();
+                    updateStats();
+                    showToast('同步了 ' + tCards.length + ' 張名片');
+                } else { showToast('沒有新名片'); }
+            } else { showToast('沒有 Telegram 名片資料'); }
+        }
+
+        // Image compression helper
         async function compressImage(file, maxWidth = 800, quality = 0.7) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -489,48 +1181,29 @@
                 reader.readAsDataURL(file);
             });
         }
-        
+
         async function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            // Validate file type
             if (!file.type.startsWith('image/')) { showToast('請上傳圖片檔案'); return; }
-            // Warn if file is very large (>3MB original)
-            if (file.size > 3 * 1024 * 1024) { showToast('圖片較大，正在壓縮...'); }
-            const progress = document.getElementById('scanProgress');
-            const percent = document.getElementById('scanPercent');
+            const progress = document.getElementById('scanProgress'), percent = document.getElementById('scanPercent');
             progress.classList.add('show');
             percent.textContent = '0%';
             try {
-                // Compress image first before storing
-                const compressedData = await compressImage(file);
-                // Estimate localStorage usage (base64 is ~1.37x larger)
-                const estimatedSize = compressedData.length * 0.75; // Approximate original size
-                if (estimatedSize > 4 * 1024 * 1024) {
-                    // Try more aggressive compression
-                    const moreCompressed = await compressImage(file, 600, 0.5);
-                    currentCardImage = moreCompressed;
-                } else {
-                    currentCardImage = compressedData;
-                }
-                // Show image size hint
-                const origKB = Math.round(file.size / 1024);
-                const storedKB = Math.round(currentCardImage.length * 0.75 / 1024);
-                document.getElementById('imageSizeHint').innerHTML = `<i class="fa-solid fa-box-archive" style="margin-right:4px;"></i> 原圖: ${origKB}KB → 儲存: ${storedKB}KB`;
-                // Show image preview
-                document.getElementById('imagePreview').src = currentCardImage;
-                document.getElementById('imagePreviewContainer').style.display = 'block';
-                // Run OCR on the compressed image (faster too)
-                const result = await Tesseract.recognize(currentCardImage, 'chi_tra+eng', {
+                const compressed = await compressImage(file);
+                currentCardImage = compressed;
+                document.getElementById('imagePreview').src = compressed;
+                document.getElementById('imagePreviewContainer').style.display = 'inline-block';
+                const result = await Tesseract.recognize(compressed, 'chi_tra+eng', {
                     logger: m => { if (m.status === 'recognizing text') percent.textContent = Math.round(m.progress * 100) + '%'; }
                 });
                 parseCardInfo(result.data.text);
-                showToast('<i class="fa-solid fa-circle-check" style="color:#34c759;margin-right:6px;"></i>圖片上傳成功');
+                showToast('圖片上傳成功');
             } catch(e) { showToast('上傳失敗：' + e.message); }
             progress.classList.remove('show');
             event.target.value = '';
         }
-        
+
         function clearCardImage() {
             currentCardImage = null;
             document.getElementById('imagePreviewContainer').style.display = 'none';
