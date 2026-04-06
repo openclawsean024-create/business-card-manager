@@ -147,7 +147,7 @@
         .scan-modal.show { display: block; }
         .scan-view { width: 100%; height: 100%; position: relative; }
         .scan-view video { width: 100%; height: 100%; object-fit: cover; }
-        .scan-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 88%; max-width: 480px; aspect-ratio: 1.6; border: 2px dashed var(--accent); border-radius: 16px; pointer-events: none; }
+        .scan-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 88%; max-width: 480px; aspect-ratio: 1.586 / 1; border: 2px dashed var(--accent); border-radius: 16px; pointer-events: none; }
         .scan-overlay::before, .scan-overlay::after, .scan-overlay .corner-tl, .scan-overlay .corner-tr, .scan-overlay .corner-bl, .scan-overlay .corner-br { content: ''; position: absolute; width: 28px; height: 28px; border-color: var(--accent); border-style: solid; border-width: 0; }
         .scan-overlay .corner-tl { top: -2px; left: -2px; border-top-width: 4px; border-left-width: 4px; border-top-left-radius: 16px; }
         .scan-overlay .corner-tr { top: -2px; right: -2px; border-top-width: 4px; border-right-width: 4px; border-top-right-radius: 16px; }
@@ -229,8 +229,15 @@
     </div>
     
     <div class="header hidden" id="header">
-        <h1>💼 名片王</h1>
-        <div class="user-info"><span id="welcomeUser"></span><button onclick="openSyncModal()" style="padding:6px 10px;background:rgba(52,199,89,0.3);border:none;border-radius:6px;color:#fff;font-size:11px;cursor:pointer;margin-right:8px;">🔄</button><button class="logout-btn" onclick="logout()">登出</button></div>
+        <div class="header-brand">
+            <div class="header-logo"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></div>
+            <h1><span>名片王</span></h1>
+        </div>
+        <div class="header-actions">
+            <span class="header-user" id="welcomeUser"></span>
+            <button class="header-btn sync" onclick="openSyncModal()">🔄</button>
+            <button class="header-btn logout" onclick="logout()">登出</button>
+        </div>
     </div>
     
     <div class="container hidden" id="mainContent">
@@ -385,7 +392,77 @@
         
         async function captureImage(){const v=document.getElementById('video'),c=document.getElementById('canvas'),ctx=c.getContext('2d');c.width=v.videoWidth;c.height=v.videoHeight;ctx.drawImage(v,0,0);closeScan();const progress=document.getElementById('scanProgress'),percent=document.getElementById('scanPercent');progress.classList.add('show');percent.textContent='0%';try{const result=await Tesseract.recognize(c.toDataURL('image/jpeg'),'chi_tra+eng',{logger:m=>{if(m.status==='recognizing text')percent.textContent=Math.round(m.progress*100)+'%'}});parseCardInfo(result.data.text);}catch(e){showToast('辨識失敗：'+e.message);}progress.classList.remove('show');}
         
-        function parseCardInfo(text){const lines=text.split('\n').map(l=>l.trim()).filter(l=>l.length>0);let name='',title='',company='',phone='',email='',address='';const phoneRegex=/(\+?886|0)[-\s]?[0-9]{1,4}[-\s]?[0-9]{3,4}[-\s]?[0-9]{3,4}/,emailRegex=/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;lines.forEach(l=>{if(phoneRegex.test(l)&&!phone)phone=l.match(phoneRegex)[0];else if(emailRegex.test(l)&&!email)email=l.match(emailRegex)[0];else if(!name)name=l;else if(!title)title=l;else if(!company)company=l;else address+=l+' ';});document.getElementById('inputName').value=name;document.getElementById('inputTitle').value=title;document.getElementById('inputCompany').value=company;document.getElementById('inputPhone').value=phone;document.getElementById('inputEmail').value=email;document.getElementById('inputAddress').value=address.trim();showToast('已自動填入名片資訊');document.getElementById('cardModal').classList.add('show');}
+        function parseCardInfo(text) {
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            let name = '', title = '', company = '', phone = '', email = '', address = '';
+            
+            // 電話號碼正規表達式（支援台灣格式）
+            const phoneRegex = /(?:\+?886|0)[\s.-]?(?:\(?\d{1,3}\)?)[\s.-]?\d{3,4}[\s.-]?\d{3,4}/g;
+            // Email 正規表達式
+            const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/gi;
+            // 職稱關鍵詞
+            const titleKeywords = ['經理', '總監', '協理', '副理', '處長', '組長', '主任', '工程師', '設計師', '開發者', '顧問', '總經理', '董事', '老師', '專員', '主管', 'CEO', 'CTO', 'CFO', 'COO', 'VP', 'PM', 'RD', 'HR', ' Manager', 'Director', 'Engineer', 'Consultant', 'President'];
+            // 公司關鍵詞
+            const companyKeywords = ['公司', '股份', '有限', '科技', '電子', '實業', '集團', '工作室', '商行', '合作社', '基金會', '協會', 'Corp', 'Inc', 'Ltd', 'Co', 'LLC', 'Studio'];
+            
+            // 掃描所有行，先找出電話和Email
+            const matchedLines = new Set();
+            
+            lines.forEach(l => {
+                // 電話
+                const phoneMatch = l.match(phoneRegex);
+                if (phoneMatch && !phone) {
+                    phone = phoneMatch[0].replace(/[\s.-]/g, '').replace(/^0/, '+886');
+                    matchedLines.add(l);
+                }
+                // Email
+                const emailMatch = l.match(emailRegex);
+                if (emailMatch && !email) {
+                    email = emailMatch[0];
+                    matchedLines.add(l);
+                }
+            });
+            
+            // 第二次掃描：識別職稱和公司
+            const remainingLines = lines.filter(l => !matchedLines.has(l) && l.length > 1);
+            
+            remainingLines.forEach(l => {
+                const hasTitleKeyword = titleKeywords.some(k => l.includes(k));
+                const hasCompanyKeyword = companyKeywords.some(k => l.includes(k));
+                
+                if (!title && hasTitleKeyword) {
+                    title = l;
+                    matchedLines.add(l);
+                } else if (!company && hasCompanyKeyword) {
+                    company = l;
+                    matchedLines.add(l);
+                }
+            });
+            
+            // 第三次：剩餘行按順序賦值
+            const finalRemaining = lines.filter(l => !matchedLines.has(l) && l.length > 1);
+            if (!name && finalRemaining.length > 0) name = finalRemaining[0];
+            if (!title && finalRemaining.length > 1) title = finalRemaining[1];
+            if (!company && finalRemaining.length > 2) company = finalRemaining[2];
+            
+            // 地址（較長的行通常包含地址）
+            lines.forEach(l => {
+                if (matchedLines.has(l)) return;
+                if (l.length > 10 && (l.includes('市') || l.includes('區') || l.includes('路') || l.includes('街') || l.includes('巷') || l.includes('號') || l.includes('樓') || l.includes('縣') || l.includes('鎮') || l.includes('鄉'))) {
+                    address += l + ' ';
+                    matchedLines.add(l);
+                }
+            });
+            
+            document.getElementById('inputName').value = name;
+            document.getElementById('inputTitle').value = title;
+            document.getElementById('inputCompany').value = company;
+            document.getElementById('inputPhone').value = phone;
+            document.getElementById('inputEmail').value = email;
+            document.getElementById('inputAddress').value = address.trim();
+            showToast('已自動填入名片資訊');
+            document.getElementById('cardModal').classList.add('show');
+        }
         
         // ========== Telegram Sync ==========
         function openSyncModal() { document.getElementById('syncModal').classList.add('show'); renderTelegramLink(); }
