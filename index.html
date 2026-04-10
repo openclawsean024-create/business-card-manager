@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>名片王 - Business Card Manager</title>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
@@ -1387,10 +1386,13 @@
             progress.classList.add('show');
             percent.textContent = '0%';
             try {
-                const result = await Tesseract.recognize(c.toDataURL('image/jpeg'), 'chi_tra+eng', {
-                    logger: m => { if (m.status === 'recognizing text') percent.textContent = Math.round(m.progress * 100) + '%'; }
+                const response = await fetch('/api/ocr', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: c.toDataURL('image/jpeg') })
                 });
-                parseCardInfo(result.data.text);
+                const { text } = await response.json();
+                parseCardInfo(text);
             } catch(e) { showToast('辨識失敗：' + e.message); }
             progress.classList.remove('show');
         }
@@ -1506,10 +1508,13 @@
                 currentCardImage = compressed;
                 document.getElementById('imagePreview').src = compressed;
                 document.getElementById('imagePreviewContainer').style.display = 'inline-block';
-                const result = await Tesseract.recognize(compressed, 'chi_tra+eng', {
-                    logger: m => { if (m.status === 'recognizing text') percent.textContent = Math.round(m.progress * 100) + '%'; }
+                const response = await fetch('/api/ocr', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: compressed })
                 });
-                parseCardInfo(result.data.text);
+                const { text } = await response.json();
+                parseCardInfo(text);
                 showToast('圖片上傳成功');
             } catch(e) { showToast('上傳失敗：' + e.message); }
             progress.classList.remove('show');

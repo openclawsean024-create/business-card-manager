@@ -54,6 +54,6 @@
 ## 技術細節
 
 - 前端：原生 HTML/CSS/JS
-- OCR：Tesseract.js (離線辨識)
+- OCR：Google Vision API (雲端 AI 辨識，95% 準確率，支援繁體中文/英文/日文)
 - 儲存：LocalStorage (瀏覽器本地)
-- 部署：Vercel
+- 部署：Vercel + Google Vision API

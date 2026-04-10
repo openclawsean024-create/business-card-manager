@@ -1,0 +1,7 @@
+{
+  "name": "business-card-manager",
+  "version": "1.0.0",
+  "dependencies": {
+    "@google-cloud/vision": "^4.0.0"
+  }
+}
