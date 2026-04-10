@@ -924,6 +924,7 @@
             <div class="toolbar-right">
                 <button class="toolbar-btn primary" onclick="openModal()"><i class="fa-solid fa-plus" style="font-size:12px;"></i>新增名片</button>
                 <button class="toolbar-btn" onclick="startScan()"><i class="fa-solid fa-camera" style="font-size:12px;"></i> 掃描</button>
+                <button class="toolbar-btn" onclick="document.getElementById('vcfUpload').click()"><i class="fa-solid fa-file-import" style="font-size:12px;"></i> 匯入vCard</button>
             </div>
         </div>
 
@@ -1018,6 +1019,7 @@
                 </div>
             </div>
             <input type="file" id="fileUpload" accept="image/*" onchange="handleFileUpload(event)">
+            <input type="file" id="vcfUpload" accept=".vcf,text/vcard" onchange="handleVCardImport(event)" style="display:none;">
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="closeModal()">取消</button>
                 <button class="btn-save" onclick="saveCard()"><i class="fa-solid fa-floppy-disk" style="margin-right:5px;"></i>儲存</button>
@@ -1518,6 +1520,84 @@
             currentCardImage = null;
             document.getElementById('imagePreviewContainer').style.display = 'none';
             document.getElementById('imagePreview').src = '';
+        }
+
+        // ===== vCard Import =====
+        function handleVCardImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const card = parseVCard(text);
+                if (!card.name && !card.company) {
+                    showToast('無法解析 vCard，請確認格式');
+                    event.target.value = '';
+                    return;
+                }
+                // Pre-fill form and open modal for new card
+                openModal(); // opens blank modal first
+                setTimeout(function() {
+                    document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-file-import"></i> 匯入vCard';
+                    document.getElementById('inputName').value = card.name || '';
+                    document.getElementById('inputTitle').value = card.title || '';
+                    document.getElementById('inputCompany').value = card.company || '';
+                    document.getElementById('inputPhone').value = card.phone || '';
+                    document.getElementById('inputEmail').value = card.email || '';
+                    document.getElementById('inputAddress').value = card.address || '';
+                    showToast('vCard 已匯入，確認資料後點擊儲存');
+                }, 50);
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function parseVCard(vcfText) {
+            var card = { name: '', title: '', company: '', phone: '', email: '', address: '' };
+            var lines = vcfText.split(/\r?\n/);
+            var currentKey = '';
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i];
+                // Handle continuation lines that start with space or tab
+                if (/^[ \t]/.test(line) && currentKey) {
+                    // Append to previous field (e.g. ADR or NOTE)
+                    card[currentKey] = (card[currentKey] + ' ' + line.trim()).trim();
+                    continue;
+                }
+                var match = line.match(/^([A-Z0-9-]+)(?::(.*))?$/i);
+                if (!match) continue;
+                var key = match[1].toUpperCase();
+                var rawValue = match[2] || '';
+                // Handle quoted-printable encoding for ADR
+                if (rawValue.indexOf('=') !== -1) {
+                    rawValue = rawValue.replace(/=0D=0A/g, '\n').replace(/=([0-9A-Fa-f]{2})/g, function(m, hex) {
+                        return String.fromCharCode(parseInt(hex, 16));
+                    });
+                }
+                // Remove ADR;type=WORK,pref: or similar prefixes
+                var value = rawValue.replace(/^[^:]+:/, '').replace(/\\n/g, '\n').trim();
+                switch (key) {
+                    case 'FN':    card.name     = value; break;
+                    case 'TITLE': card.title    = value; break;
+                    case 'ORG':   card.company  = value.split(';')[0].trim(); break;
+                    case 'TEL':   card.phone    = value.replace(/^type=[^;]+;?/i, '').replace(/^tel:/i, ''); break;
+                    case 'EMAIL': card.email    = value.replace(/^type=[^;]+;?/i, '').replace(/^email:/i, ''); break;
+                    case 'ADR':
+                        // ADR:;;street;city;state;postal;country
+                        var parts = value.split(';');
+                        card.address = parts.filter(function(p) { return p.trim(); }).join(' ');
+                        break;
+                    case 'N':
+                        // N:Last;First;Middle;Prefix;Suffix
+                        if (!card.name) {
+                            var nameParts = value.split(';').filter(function(p) { return p.trim(); });
+                            if (nameParts.length >= 2) card.name = nameParts[1] + ' ' + nameParts[0];
+                            else if (nameParts.length === 1) card.name = nameParts[0];
+                        }
+                        break;
+                }
+            }
+            return card;
         }
     </script>
 </body>
