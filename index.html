@@ -6,208 +6,883 @@
     <title>名片王 - Business Card Manager</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <style>
+        /* ===== Design System — Professional Corporate ===== */
         :root {
-            --primary: #4f46e5; --primary-light: #818cf8; --primary-dark: #3730a3;
-            --accent: #10b981; --accent-light: #34d399;
-            --danger: #ef4444; --warning: #f59e0b;
-            --text: #0f172a; --text2: #64748b; --text3: #94a3b8;
-            --bg: #f8fafc; --card: #ffffff;
-            --border: #e2e8f0; --border-light: #f1f5f9;
-            --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
-            --shadow-lg: 0 4px 20px rgba(79,70,229,0.12), 0 12px 40px rgba(0,0,0,0.08);
-            --shadow-xl: 0 8px 40px rgba(79,70,229,0.16), 0 20px 60px rgba(0,0,0,0.1);
-            --radius: 16px; --radius-sm: 10px; --radius-lg: 24px;
-            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+          --primary: #1b3a6b;
+          --primary-mid: #244f9a;
+          --primary-light: #e8edf7;
+          --accent: #c0392b;
+          --accent-light: #fdf0ef;
+          --green: #1a7a4a;
+          --green-light: #edf7f2;
+          --text: #1a1a2e;
+          --text2: #4a4a6a;
+          --text3: #9090a8;
+          --bg: #f0f2f5;
+          --bg2: #e2e6ed;
+          --card: #ffffff;
+          --border: #dde1e9;
+          --border-strong: #c4cad6;
+          --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
+          --shadow-sm: 0 1px 4px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+          --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.05);
+          --shadow-lg: 0 8px 28px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
+          --radius-sm: 4px;
+          --radius-md: 8px;
+          --radius-lg: 12px;
+          --header-bg: #ffffff;
+          --header-border: #dde1e9;
+          --font-main: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Noto Sans TC', -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; -webkit-font-smoothing: antialiased; }
-        ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        body {
+          font-family: var(--font-main);
+          background: var(--bg);
+          color: var(--text);
+          min-height: 100vh;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+        *, *::before, *::after { transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease; }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--bg2); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
         :focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-        .login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); position: relative; overflow: hidden; }
-        .login-screen::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.15) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(255,255,255,0.1) 0%, transparent 40%); animation: floatBg 20s ease-in-out infinite; }
-        @keyframes floatBg { 0%, 100% { transform: translate(0, 0); } 33% { transform: translate(2%, 1%); } 66% { transform: translate(-1%, 2%); } }
+
+        /* ===== Login Screen ===== */
+        .login-screen {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 100vh;
+          padding: 20px;
+          background: linear-gradient(145deg, #e8edf7 0%, #f0f2f5 50%, #edf7f2 100%);
+        }
         .login-screen.hidden { display: none; }
-        .login-box { background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: var(--radius-lg); padding: 40px; width: 100%; max-width: 420px; box-shadow: var(--shadow-xl); position: relative; z-index: 1; border: 1px solid rgba(255,255,255,0.6); }
-        .login-brand { text-align: center; margin-bottom: 32px; }
-        .login-logo { width: 64px; height: 64px; background: linear-gradient(135deg, var(--primary) 0%, #764ba2 100%); border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; box-shadow: 0 8px 24px rgba(79,70,229,0.3); }
-        .login-logo svg { width: 36px; height: 36px; fill: white; }
-        .login-box h1 { font-size: 26px; font-weight: 900; background: linear-gradient(135deg, var(--primary) 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 4px; }
-        .login-box .subtitle { color: var(--text2); font-size: 14px; }
-        .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
-        .form-group input, .form-group select { width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: var(--radius-sm); font-size: 15px; font-family: inherit; background: var(--card); color: var(--text); transition: var(--transition); }
-        .form-group input:hover { border-color: var(--text3); }
-        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79,70,229,0.1); }
+        .login-box {
+          background: var(--card);
+          border-radius: var(--radius-lg);
+          padding: 44px 40px;
+          width: 100%;
+          max-width: 400px;
+          box-shadow: var(--shadow-lg);
+          border: 1px solid var(--border);
+        }
+        .login-logo {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 8px;
+        }
+        .login-logo-icon {
+          width: 40px;
+          height: 40px;
+          background: var(--primary);
+          border-radius: var(--radius-md);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #fff;
+          font-size: 18px;
+        }
+        .login-logo-text {
+          font-size: 20px;
+          font-weight: 700;
+          color: var(--text);
+          letter-spacing: -0.3px;
+        }
+        .login-subtitle {
+          color: var(--text3);
+          font-size: 13px;
+          margin-bottom: 32px;
+          padding-left: 52px;
+          letter-spacing: 0.2px;
+        }
+        .login-tabs {
+          display: flex;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-md);
+          overflow: hidden;
+          margin-bottom: 28px;
+        }
+        .login-tabs button {
+          flex: 1;
+          padding: 11px;
+          border: none;
+          background: transparent;
+          font-size: 13.5px;
+          font-weight: 500;
+          cursor: pointer;
+          color: var(--text2);
+          font-family: inherit;
+        }
+        .login-tabs button.active {
+          background: var(--primary);
+          color: #fff;
+        }
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+          display: block;
+          font-size: 12px;
+          font-weight: 600;
+          color: var(--text2);
+          margin-bottom: 6px;
+          letter-spacing: 0.3px;
+          text-transform: uppercase;
+        }
+        .form-group input, .form-group select {
+          width: 100%;
+          padding: 11px 14px;
+          border: 1.5px solid var(--border);
+          border-radius: var(--radius-sm);
+          font-size: 14px;
+          font-family: inherit;
+          background: var(--card);
+          color: var(--text);
+        }
+        .form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(27,58,107,0.08); }
         .form-group input::placeholder { color: var(--text3); }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: #fff; box-shadow: 0 4px 14px rgba(79,70,229,0.35); }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(79,70,229,0.45); }
-        .btn-primary:active { transform: translateY(0); }
-        .btn-scan { background: linear-gradient(135deg, var(--accent) 0%, #059669 100%); color: #fff; box-shadow: 0 4px 14px rgba(16,185,129,0.35); }
-        .btn-scan:hover { transform: translateY(-2px); }
-        .btn-ghost { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
-        .btn-ghost:hover { background: var(--border-light); }
-        .login-tabs { display: flex; margin-bottom: 28px; background: var(--bg); border-radius: var(--radius-sm); padding: 4px; }
-        .login-tabs button { flex: 1; padding: 12px; border: none; background: transparent; font-size: 14px; font-weight: 600; cursor: pointer; border-radius: 8px; transition: var(--transition); color: var(--text2); }
-        .login-tabs button.active { background: var(--card); color: var(--primary); box-shadow: var(--shadow); }
-        .error-msg { color: var(--danger); font-size: 12px; margin-top: 8px; display: none; font-weight: 500; }
+        .btn { width: 100%; padding: 12px 20px; border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; letter-spacing: 0.2px; }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-mid); }
+        .btn-accent { background: var(--accent); color: #fff; }
+        .btn-accent:hover { background: #a93226; }
+        .btn-ghost { background: var(--bg); color: var(--text2); border: 1px solid var(--border); }
+        .btn-ghost:hover { background: var(--bg2); }
+        .error-msg { color: var(--accent); font-size: 12px; margin-top: 6px; display: none; font-weight: 500; }
         .error-msg.show { display: block; }
-        .header { background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; }
+
+        /* ===== Header ===== */
+        .header {
+          background: var(--header-bg);
+          border-bottom: 1px solid var(--header-border);
+          padding: 0 24px;
+          height: 60px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          position: sticky;
+          top: 0;
+          z-index: 50;
+          box-shadow: var(--shadow-xs);
+        }
         .header.hidden { display: none; }
-        .header-brand { display: flex; align-items: center; gap: 12px; }
-        .header-logo { width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary) 0%, #764ba2 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(79,70,229,0.25); }
-        .header-logo svg { width: 22px; height: 22px; fill: white; }
-        .header h1 { font-size: 20px; font-weight: 800; color: var(--text); }
-        .header h1 span { background: linear-gradient(135deg, var(--primary) 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .header-actions { display: flex; align-items: center; gap: 10px; }
-        .header-user { font-size: 14px; color: var(--text2); font-weight: 500; }
-        .header-btn { padding: 8px 14px; border: 1px solid var(--border); background: var(--card); border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; color: var(--text); transition: var(--transition); display: flex; align-items: center; gap: 6px; }
-        .header-btn:hover { background: var(--bg); border-color: var(--text3); }
-        .header-btn.sync { color: var(--accent); border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); }
-        .header-btn.sync:hover { background: rgba(16,185,129,0.1); }
-        .header-btn.logout { color: var(--danger); border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.05); }
-        .header-btn.logout:hover { background: rgba(239,68,68,0.1); }
-        .container { max-width: 900px; margin: 0 auto; padding: 24px; }
+        .header-left { display: flex; align-items: center; gap: 14px; }
+        .header-logo {
+          width: 34px;
+          height: 34px;
+          background: var(--primary);
+          border-radius: var(--radius-sm);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #fff;
+          font-size: 16px;
+        }
+        .header-title {
+          font-size: 15px;
+          font-weight: 700;
+          color: var(--text);
+          letter-spacing: -0.2px;
+        }
+        .header-right { display: flex; align-items: center; gap: 8px; }
+        .header-user {
+          font-size: 13px;
+          color: var(--text2);
+          margin-right: 4px;
+        }
+        .header-btn {
+          padding: 7px 14px;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-sm);
+          background: transparent;
+          font-size: 12.5px;
+          font-weight: 500;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          color: var(--text2);
+          font-family: inherit;
+        }
+        .header-btn:hover { background: var(--bg); border-color: var(--border-strong); color: var(--text); }
+        .header-btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .header-btn.primary:hover { background: var(--primary-mid); }
+
+        /* ===== Container ===== */
+        .container { max-width: 1100px; margin: 0 auto; padding: 28px 24px 120px; }
         .container.hidden { display: none; }
-        .search-box { background: var(--card); border-radius: var(--radius); padding: 6px; margin-bottom: 20px; display: flex; gap: 8px; box-shadow: var(--shadow); border: 1px solid var(--border-light); }
-        .search-box input { flex: 1; padding: 14px 16px; border: none; border-radius: var(--radius-sm); font-size: 15px; font-family: inherit; background: var(--bg); color: var(--text); transition: var(--transition); }
-        .search-box input:focus { outline: none; background: var(--card); box-shadow: inset 0 0 0 2px var(--primary-light); }
+
+        /* ===== Toolbar ===== */
+        .toolbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          margin-bottom: 24px;
+          flex-wrap: wrap;
+        }
+        .search-box {
+          background: var(--card);
+          border: 1.5px solid var(--border);
+          border-radius: var(--radius-md);
+          padding: 10px 14px;
+          display: flex;
+          gap: 8px;
+          flex: 1;
+          min-width: 240px;
+          max-width: 480px;
+          box-shadow: var(--shadow-xs);
+        }
+        .search-box:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(27,58,107,0.07); }
+        .search-box input {
+          flex: 1;
+          border: none;
+          outline: none;
+          font-size: 13.5px;
+          font-family: inherit;
+          color: var(--text);
+          background: transparent;
+        }
         .search-box input::placeholder { color: var(--text3); }
-        .search-btn { padding: 14px 22px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: #fff; border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; cursor: pointer; transition: var(--transition); box-shadow: 0 2px 8px rgba(79,70,229,0.25); }
-        .search-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(79,70,229,0.35); }
-        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
-        .stat-card { background: var(--card); border-radius: var(--radius); padding: 20px; text-align: center; box-shadow: var(--shadow); border: 1px solid var(--border-light); transition: var(--transition); }
-        .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
-        .stat-card .num { font-size: 32px; font-weight: 900; background: linear-gradient(135deg, var(--primary) 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2; }
-        .stat-card .label { font-size: 12px; color: var(--text2); font-weight: 600; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
-        .card-item { background: var(--card); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); border: 1px solid var(--border-light); transition: var(--transition); cursor: default; position: relative; overflow: hidden; }
-        .card-item::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--primary) 0%, #764ba2 50%, var(--accent) 100%); opacity: 0; transition: var(--transition); }
-        .card-item:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--primary-light); }
-        .card-item:hover::before { opacity: 1; }
-        .card-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
-        .card-avatar { width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; color: #fff; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        .card-header-info { flex: 1; min-width: 0; }
-        .card-name { font-size: 18px; font-weight: 800; color: var(--text); line-height: 1.3; word-break: break-word; }
-        .card-title { font-size: 13px; color: var(--primary); font-weight: 600; margin-top: 3px; }
-        .card-company { font-size: 13px; color: var(--text2); margin-top: 3px; font-weight: 500; }
-        .card-badge { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.3px; }
-        .badge-client { background: rgba(79,70,229,0.1); color: var(--primary); }
-        .badge-supplier { background: rgba(16,185,129,0.1); color: var(--accent); }
-        .badge-colleague { background: rgba(245,158,11,0.1); color: var(--warning); }
-        .badge-prospect { background: rgba(168,85,247,0.1); color: #a855f7; }
-        .badge-other { background: var(--bg); color: var(--text2); }
-        .card-info { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-light); }
-        .card-info-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13px; }
-        .card-info-row:last-child { margin-bottom: 0; }
-        .card-info-icon { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; }
-        .card-info-icon.phone { background: rgba(16,185,129,0.1); color: var(--accent); }
-        .card-info-icon.email { background: rgba(79,70,229,0.1); color: var(--primary); }
-        .card-info-icon.line { background: rgba(168,85,247,0.1); color: #a855f7; }
-        .card-info-icon.address { background: rgba(245,158,11,0.1); color: var(--warning); }
-        .card-info-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text2); font-weight: 500; }
-        .card-actions { display: flex; gap: 8px; margin-top: 16px; }
-        .card-actions button { flex: 1; padding: 10px 12px; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); font-family: inherit; }
-        .btn-edit { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
-        .btn-edit:hover { background: var(--border-light); border-color: var(--text3); }
-        .btn-share { background: rgba(79,70,229,0.08); color: var(--primary); border: 1px solid rgba(79,70,229,0.15); }
-        .btn-share:hover { background: rgba(79,70,229,0.15); }
-        .btn-delete { background: rgba(239,68,68,0.08); color: var(--danger); border: 1px solid rgba(239,68,68,0.15); }
-        .btn-delete:hover { background: rgba(239,68,68,0.15); }
-        .fab-group { position: fixed; bottom: 28px; right: 28px; display: flex; flex-direction: column; gap: 14px; z-index: 100; }
-        .fab-group.hidden { display: none; }
-        .fab { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; border: none; box-shadow: var(--shadow-lg); transition: var(--transition); }
-        .fab-scan { background: linear-gradient(135deg, var(--accent) 0%, #059669 100%); color: #fff; }
-        .fab-add { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: #fff; }
-        .fab:hover { transform: scale(1.08); box-shadow: var(--shadow-xl); }
+        .search-box i { color: var(--text3); font-size: 13px; align-self: center; }
+        .toolbar-right { display: flex; gap: 8px; align-items: center; }
+        .toolbar-btn {
+          padding: 9px 16px;
+          border: 1.5px solid var(--border);
+          border-radius: var(--radius-sm);
+          background: var(--card);
+          font-size: 13px;
+          font-weight: 500;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          color: var(--text2);
+          font-family: inherit;
+          box-shadow: var(--shadow-xs);
+        }
+        .toolbar-btn:hover { background: var(--bg); border-color: var(--border-strong); color: var(--text); }
+        .toolbar-btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 2px 6px rgba(27,58,107,0.25); }
+        .toolbar-btn.primary:hover { background: var(--primary-mid); border-color: var(--primary-mid); }
+
+        /* ===== Stats Row ===== */
+        .stats-row {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
+          margin-bottom: 28px;
+        }
+        .stat-card {
+          background: var(--card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-md);
+          padding: 20px 22px;
+          box-shadow: var(--shadow-xs);
+          display: flex;
+          align-items: center;
+          gap: 16px;
+        }
+        .stat-icon {
+          width: 40px;
+          height: 40px;
+          border-radius: var(--radius-sm);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+          flex-shrink: 0;
+        }
+        .stat-icon.blue { background: var(--primary-light); color: var(--primary); }
+        .stat-icon.green { background: var(--green-light); color: var(--green); }
+        .stat-icon.red { background: var(--accent-light); color: var(--accent); }
+        .stat-info .stat-num { font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; line-height: 1; }
+        .stat-info .stat-label { font-size: 12px; color: var(--text3); margin-top: 4px; font-weight: 500; }
+
+        /* ===== Section Header ===== */
+        .section-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 14px;
+        }
+        .section-title { font-size: 13px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; }
+
+        /* ===== Cards Table/List ===== */
+        .cards-list { display: flex; flex-direction: column; gap: 10px; }
+        .card-item {
+          background: var(--card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-md);
+          padding: 20px 22px;
+          box-shadow: var(--shadow-xs);
+          display: flex;
+          align-items: center;
+          gap: 18px;
+          cursor: default;
+        }
+        .card-item:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); }
+
+        .card-avatar {
+          width: 48px;
+          height: 48px;
+          border-radius: var(--radius-sm);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          font-size: 15px;
+          color: #fff;
+          flex-shrink: 0;
+          letter-spacing: -0.3px;
+        }
+        .card-body { flex: 1; min-width: 0; }
+        .card-name-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .card-name { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
+        .card-badge {
+          display: inline-flex;
+          align-items: center;
+          padding: 2px 9px;
+          border-radius: 3px;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.2px;
+        }
+        .badge-client { background: var(--primary-light); color: var(--primary); }
+        .badge-supplier { background: var(--green-light); color: var(--green); }
+        .badge-colleague { background: #fef3e2; color: #b36000; }
+        .badge-prospect { background: #f3e8fe; color: #7c3aed; }
+        .badge-other { background: var(--bg); color: var(--text3); }
+        .card-meta { display: flex; align-items: center; gap: 16px; margin-top: 5px; flex-wrap: wrap; }
+        .card-meta-item { display: flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--text2); }
+        .card-meta-item i { width: 13px; text-align: center; color: var(--text3); font-size: 11px; }
+        .card-image-thumb {
+          width: 56px;
+          height: 40px;
+          object-fit: cover;
+          border-radius: var(--radius-sm);
+          border: 1px solid var(--border);
+          flex-shrink: 0;
+        }
+        .card-actions { display: flex; gap: 6px; flex-shrink: 0; margin-left: auto; }
+        .card-actions button {
+          width: 34px;
+          height: 34px;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-sm);
+          background: transparent;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12.5px;
+          color: var(--text2);
+        }
+        .card-actions button:hover { background: var(--bg); color: var(--text); }
+        .card-actions .btn-delete-action:hover { background: var(--accent-light); color: var(--accent); border-color: #f5c6c3; }
+        .btn:active { transform: scale(0.97); }
+
+        /* ===== FAB ===== */
+        .fab {
+          position: fixed;
+          bottom: 28px;
+          right: 28px;
+          width: 52px;
+          height: 52px;
+          background: var(--primary);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 20px;
+          color: #fff;
+          box-shadow: 0 4px 16px rgba(27,58,107,0.35);
+          cursor: pointer;
+          z-index: 100;
+          border: none;
+        }
+        .fab:hover { background: var(--primary-mid); box-shadow: 0 6px 24px rgba(27,58,107,0.4); transform: scale(1.06); }
         .fab:active { transform: scale(0.96); }
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 200; align-items: center; justify-content: center; padding: 24px; }
+        .fab.hidden { display: none; }
+
+        /* ===== Modal ===== */
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,20,40,0.45); backdrop-filter: blur(4px); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
         .modal.show { display: flex; }
-        .modal-content { background: var(--card); border-radius: var(--radius-lg); padding: 32px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-xl); animation: modalIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        @keyframes modalIn { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-        .modal-header h2 { font-size: 20px; font-weight: 800; color: var(--text); }
-        .modal-close { width: 36px; height: 36px; border: 1px solid var(--border); background: var(--card); border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text2); transition: var(--transition); }
+        .modal-content {
+          background: var(--card);
+          border-radius: var(--radius-lg);
+          padding: 32px;
+          width: 100%;
+          max-width: 520px;
+          max-height: 90vh;
+          overflow-y: auto;
+          box-shadow: var(--shadow-lg);
+          border: 1px solid var(--border);
+          animation: modalIn 0.22s cubic-bezier(0.34, 1.4, 0.64, 1);
+        }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+        .modal-header h2 { font-size: 16px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+        .modal-header h2 i { color: var(--primary); }
+        .modal-close {
+          width: 30px;
+          height: 30px;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-sm);
+          background: transparent;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+          color: var(--text2);
+        }
         .modal-close:hover { background: var(--bg); color: var(--text); }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        .modal-actions { display: flex; gap: 12px; margin-top: 24px; }
-        .modal-actions button { flex: 1; padding: 15px; border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; transition: var(--transition); }
-        .btn-save { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: #fff; box-shadow: 0 4px 14px rgba(79,70,229,0.3); }
-        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(79,70,229,0.4); }
-        .btn-cancel { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
-        .btn-cancel:hover { background: var(--border-light); }
-        #shareModal .modal-content { text-align: center; }
-        #qrContainer { margin: 20px auto; display: flex; justify-content: center; }
-        #qrContainer canvas { border-radius: var(--radius-sm); }
-        .share-actions { display: flex; gap: 12px; justify-content: center; margin-top: 20px; }
-        .share-actions button { flex: 1; max-width: 160px; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+        .modal-actions button { flex: 1; padding: 12px; border: none; border-radius: var(--radius-sm); font-size: 13.5px; font-weight: 600; cursor: pointer; font-family: inherit; }
+        .btn-save { background: var(--primary); color: #fff; }
+        .btn-save:hover { background: var(--primary-mid); }
+        .btn-cancel { background: var(--bg); color: var(--text2); border: 1px solid var(--border); }
+        .btn-cancel:hover { background: var(--bg2); color: var(--text); }
+        .btn-scan-modal { background: var(--accent); color: #fff; }
+        .btn-scan-modal:hover { background: #a93226; }
+
+        /* ===== Upload Zone (NEW) ===== */
+        .upload-zone {
+          border: 2px dashed var(--border-strong);
+          border-radius: var(--radius-lg);
+          padding: 28px 20px;
+          text-align: center;
+          cursor: pointer;
+          background: var(--bg);
+          margin-top: 4px;
+          transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+          position: relative;
+        }
+        .upload-zone:hover, .upload-zone.drag-over {
+          border-color: var(--primary);
+          background: var(--primary-light);
+          box-shadow: 0 0 0 4px rgba(27,58,107,0.08);
+        }
+        .upload-zone.drag-over { border-style: solid; }
+        .upload-zone-icon { font-size: 36px; color: var(--text3); margin-bottom: 10px; }
+        .upload-zone:hover .upload-zone-icon, .upload-zone.drag-over .upload-zone-icon { color: var(--primary); }
+        .upload-zone-text { font-size: 14px; font-weight: 500; color: var(--text2); }
+        .upload-zone-text span { color: var(--primary); text-decoration: underline; }
+        .upload-zone-hint { font-size: 12px; color: var(--text3); margin-top: 6px; }
+        .upload-zone-divider { display: flex; align-items: center; gap: 12px; margin: 14px 0; color: var(--text3); font-size: 12px; }
+        .upload-zone-divider::before, .upload-zone-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+        .upload-zone-actions { display: flex; gap: 10px; justify-content: center; }
+        .upload-zone-actions button {
+          flex: 0 0 auto;
+          padding: 9px 18px;
+          border: 1.5px solid var(--border);
+          border-radius: var(--radius-sm);
+          background: var(--card);
+          font-size: 13px;
+          font-weight: 500;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          color: var(--text2);
+          font-family: inherit;
+          transition: all 0.15s;
+        }
+        .upload-zone-actions button:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+        .upload-zone-actions .btn-camera:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+        #fileUpload { display: none; }
+        #imagePreviewContainer { display: none; margin-top: 14px; }
+        .image-preview-wrap { position: relative; display: inline-block; }
+        .image-preview-wrap img { display: block; max-width: 100%; max-height: 200px; border-radius: var(--radius-md); border: 1px solid var(--border); }
+        .image-preview-wrap .remove-img {
+          position: absolute;
+          top: -10px;
+          right: -10px;
+          width: 26px;
+          height: 26px;
+          background: var(--accent);
+          color: #fff;
+          border: none;
+          border-radius: 50%;
+          font-size: 13px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: var(--shadow-sm);
+        }
+
+        /* ===== Scan Modal ===== */
         .scan-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 300; }
         .scan-modal.show { display: block; }
         .scan-view { width: 100%; height: 100%; position: relative; }
         .scan-view video { width: 100%; height: 100%; object-fit: cover; }
-        .scan-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 88%; max-width: 480px; aspect-ratio: 1.586 / 1; border: 2px dashed var(--accent); border-radius: 16px; pointer-events: none; }
-        .scan-overlay::before, .scan-overlay::after, .scan-overlay .corner-tl, .scan-overlay .corner-tr, .scan-overlay .corner-bl, .scan-overlay .corner-br { content: ''; position: absolute; width: 28px; height: 28px; border-color: var(--accent); border-style: solid; border-width: 0; }
-        .scan-overlay .corner-tl { top: -2px; left: -2px; border-top-width: 4px; border-left-width: 4px; border-top-left-radius: 16px; }
-        .scan-overlay .corner-tr { top: -2px; right: -2px; border-top-width: 4px; border-right-width: 4px; border-top-right-radius: 16px; }
-        .scan-overlay .corner-bl { bottom: -2px; left: -2px; border-bottom-width: 4px; border-left-width: 4px; border-bottom-left-radius: 16px; }
-        .scan-overlay .corner-br { bottom: -2px; right: -2px; border-bottom-width: 4px; border-right-width: 4px; border-bottom-right-radius: 16px; }
-        .scan-hint { position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%); color: #fff; font-size: 15px; font-weight: 600; text-shadow: 0 2px 8px rgba(0,0,0,0.6); text-align: center; width: 80%; }
-        .scan-buttons { position: absolute; bottom: 40px; left: 0; right: 0; display: flex; justify-content: center; gap: 24px; }
-        .scan-btn { width: 68px; height: 68px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.7); background: transparent; cursor: pointer; transition: var(--transition); }
-        .scan-btn.capture { width: 78px; height: 78px; background: #fff; border-color: #fff; }
-        .scan-btn.capture:hover { transform: scale(1.05); }
-        .scan-btn.close { position: absolute; top: 20px; left: 20px; width: 44px; height: 44px; border-radius: 50%; background: rgba(0,0,0,0.5); color: #fff; border: none; font-size: 20px; }
+        .scan-frame {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 88%;
+          height: 48%;
+          border: 2px solid rgba(255,255,255,0.6);
+          border-radius: 8px;
+        }
+        .scan-corner { position: absolute; width: 24px; height: 24px; border-color: #fff; border-style: solid; }
+        .scan-corner.tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
+        .scan-corner.tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; border-radius: 0 4px 0 0; }
+        .scan-corner.bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; border-radius: 0 0 0 4px; }
+        .scan-corner.br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
+        .scan-hint { position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.85); font-size: 13px; white-space: nowrap; letter-spacing: 0.3px; }
+        .scan-buttons { position: absolute; bottom: 40px; left: 0; right: 0; display: flex; justify-content: center; gap: 20px; }
+        .scan-btn { width: 64px; height: 64px; border-radius: 50%; border: 2.5px solid rgba(255,255,255,0.5); background: transparent; cursor: pointer; }
+        .scan-btn.capture { width: 74px; height: 74px; background: #fff; border-color: #fff; }
+        .scan-btn.close-btn { position: absolute; top: 20px; left: 20px; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.45); color: #fff; border: none; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+
         .scan-progress { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.92); z-index: 350; align-items: center; justify-content: center; flex-direction: column; color: #fff; }
         .scan-progress.show { display: flex; }
-        .scan-progress .spinner { width: 64px; height: 64px; border: 4px solid rgba(255,255,255,0.15); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+        .scan-progress .spinner { width: 52px; height: 52px; border: 3px solid rgba(255,255,255,0.15); border-top-color: var(--primary-light); border-radius: 50%; animation: spin 0.9s linear infinite; }
+        .scan-progress .text { margin-top: 18px; font-size: 14px; color: rgba(255,255,255,0.7); }
+        .scan-progress .percent { margin-top: 10px; font-size: 28px; font-weight: 700; color: #fff; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .scan-progress .text { margin-top: 24px; font-size: 16px; font-weight: 600; }
-        .scan-progress .percent { margin-top: 12px; font-size: 28px; font-weight: 900; color: var(--accent-light); }
-        .sync-info { font-size: 14px; color: var(--text2); margin-bottom: 20px; line-height: 1.6; }
-        .sync-status-box { background: var(--bg); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 20px; }
-        .sync-status-label { font-size: 12px; color: var(--text3); font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .sync-status-value { font-size: 15px; font-weight: 600; color: var(--text); }
-        .sync-status-value.linked { color: var(--accent); }
-        .sync-status-value.unlinked { color: var(--text2); }
-        .sync-divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
-        .sync-section-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 14px; }
-        .sync-btn { width: 100%; padding: 14px; border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; transition: var(--transition); background: linear-gradient(135deg, var(--accent) 0%, #059669 100%); color: #fff; box-shadow: 0 4px 14px rgba(16,185,129,0.3); display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .sync-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16,185,129,0.4); }
-        .sync-hint { font-size: 12px; color: var(--text3); margin-top: 12px; text-align: center; }
-        .empty { text-align: center; padding: 80px 24px; }
-        .empty-icon { width: 80px; height: 80px; background: linear-gradient(135deg, rgba(79,70,229,0.1) 0%, rgba(118,75,162,0.1) 100%); border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 36px; }
-        .empty h3 { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
-        .empty p { font-size: 14px; color: var(--text2); margin-bottom: 24px; }
-        .empty-btn { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: #fff; border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(79,70,229,0.3); transition: var(--transition); }
-        .empty-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(79,70,229,0.4); }
-        .toast { position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%) translateY(120px); background: #1e293b; color: #fff; padding: 14px 24px; border-radius: 12px; font-size: 14px; font-weight: 600; opacity: 0; transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 400; box-shadow: 0 8px 32px rgba(0,0,0,0.25); pointer-events: none; }
+
+        /* ===== Share Modal ===== */
+        .share-qr { display: flex; justify-content: center; margin: 20px 0; }
+        .share-actions { display: flex; gap: 10px; justify-content: center; margin-top: 16px; }
+        .share-actions button { flex: 1; max-width: 160px; padding: 11px; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; }
+        .btn-download { background: var(--primary); color: #fff; }
+        .btn-download:hover { background: var(--primary-mid); }
+        .btn-copy { background: var(--bg); color: var(--text2); border: 1px solid var(--border); }
+        .btn-copy:hover { background: var(--bg2); color: var(--text); }
+
+        /* ===== Sync Modal ===== */
+        .sync-info-block { background: var(--bg); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px; border: 1px solid var(--border); }
+        .sync-info-block .row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; color: var(--text2); }
+        .sync-info-block .row:last-child { margin-bottom: 0; }
+        .sync-info-block .row i { width: 14px; text-align: center; color: var(--text3); }
+        .sync-divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+        /* ===== Empty State ===== */
+        .empty-state { text-align: center; padding: 80px 20px; color: var(--text3); }
+        .empty-icon {
+          width: 64px;
+          height: 64px;
+          background: var(--bg);
+          border-radius: var(--radius-md);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 18px;
+          font-size: 26px;
+          color: var(--text3);
+          border: 1.5px dashed var(--border-strong);
+        }
+        .empty-state p { font-size: 14px; }
+        .empty-state p.title { font-size: 15px; font-weight: 600; color: var(--text2); margin-bottom: 4px; }
+
+        /* ===== Toast ===== */
+        .toast {
+          position: fixed;
+          bottom: 96px;
+          left: 50%;
+          transform: translateX(-50%) translateY(80px);
+          background: #1a1a2e;
+          color: #fff;
+          padding: 12px 22px;
+          border-radius: var(--radius-md);
+          font-size: 13px;
+          opacity: 0;
+          transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+          z-index: 400;
+          box-shadow: 0 6px 24px rgba(0,0,0,0.2);
+          pointer-events: none;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          white-space: nowrap;
+        }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-        .cards-grid .card-item { animation: cardIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
-        @keyframes cardIn { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        @media (max-width: 600px) {
-            .cards-grid { grid-template-columns: 1fr; }
-            .form-row { grid-template-columns: 1fr; }
-            .stats { grid-template-columns: repeat(3, 1fr); gap: 10px; }
-            .stat-card { padding: 16px; }
-            .stat-card .num { font-size: 26px; }
-            .header { padding: 12px 16px; }
-            .header h1 { font-size: 18px; }
-            .header-user { display: none; }
-            .login-box { padding: 28px; }
-            .modal-content { padding: 24px; }
-            .fab-group { bottom: 20px; right: 20px; }
-            .fab { width: 52px; height: 52px; font-size: 22px; }
+
+        /* ===== Landing Page ===== */
+        .landing { width: 100%; background: var(--bg); }
+        .landing-nav {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+        .landing-nav-inner {
+            max-width: 1100px; margin: 0 auto;
+            padding: 0 24px; height: 60px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .landing-logo {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 1.1rem; font-weight: 700; color: var(--primary);
+        }
+        .landing-logo i { font-size: 1.3rem; }
+        .landing-cta-btn {
+            padding: 8px 20px;
+            background: var(--primary); color: #fff;
+            border: none; border-radius: 8px;
+            font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .landing-cta-btn:hover { background: var(--primary-mid); transform: translateY(-1px); }
+
+        .landing-hero {
+            position: relative; overflow: hidden;
+            padding: 80px 24px 100px;
+            text-align: center;
+            background: var(--bg);
+        }
+        .landing-hero-bg {
+            position: absolute; inset: 0; pointer-events: none;
+            background:
+                radial-gradient(ellipse 80% 60% at 50% 0%, rgba(27,58,107,0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 60% 40% at 80% 100%, rgba(26,122,74,0.05) 0%, transparent 60%);
+        }
+        .landing-hero-content { position: relative; max-width: 720px; margin: 0 auto; }
+        .landing-hero-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: var(--primary-light); color: var(--primary);
+            border-radius: 100px; font-size: 0.78rem; font-weight: 600;
+            letter-spacing: 0.06em; margin-bottom: 24px;
+        }
+        .landing-hero-title {
+            font-size: clamp(2.4rem, 6vw, 3.8rem);
+            font-weight: 700; line-height: 1.15;
+            color: var(--text); letter-spacing: -0.02em;
+            margin-bottom: 20px;
+        }
+        .landing-hero-sub {
+            font-size: clamp(1rem, 2vw, 1.15rem);
+            color: var(--text2); line-height: 1.75;
+            max-width: 540px; margin: 0 auto 36px;
+        }
+        .landing-hero-actions {
+            display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+            margin-bottom: 48px;
+        }
+        .landing-btn-primary {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 13px 28px;
+            background: var(--primary); color: #fff;
+            border: none; border-radius: 10px;
+            font-size: 1rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .landing-btn-primary:hover { background: var(--primary-mid); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(27,58,107,0.25); }
+        .landing-btn-ghost {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 13px 28px;
+            background: transparent; color: var(--text2);
+            border: 1.5px solid var(--border-strong); border-radius: 10px;
+            font-size: 1rem; font-weight: 500;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .landing-btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+        .landing-hero-stats {
+            display: flex; align-items: center; justify-content: center; gap: 24px;
+        }
+        .landing-stat { text-align: center; }
+        .landing-stat-num { display: block; font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+        .landing-stat-label { font-size: 0.75rem; color: var(--text3); }
+        .landing-stat-div { width: 1px; height: 28px; background: var(--border); }
+
+        .landing-features { background: #fff; padding: 80px 24px; }
+        .landing-features-inner { max-width: 1100px; margin: 0 auto; }
+        .landing-section-label {
+            display: inline-block;
+            font-size: 0.72rem; font-weight: 700;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--primary); margin-bottom: 12px;
+        }
+        .landing-section-title {
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+            font-weight: 700; color: var(--text);
+            margin-bottom: 48px; letter-spacing: -0.02em;
+        }
+        .landing-features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+        .landing-feature-card {
+            padding: 28px 24px;
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: 14px; text-align: left;
+            transition: all 0.2s;
+        }
+        .landing-feature-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-3px);
+        }
+        .landing-feature-icon {
+            width: 44px; height: 44px;
+            background: var(--primary-light);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 16px;
+            color: var(--primary); font-size: 1.1rem;
+        }
+        .landing-feature-card h3 { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+        .landing-feature-card p { font-size: 0.875rem; color: var(--text2); line-height: 1.65; }
+
+        .landing-cta-section { background: var(--primary); padding: 80px 24px; text-align: center; }
+        .landing-cta-inner { max-width: 540px; margin: 0 auto; }
+        .landing-cta-section h2 { font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 12px; }
+        .landing-cta-section p { color: rgba(255,255,255,0.7); margin-bottom: 28px; font-size: 1rem; }
+        .landing-cta-section .landing-btn-primary { background: #fff; color: var(--primary); }
+        .landing-cta-section .landing-btn-primary:hover { background: var(--primary-light); transform: translateY(-2px); }
+
+        .landing-footer {
+            background: var(--primary); border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 20px 24px; text-align: center;
+            color: rgba(255,255,255,0.45); font-size: 0.8rem;
         }
 
+        @media (max-width: 700px) {
+            .landing-features-grid { grid-template-columns: 1fr; }
+            .landing-hero { padding: 60px 20px 70px; }
+            .landing-hero-stats { flex-direction: column; gap: 12px; }
+            .landing-stat-div { display: none; }
+        }
+
+        /* ===== Mobile ===== */
+        @media (max-width: 700px) {
+          .cards-list { gap: 8px; }
+          .card-item { flex-wrap: wrap; padding: 16px 18px; }
+          .card-body { flex: 1 0 calc(100% - 66px); }
+          .card-image-thumb { display: none; }
+          .card-actions { margin-left: 0; width: 100%; justify-content: flex-end; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+          .stats-row { grid-template-columns: 1fr; gap: 10px; }
+          .form-row { grid-template-columns: 1fr; }
+          .toolbar { flex-direction: column; align-items: stretch; }
+          .search-box { max-width: 100%; }
+          .toolbar-right { justify-content: flex-end; }
+          .login-box { padding: 32px 24px; }
+          .login-subtitle { padding-left: 0; }
+          .modal-content { padding: 24px 18px; }
+        }
     </style>
 </head>
 <body>
+
+    <!-- ===== LANDING PAGE ===== -->
+    <div class="landing" id="landingPage">
+        <!-- Nav -->
+        <nav class="landing-nav">
+            <div class="landing-nav-inner">
+                <div class="landing-logo">
+                    <i class="fa-solid fa-id-card"></i>
+                    <span>名片王</span>
+                </div>
+                <button class="landing-cta-btn" onclick="document.getElementById('loginScreen').scrollIntoView({behavior:'smooth'})">開始使用</button>
+            </div>
+        </nav>
+
+        <!-- Hero -->
+        <section class="landing-hero">
+            <div class="landing-hero-bg"></div>
+            <div class="landing-hero-content">
+                <div class="landing-hero-badge">專業名片管理</div>
+                <h1 class="landing-hero-title">不再遺漏<br任何重要人脈</h1>
+                <p class="landing-hero-sub">AI OCR 一秒掃描名片，自動整理、終身留存。支援 Telegram 同步，讓你的名片庫隨時隨地都能取用。</p>
+                <div class="landing-hero-actions">
+                    <button class="landing-btn-primary" onclick="document.getElementById('loginScreen').scrollIntoView({behavior:'smooth'})">
+                        <i class="fa-solid fa-arrow-right"></i> 免費開始
+                    </button>
+                    <button class="landing-btn-ghost" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">
+                        了解更多
+                    </button>
+                </div>
+                <div class="landing-hero-stats">
+                    <div class="landing-stat"><span class="landing-stat-num">100%</span><span class="landing-stat-label">本地儲存</span></div>
+                    <div class="landing-stat-div"></div>
+                    <div class="landing-stat"><span class="landing-stat-num">AI</span><span class="landing-stat-label">OCR 辨識</span></div>
+                    <div class="landing-stat-div"></div>
+                    <div class="landing-stat"><span class="landing-stat-num">Telegram</span><span class="landing-stat-label">同步備份</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section class="landing-features" id="features">
+            <div class="landing-features-inner">
+                <div class="landing-section-label">核心功能</div>
+                <h2 class="landing-section-title">一行名片，掌控所有人脈</h2>
+                <div class="landing-features-grid">
+                    <div class="landing-feature-card">
+                        <div class="landing-feature-icon"><i class="fa-solid fa-camera"></i></div>
+                        <h3>AI OCR 掃描</h3>
+                        <p>一拍即識別！相機對準名片，AI 自動提取姓名、公司、職稱、電話、Email，零誤差入庫。</p>
+                    </div>
+                    <div class="landing-feature-card">
+                        <div class="landing-feature-icon"><i class="fa-solid fa-mobile-screen"></i></div>
+                        <h3>Telegram 同步</h3>
+                        <p>綁定 Telegram Bot，名片資料雲端備份，隨時查詢、分享，再也不怕資料遺失。</p>
+                    </div>
+                    <div class="landing-feature-card">
+                        <div class="landing-feature-icon"><i class="fa-solid fa-qrcode"></i></div>
+                        <h3>QR Code 分享</h3>
+                        <p>一鍵生成個人 QR Code 名片，別人掃描即可存入聯絡人，交換名片面對面 instant。</p>
+                    </div>
+                    <div class="landing-feature-card">
+                        <div class="landing-feature-icon"><i class="fa-solid fa-folder-open"></i></div>
+                        <h3>分類管理</h3>
+                        <p>公司、產業標籤自訂維護，多維度檢索，找名片不再大海撈針。</p>
+                    </div>
+                    <div class="landing-feature-card">
+                        <div class="landing-feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                        <h3>資料安全</h3>
+                        <p>100% 本地儲存，僅你自己可存取。支援匯出 vCard，跨平台通用。</p>
+                    </div>
+                    <div class="landing-feature-card">
+                        <div class="landing-feature-icon"><i class="fa-solid fa-language"></i></div>
+                        <h3>多語言支援</h3>
+                        <p>繁體中文、簡體中文、英文、日文、韓文名片，AI 智能識別語言自動轉寫。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bottom CTA -->
+        <section class="landing-cta-section">
+            <div class="landing-cta-inner">
+                <h2>準備好管理你的人脈了嗎？</h2>
+                <p>完全免費，無需信用卡，立即開始</p>
+                <button class="landing-btn-primary" onclick="document.getElementById('loginScreen').scrollIntoView({behavior:'smooth'})">
+                    <i class="fa-solid fa-arrow-right"></i> 開始使用
+                </button>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="landing-footer">
+            <span>© 2026 名片王 Business Card Manager</span>
+        </footer>
+    </div>
+
     <div class="login-screen" id="loginScreen">
         <div class="login-box">
-            <h1>💼 名片王</h1>
-            <p class="subtitle">AI 辨識版 - 掃描名片自動輸入</p>
+            <div class="login-logo">
+                <div class="login-logo-icon"><i class="fa-solid fa-id-card"></i></div>
+                <span class="login-logo-text">名片王</span>
+            </div>
+            <p class="login-subtitle">專業名片管理平台</p>
             <div class="login-tabs">
                 <button class="active" id="tabLogin" onclick="showTab('login')">登入</button>
                 <button id="tabRegister" onclick="showTab('register')">註冊</button>
@@ -216,64 +891,95 @@
                 <div class="form-group"><label>帳號</label><input type="text" id="loginUsername" placeholder="輸入帳號"></div>
                 <div class="form-group"><label>密碼</label><input type="password" id="loginPassword" placeholder="輸入密碼"></div>
                 <div class="error-msg" id="loginError"></div>
-                <button class="btn btn-primary" onclick="login()">登入</button>
+                <button class="btn btn-primary" onclick="login()"><i class="fa-solid fa-arrow-right-to-bracket" style="margin-right:6px;"></i>登入</button>
             </div>
             <div id="registerForm" style="display:none;">
                 <div class="form-group"><label>帳號</label><input type="text" id="regUsername" placeholder="設定帳號"></div>
-                <div class="form-group"><label>密碼</label><input type="password" id="regPassword" placeholder="設定密碼"></div>
+                <div class="form-group"><label>密碼</label><input type="password" id="regPassword" placeholder="設定密碼（至少6碼）"></div>
                 <div class="form-group"><label>確認密碼</label><input type="password" id="regConfirm" placeholder="再次輸入密碼"></div>
                 <div class="error-msg" id="regError"></div>
-                <button class="btn btn-primary" onclick="register()">註冊</button>
+                <button class="btn btn-primary" onclick="register()"><i class="fa-solid fa-user-plus" style="margin-right:6px;"></i>註冊</button>
             </div>
         </div>
     </div>
-    
+
     <div class="header hidden" id="header">
-        <div class="header-brand">
-            <div class="header-logo"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></div>
-            <h1><span>名片王</span></h1>
+        <div class="header-left">
+            <div class="header-logo"><i class="fa-solid fa-id-card"></i></div>
+            <span class="header-title">名片王</span>
         </div>
-        <div class="header-actions">
+        <div class="header-right">
             <span class="header-user" id="welcomeUser"></span>
-            <button class="header-btn sync" onclick="openSyncModal()">🔄</button>
-            <button class="header-btn logout" onclick="logout()">登出</button>
+            <button class="header-btn" onclick="openSyncModal()"><i class="fa-brands fa-telegram" style="font-size:12px;"></i> 同步</button>
+            <button class="header-btn" onclick="logout()"><i class="fa-solid fa-arrow-right-from-bracket" style="font-size:12px;"></i> 登出</button>
         </div>
     </div>
-    
+
     <div class="container hidden" id="mainContent">
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="搜尋姓名、公司、職稱..." oninput="filterCards()">
-            <button class="btn btn-primary" style="width:auto;padding:12px 20px;" onclick="filterCards()">搜尋</button>
+        <div class="toolbar">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="搜尋姓名、公司、職稱..." oninput="filterCards()">
+            </div>
+            <div class="toolbar-right">
+                <button class="toolbar-btn primary" onclick="openModal()"><i class="fa-solid fa-plus" style="font-size:12px;"></i>新增名片</button>
+                <button class="toolbar-btn" onclick="startScan()"><i class="fa-solid fa-camera" style="font-size:12px;"></i> 掃描</button>
+                <button class="toolbar-btn" onclick="document.getElementById('vcfUpload').click()"><i class="fa-solid fa-file-import" style="font-size:12px;"></i> 匯入vCard</button>
+            </div>
         </div>
-        <div class="stats">
-            <div class="stat-card"><div class="num" id="totalCount">0</div><div class="label">總名片數</div></div>
-            <div class="stat-card"><div class="num" id="companyCount">0</div><div class="label">公司數</div></div>
-            <div class="stat-card"><div class="num" id="thisMonth">0</div><div class="label">本月新增</div></div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="fa-solid fa-id-card"></i></div>
+                <div class="stat-info"><div class="stat-num" id="totalCount">0</div><div class="stat-label">總名片數</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="fa-solid fa-building"></i></div>
+                <div class="stat-info"><div class="stat-num" id="companyCount">0</div><div class="stat-label">公司數</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon red"><i class="fa-solid fa-calendar-plus"></i></div>
+                <div class="stat-info"><div class="stat-num" id="thisMonth">0</div><div class="stat-label">本月新增</div></div>
+            </div>
         </div>
-        <div class="cards-grid" id="cardsGrid">
-            <div class="empty"><div>📇</div><p>尚未建立名片</p><p>點擊下方 + 按鈕新增名片</p></div>
+
+        <div class="section-header">
+            <span class="section-title" id="cardsSectionTitle">全部名片</span>
         </div>
-    </div>
-    
-    <div class="scan-fab hidden" id="scanFab" onclick="startScan()">📷</div>
-    
-    <!-- 分享 Modal -->
-    <div class="modal" id="shareModal">
-        <div class="modal-content" style="text-align:center">
-            <div class="modal-header"><h2>分享名片</h2><button class="modal-close" onclick="closeShare()">×</button></div>
-            <div id="qrContainer" style="margin:20px auto"></div>
-            <div style="display:flex;gap:10px;justify-content:center;margin-top:20px">
-                <button class="btn btn-primary" style="width:auto;padding:12px 24px" onclick="downloadVCard()">📥 下載 vCard</button>
-                <button class="btn" style="width:auto;padding:12px 24px;background:var(--bg)" onclick="copyVCard()">📋 複製</button>
-                <button class="btn" style="width:auto;padding:12px 24px;background:var(--bg2);display:flex;align-items:center;gap:6px" onclick="document.getElementById('vcfInput').click()">📤 匯入 vCard</button>
-                <input type="file" id="vcfInput" accept=".vcf,.txt" style="display:none" onchange="importVCard(this.files[0])">
+        <div class="cards-list" id="cardsGrid">
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fa-solid fa-address-card"></i></div>
+                <p class="title">尚無名片</p>
+                <p>點擊「新增名片」開始建立，或使用「掃描」透過相機讀取</p>
             </div>
         </div>
     </div>
-    
+
+    <button class="fab hidden" id="addBtn" onclick="openModal()"><i class="fa-solid fa-plus"></i></button>
+    <div class="toast" id="toast"></div>
+
+    <!-- Share Modal -->
+    <div class="modal" id="shareModal">
+        <div class="modal-content" style="text-align:center; max-width:420px;">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-share-nodes"></i> 分享名片</h2>
+                <button class="modal-close" onclick="closeShare()">×</button>
+            </div>
+            <div id="qrContainer" class="share-qr"></div>
+            <div class="share-actions">
+                <button class="btn-download" onclick="downloadVCard()"><i class="fa-solid fa-download"></i> 下載 vCard</button>
+                <button class="btn-copy" onclick="copyVCard()"><i class="fa-regular fa-copy"></i> 複製</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card Modal -->
     <div class="modal" id="cardModal">
         <div class="modal-content">
-            <div class="modal-header"><h2 id="modalTitle">新增名片</h2><button class="modal-close" onclick="closeModal()">×</button></div>
+            <div class="modal-header">
+                <h2 id="modalTitle"><i class="fa-solid fa-pen-to-square"></i>新增名片</h2>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
             <div class="form-row">
                 <div class="form-group"><label>姓名 *</label><input type="text" id="inputName" placeholder="王大明"></div>
                 <div class="form-group"><label>職稱</label><input type="text" id="inputTitle" placeholder="業務經理"></div>
@@ -285,180 +991,444 @@
             </div>
             <div class="form-row">
                 <div class="form-group"><label>LINE</label><input type="text" id="inputLine" placeholder="lineid"></div>
-                <div class="form-group"><label>分類</label><select id="inputCategory"><option value="客戶">客戶</option><option value="供應商">供應商</option><option value="同事">同事</option><option value="潛在客戶">潛在客戶</option><option value="其他">其他</option></select></div>
+                <div class="form-group"><label>分類</label>
+                    <select id="inputCategory">
+                        <option value="客戶">客戶</option>
+                        <option value="供應商">供應商</option>
+                        <option value="同事">同事</option>
+                        <option value="潛在客戶">潛在客戶</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
             </div>
             <div class="form-group"><label>地址</label><input type="text" id="inputAddress" placeholder="台北市信義區忠孝東路一段"></div>
-            <button class="btn btn-scan" onclick="startScanFromModal()">📷 掃描名片自動輸入</button>
-            <div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-save" onclick="saveCard()">儲存名片</button></div>
+            <div id="imagePreviewContainer">
+                <div class="image-preview-wrap">
+                    <img id="imagePreview" />
+                    <button class="remove-img" onclick="clearCardImage()">×</button>
+                </div>
+            </div>
+            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileUpload').click()">
+                <div class="upload-zone-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                <div class="upload-zone-text">拖放圖片到此處，或 <span>點擊上傳</span></div>
+                <div class="upload-zone-hint">支援 JPG、PNG、GIF，檔案大小上限 10MB</div>
+                <div class="upload-zone-divider">或</div>
+                <div class="upload-zone-actions">
+                    <button class="btn-camera" onclick="event.stopPropagation(); startScanFromModal()"><i class="fa-solid fa-camera"></i> 相機掃描</button>
+                    <button onclick="event.stopPropagation(); document.getElementById('fileUpload').click()"><i class="fa-solid fa-image"></i> 從相簿選擇</button>
+                </div>
+            </div>
+            <input type="file" id="fileUpload" accept="image/*" onchange="handleFileUpload(event)">
+            <input type="file" id="vcfUpload" accept=".vcf,text/vcard" onchange="handleVCardImport(event)" style="display:none;">
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal()">取消</button>
+                <button class="btn-save" onclick="saveCard()"><i class="fa-solid fa-floppy-disk" style="margin-right:5px;"></i>儲存</button>
+            </div>
         </div>
     </div>
-    
+
+    <!-- Scan Modal -->
     <div class="scan-modal" id="scanModal">
         <div class="scan-view">
             <video id="video" autoplay playsinline></video>
             <canvas id="canvas" style="display:none;"></canvas>
-            <div class="scan-overlay"></div>
-            <div class="scan-hint">將名片放入框內</div>
+            <div class="scan-frame">
+                <div class="scan-corner tl"></div>
+                <div class="scan-corner tr"></div>
+                <div class="scan-corner bl"></div>
+                <div class="scan-corner br"></div>
+            </div>
+            <div class="scan-hint">將名片置於框內</div>
             <div class="scan-buttons">
-                <button class="scan-btn close" onclick="closeScan()">×</button>
+                <button class="scan-btn close-btn" onclick="closeScan()">×</button>
                 <button class="scan-btn capture" onclick="captureImage()"></button>
             </div>
         </div>
     </div>
-    
     <div class="scan-progress" id="scanProgress">
         <div class="spinner"></div>
         <div class="text">正在辨識名片...</div>
         <div class="percent" id="scanPercent">0%</div>
     </div>
-    
-    <div class="add-btn hidden" id="addBtn" onclick="openModal()">+</div>
-    <div class="toast" id="toast"></div>
-    
+
     <!-- Sync Modal -->
     <div class="modal" id="syncModal">
         <div class="modal-content">
-            <div class="modal-header"><h2>🔗 Telegram 同步</h2><button class="modal-close" onclick="closeSyncModal()">×</button></div>
+            <div class="modal-header">
+                <h2><i class="fa-brands fa-telegram" style="color:#34c759;"></i> Telegram 同步</h2>
+                <button class="modal-close" onclick="closeSyncModal()">×</button>
+            </div>
             <div style="margin-bottom:20px;">
-                <div style="font-size:14px;color:var(--text2);margin-bottom:16px;">
-                    綁定 Telegram 後，可以透過 Bot 上傳名片照片自動辨識並同步到此帳戶
+                <div style="font-size:14px;color:var(--text2);margin-bottom:16px;line-height:1.6;">
+                    綁定 Telegram Bot，可將拍攝的名片照片自動辨識並同步至此帳戶。
                 </div>
-                <div style="background:var(--bg);border-radius:10px;padding:16px;margin-bottom:16px;">
-                    <div style="font-size:13px;margin-bottom:8px;">綁定狀態</div>
-                    <div id="telegramStatus">載入中...</div>
+                <div class="sync-info-block">
+                    <div class="row"><i class="fa-solid fa-link"></i><span>綁定狀態：</span><span id="telegramStatus">載入中...</span></div>
                 </div>
-                <div class="form-group">
-                    <label>Telegram 使用者名稱</label>
+                <div class="form-group"><label>Telegram 使用者名稱</label>
                     <input type="text" id="telegramUsername" placeholder="輸入 @username（不含 @）">
                 </div>
-                <button class="btn btn-primary" onclick="linkTelegram()">綁定帳戶</button>
-                <hr style="margin:20px 0;border:none;border-top:1px solid var(--border);">
-                <div style="font-size:14px;margin-bottom:12px;">從 Telegram 同步名片</div>
-                <button class="btn" style="background:var(--accent);color:#fff;" onclick="syncFromTelegram()">🔄 同步名片</button>
-                <div style="font-size:12px;color:var(--text2);margin-top:12px;">
-                    或在 Telegram 搜尋 <b>@CardKingBot</b> 來上傳名片
+                <button class="btn btn-primary" onclick="linkTelegram()"><i class="fa-solid fa-link" style="margin-right:6px;"></i>綁定帳戶</button>
+                <hr class="sync-divider">
+                <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:12px;">同步名片</div>
+                <button class="btn btn-accent" onclick="syncFromTelegram()"><i class="fa-solid fa-rotate" style="margin-right:6px;"></i>從 Telegram 同步名片</button>
+                <div style="font-size:12px;color:var(--text3);margin-top:12px;">
+                    或在 Telegram 搜尋 <b>@CardKingBot</b> 上傳名片照片
                 </div>
             </div>
         </div>
     </div>
-    
+
     <script>
-        let currentUser = null, cards = [], editingId = null, videoStream = null;
-        
+        let currentUser = null, cards = [], editingId = null, videoStream = null, currentCardImage = null;
+
         function getUsers() { return JSON.parse(localStorage.getItem('cardUsers')) || {}; }
         function saveUsers(users) { localStorage.setItem('cardUsers', JSON.stringify(users)); }
         function getUserCards() { if (!currentUser) return []; return (JSON.parse(localStorage.getItem('businessCards')) || {})[currentUser] || []; }
-        function saveUserCards(cards) { if (!currentUser) return; const all = JSON.parse(localStorage.getItem('businessCards')) || {}; all[currentUser] = cards; localStorage.setItem('businessCards', JSON.stringify(all)); }
-        
-        function showTab(tab) { document.getElementById('tabLogin').classList.toggle('active', tab==='login'); document.getElementById('tabRegister').classList.toggle('active', tab==='register'); document.getElementById('loginForm').style.display=tab==='login'?'block':'none'; document.getElementById('registerForm').style.display=tab==='register'?'block':'none'; hideError(); }
-        
-        function hashPassword(raw){try{return btoa(unescape(encodeURIComponent(raw)));}catch(e){return raw;}}
-        function register() { const u=document.getElementById('regUsername').value.trim(), p=document.getElementById('regPassword').value, c=document.getElementById('regConfirm').value; if(!u||!p){showError('regError','請填寫所有欄位');return;} if(p.length<6){showError('regError','密碼至少 6 碼');return;} if(p!==c){showError('regError','兩次密碼不一致');return;} const users=getUsers(); if(users[u]){showError('regError','帳號已被註冊');return;} users[u]={password:hashPassword(p), createdAt:new Date().toISOString()}; saveUsers(users); showToast('註冊成功！請登入'); showTab('login'); }
-        
-        function login() { const u=document.getElementById('loginUsername').value.trim(), p=document.getElementById('loginPassword').value; const users=getUsers(); const candidate=users[u]; const hashed=hashPassword(p); if(!candidate||![candidate.password,p].includes(hashed)&&candidate.password!==p){showError('loginError','帳號或密碼錯誤');return;} if(candidate.password===p){candidate.password=hashed; saveUsers(users);} currentUser=u; localStorage.setItem('currentUser',u); document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('header').classList.remove('hidden'); document.getElementById('mainContent').classList.remove('hidden'); document.getElementById('addBtn').classList.remove('hidden'); document.getElementById('scanFab').classList.remove('hidden'); document.getElementById('welcomeUser').textContent='你好，'+u; cards=getUserCards(); renderCards(); updateStats(); }
-        
-        function logout(){currentUser=null;localStorage.removeItem('currentUser');document.getElementById('loginScreen').classList.remove('hidden');document.getElementById('header').classList.add('hidden');document.getElementById('mainContent').classList.add('hidden');document.getElementById('addBtn').classList.add('hidden');document.getElementById('scanFab').classList.add('hidden');hideError();}
-        function showError(id,msg){document.getElementById(id).textContent=msg;document.getElementById(id).classList.add('show');}
-        function hideError(){document.getElementById('loginError').classList.remove('show');document.getElementById('regError').classList.remove('show');}
-        
-        function updateStats(){document.getElementById('totalCount').textContent=cards.length;document.getElementById('companyCount').textContent=[...new Set(cards.map(c=>c.company).filter(c=>c))].length;document.getElementById('thisMonth').textContent=cards.filter(c=>c.createdAt&&new Date(c.createdAt).getMonth()===new Date().getMonth()&&new Date(c.createdAt).getFullYear()===new Date().getFullYear()).length;}
-        
-        function escapeHtml(text){return String(text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
-        function getAvatarColor(name){const colors=['#0071e3','#34c759','#ff9500','#af52de','#ff3b30','#5ac8fa','#ffcc00'];let hash=0;for(let i=0;i<(name||'').length;i++)hash=name.charCodeAt(i)+((hash<<5)-hash);return colors[Math.abs(hash)%colors.length];}
-        function getInitials(name){return (name||'未知').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();}
-        function getBadgeClass(category){return{客戶:'badge-client',供應商:'badge-supplier',同事:'badge-colleague',潛在客戶:'badge-prospect',其他:'badge-other'}[category]||'badge-other';}
-        function renderCards(f=''){const grid=document.getElementById('cardsGrid');const q=(f||'').toLowerCase();const filtered=cards.filter(c=>!q||(c.name||'').toLowerCase().includes(q)||(c.company||'').toLowerCase().includes(q)||(c.title||'').toLowerCase().includes(q)||(c.email||'').toLowerCase().includes(q));if(filtered.length===0){grid.innerHTML='<div class="empty"><div>📇</div><p>'+(q?'找不到符合的名片':'尚未建立名片')+'</p></div>';return;}grid.innerHTML=filtered.map((c,i)=>'<div class="card-item" style="animation-delay:'+(i*60)+'ms"><div class="card-header-row"><div class="card-avatar" style="background:'+getAvatarColor(c.name)+'">'+getInitials(c.name)+'</div><div class="card-header-info"><div class="card-name">'+escapeHtml(c.name||'未命名')+'</div><div class="card-title">'+escapeHtml(c.title||'')+'</div><div class="card-company">'+escapeHtml(c.company||'')+'</div></div></div><div><span class="card-badge '+getBadgeClass(c.category)+'">'+escapeHtml(c.category||'其他')+'</span></div><div class="card-info">'+(c.phone?'<div><span>電話</span>'+escapeHtml(c.phone)+'</div>':'')+(c.email?'<div><span>Email</span>'+escapeHtml(c.email)+'</div>':'')+(c.line?'<div><span>LINE</span>'+escapeHtml(c.line)+'</div>':'')+'</div><div class="card-actions"><button class="btn-edit" onclick="editCard(\''+c.id+'\')">編輯</button><button class="btn-edit" onclick="showShareModal(\''+c.id+'\')">分享</button><button class="btn-delete" onclick="deleteCard(\''+c.id+'\')">刪除</button></div></div>').join('');}
-        
-        function filterCards(){renderCards(document.getElementById('searchInput').value);}
-        
-        function openModal(card=null){editingId=card?.id||null;document.getElementById('modalTitle').textContent=card?'編輯名片':'新增名片';document.getElementById('inputName').value=card?.name||'';document.getElementById('inputTitle').value=card?.title||'';document.getElementById('inputCompany').value=card?.company||'';document.getElementById('inputPhone').value=card?.phone||'';document.getElementById('inputEmail').value=card?.email||'';document.getElementById('inputLine').value=card?.line||'';document.getElementById('inputCategory').value=card?.category||'客戶';document.getElementById('inputAddress').value=card?.address||'';document.getElementById('cardModal').classList.add('show');}
-        function closeModal(){document.getElementById('cardModal').classList.remove('show');editingId=null;}
-        
-        function saveCard(){const name=document.getElementById('inputName').value.trim();if(!name){showToast('請輸入姓名');return;}const cardData={id:editingId||Date.now().toString(),name:name,title:document.getElementById('inputTitle').value.trim(),company:document.getElementById('inputCompany').value.trim(),phone:document.getElementById('inputPhone').value.trim(),email:document.getElementById('inputEmail').value.trim(),line:document.getElementById('inputLine').value.trim(),category:document.getElementById('inputCategory').value,address:document.getElementById('inputAddress').value.trim(),createdAt:editingId?cards.find(c=>c.id===editingId)?.createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};if(editingId){cards[cards.findIndex(c=>c.id===editingId)]=cardData;showToast('名片已更新');}else{cards.unshift(cardData);showToast('名片已新增');}saveUserCards(cards);renderCards();updateStats();closeModal();}
-        function editCard(id){const c=cards.find(x=>x.id===id);if(c)openModal(c);}
-        function deleteCard(id){if(confirm('確定要刪除這張名片嗎？')){cards=cards.filter(x=>x.id!==id);saveUserCards(cards);renderCards();updateStats();showToast('名片已刪除');}}
-        function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
-        
-        // 分享功能
+        function saveUserCards(cards) {
+            if (!currentUser) return;
+            const all = JSON.parse(localStorage.getItem('businessCards')) || {};
+            all[currentUser] = cards;
+            try { localStorage.setItem('businessCards', JSON.stringify(all)); }
+            catch (e) {
+                if (e.name === 'QuotaExceededError') showToast('儲存空間已滿，請移除部分名片圖片');
+                else showToast('儲存失敗：' + e.message);
+            }
+        }
+
+        function showTab(tab) {
+            document.getElementById('tabLogin').classList.toggle('active', tab==='login');
+            document.getElementById('tabRegister').classList.toggle('active', tab==='register');
+            document.getElementById('loginForm').style.display=tab==='login'?'block':'none';
+            document.getElementById('registerForm').style.display=tab==='register'?'block':'none';
+            hideError();
+        }
+
+        function hashPassword(raw) {
+            try { return btoa(unescape(encodeURIComponent(raw))); }
+            catch(e) { return raw; }
+        }
+
+        function register() {
+            const u = document.getElementById('regUsername').value.trim();
+            const p = document.getElementById('regPassword').value;
+            const c = document.getElementById('regConfirm').value;
+            if (!u || !p) { showError('regError', '請填寫所有欄位'); return; }
+            if (p.length < 6) { showError('regError', '密碼至少 6 碼'); return; }
+            if (p !== c) { showError('regError', '兩次密碼不一致'); return; }
+            const users = getUsers();
+            if (users[u]) { showError('regError', '帳號已被註冊'); return; }
+            users[u] = { password: hashPassword(p), createdAt: new Date().toISOString() };
+            saveUsers(users);
+            showToast('註冊成功！請登入');
+            showTab('login');
+        }
+
+        function login() {
+            const u = document.getElementById('loginUsername').value.trim();
+            const p = document.getElementById('loginPassword').value;
+            const users = getUsers();
+            const candidate = users[u];
+            const hashed = hashPassword(p);
+            if (!candidate || ![candidate.password, p].includes(hashed) && candidate.password !== p) {
+                showError('loginError', '帳號或密碼錯誤');
+                return;
+            }
+            if (candidate.password === p) { candidate.password = hashed; saveUsers(users); }
+            currentUser = u;
+            localStorage.setItem('currentUser', u);
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('header').classList.remove('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+            document.getElementById('addBtn').classList.remove('hidden');
+            document.getElementById('welcomeUser').textContent = '你好，' + u;
+            cards = getUserCards();
+            renderCards();
+            updateStats();
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('header').classList.add('hidden');
+            document.getElementById('mainContent').classList.add('hidden');
+            document.getElementById('addBtn').classList.add('hidden');
+            hideError();
+        }
+
+        function showError(id, msg) {
+            document.getElementById(id).textContent = msg;
+            document.getElementById(id).classList.add('show');
+        }
+        function hideError() {
+            document.getElementById('loginError').classList.remove('show');
+            document.getElementById('regError').classList.remove('show');
+        }
+
+        function updateStats() {
+            document.getElementById('totalCount').textContent = cards.length;
+            document.getElementById('companyCount').textContent = [...new Set(cards.map(c => c.company).filter(Boolean))].length;
+            const now = new Date();
+            document.getElementById('thisMonth').textContent = cards.filter(c =>
+                c.createdAt && new Date(c.createdAt).getMonth() === now.getMonth() && new Date(c.createdAt).getFullYear() === now.getFullYear()
+            ).length;
+        }
+
+        function escapeHtml(text) {
+            return String(text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+        }
+
+        function getAvatarColor(name) {
+            const colors = ['#1b3a6b','#1a7a4a','#c0392b','#6c3483','#b7600a','#1a5276','#6e2f1a'];
+            let hash = 0;
+            for (let i = 0; i < (name||'').length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            return colors[Math.abs(hash) % colors.length];
+        }
+
+        function getInitials(name) {
+            return (name || '未知').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+        }
+
+        function getBadgeClass(cat) {
+            return { '客戶':'badge-client', '供應商':'badge-supplier', '同事':'badge-colleague', '潛在客戶':'badge-prospect', '其他':'badge-other' }[cat] || 'badge-other';
+        }
+
+        function renderCards(filter = '') {
+            const grid = document.getElementById('cardsGrid');
+            const q = (filter || '').toLowerCase();
+            const filtered = cards.filter(c =>
+                !q || (c.name||'').toLowerCase().includes(q) || (c.company||'').toLowerCase().includes(q) ||
+                (c.title||'').toLowerCase().includes(q) || (c.email||'').toLowerCase().includes(q)
+            );
+
+            const sectionTitle = document.getElementById('cardsSectionTitle');
+            sectionTitle.textContent = q ? `搜尋結果（${filtered.length}）` : `全部名片（${cards.length}）`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-address-card"></i></div><p class="title">${q ? '找不到符合的名片' : '尚無名片'}</p><p>${q ? '嘗試其他關鍵字' : '點擊「新增名片」開始建立，或使用「掃描」透過相機讀取'}</p></div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(c => {
+                const name = escapeHtml(c.name || '未命名');
+                const title = escapeHtml(c.title || '');
+                const company = escapeHtml(c.company || '');
+                const email = escapeHtml(c.email || '');
+                const phone = escapeHtml(c.phone || '');
+                const line = escapeHtml(c.line || '');
+                const badge = getBadgeClass(c.category || '其他');
+                const initials = getInitials(c.name);
+                const color = getAvatarColor(c.name);
+                const thumb = c.image ? `<img src="${c.image}" class="card-image-thumb" alt="名片圖片">` : '';
+
+                return `<div class="card-item">
+                    <div class="card-avatar" style="background:${color}">${initials}</div>
+                    <div class="card-body">
+                        <div class="card-name-row">
+                            <span class="card-name">${name}</span>
+                            <span class="card-badge ${badge}">${escapeHtml(c.category || '其他')}</span>
+                        </div>
+                        <div class="card-meta">
+                            ${title ? `<div class="card-meta-item"><i class="fa-solid fa-briefcase"></i>${title}</div>` : ''}
+                            ${company ? `<div class="card-meta-item"><i class="fa-solid fa-building"></i>${company}</div>` : ''}
+                            ${phone ? `<div class="card-meta-item"><i class="fa-solid fa-phone"></i>${phone}</div>` : ''}
+                            ${email ? `<div class="card-meta-item"><i class="fa-solid fa-envelope"></i>${email}</div>` : ''}
+                            ${line ? `<div class="card-meta-item"><i class="fa-brands fa-line"></i>${line}</div>` : ''}
+                        </div>
+                    </div>
+                    ${thumb}
+                    <div class="card-actions">
+                        <button onclick="editCard('${c.id}')" title="編輯"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="showShareModal('${c.id}')" title="分享"><i class="fa-solid fa-share-nodes"></i></button>
+                        <button class="btn-delete-action" onclick="deleteCard('${c.id}')" title="刪除"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function filterCards() { renderCards(document.getElementById('searchInput').value); }
+
+        function openModal(card) {
+            editingId = card?.id || null;
+            document.getElementById('modalTitle').innerHTML = `<i class="fa-solid fa-pen-to-square"></i>${card ? '編輯名片' : '新增名片'}`;
+            document.getElementById('inputName').value = card?.name || '';
+            document.getElementById('inputTitle').value = card?.title || '';
+            document.getElementById('inputCompany').value = card?.company || '';
+            document.getElementById('inputPhone').value = card?.phone || '';
+            document.getElementById('inputEmail').value = card?.email || '';
+            document.getElementById('inputLine').value = card?.line || '';
+            document.getElementById('inputCategory').value = card?.category || '客戶';
+            document.getElementById('inputAddress').value = card?.address || '';
+            if (card?.image) {
+                currentCardImage = card.image;
+                document.getElementById('imagePreview').src = card.image;
+                document.getElementById('imagePreviewContainer').style.display = 'inline-block';
+            } else {
+                clearCardImage();
+            }
+            document.getElementById('cardModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('cardModal').classList.remove('show');
+            editingId = null;
+            clearCardImage();
+        }
+
+        function saveCard() {
+            const name = document.getElementById('inputName').value.trim();
+            if (!name) { showToast('請輸入姓名'); return; }
+            const existingCard = editingId ? cards.find(x => x.id === editingId) : null;
+            const cardData = {
+                id: editingId || Date.now().toString(),
+                name,
+                title: document.getElementById('inputTitle').value.trim(),
+                company: document.getElementById('inputCompany').value.trim(),
+                phone: document.getElementById('inputPhone').value.trim(),
+                email: document.getElementById('inputEmail').value.trim(),
+                line: document.getElementById('inputLine').value.trim(),
+                category: document.getElementById('inputCategory').value,
+                address: document.getElementById('inputAddress').value.trim(),
+                image: currentCardImage || existingCard?.image || null,
+                createdAt: editingId ? cards.find(x => x.id === editingId)?.createdAt : new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            if (editingId) {
+                cards[cards.findIndex(x => x.id === editingId)] = cardData;
+                showToast('名片已更新');
+            } else {
+                cards.unshift(cardData);
+                showToast('名片已新增');
+            }
+            saveUserCards(cards);
+            renderCards();
+            updateStats();
+            closeModal();
+        }
+
+        function editCard(id) { const c = cards.find(x => x.id === id); if (c) openModal(c); }
+
+        function deleteCard(id) {
+            if (confirm('確定要刪除這張名片嗎？')) {
+                cards = cards.filter(x => x.id !== id);
+                saveUserCards(cards);
+                renderCards();
+                updateStats();
+                showToast('名片已刪除');
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerHTML = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        // Share
         let currentShareCard = null;
-        function showShareModal(id) { currentShareCard = cards.find(c => c.id === id); if (!currentShareCard) return; const container = document.getElementById('qrContainer'); container.innerHTML = ''; const vcard = generateVCard(currentShareCard); QRCode.toCanvas(vcard, { width: 200, margin: 2 }, (err, canvas) => { if (!err) container.appendChild(canvas); }); document.getElementById('shareModal').classList.add('show'); }
+        function showShareModal(id) {
+            currentShareCard = cards.find(c => c.id === id);
+            if (!currentShareCard) return;
+            const container = document.getElementById('qrContainer');
+            container.innerHTML = '';
+            const vcard = generateVCard(currentShareCard);
+            QRCode.toCanvas(vcard, { width: 180, margin: 2 }, (err, canvas) => {
+                if (!err) container.appendChild(canvas);
+            });
+            document.getElementById('shareModal').classList.add('show');
+        }
         function closeShare() { document.getElementById('shareModal').classList.remove('show'); currentShareCard = null; }
-        function generateVCard(card) { return `BEGIN:VCARD\nVERSION:3.0\nFN:${card.name||''}\nTITLE:${card.title||''}\nORG:${card.company||''}\nTEL:${card.phone||''}\nEMAIL:${card.email||''}\nADR:${card.address||''}\nNOTE:${card.note||''}\nEND:VCARD`; }
-        function downloadVCard() { if (!currentShareCard) return; const vcard = generateVCard(currentShareCard); const blob = new Blob([vcard], { type: 'text/vcard' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `${currentShareCard.name||'contact'}.vcf`; a.click(); URL.revokeObjectURL(url); showToast('已下載 vCard'); }
-        function copyVCard() { if (!currentShareCard) return; const vcard = generateVCard(currentShareCard); navigator.clipboard.writeText(vcard).then(() => showToast('已複製 vCard')); }
-        async function importVCard(file) { if (!file) return; const text = await file.text(); const imported = parseVCard(text); if (imported.length === 0) { showToast('找不到有效的聯絡人資訊'); return; } let added = 0; for (const card of imported) { const id = Date.now().toString() + Math.random().toString(36).substr(2, 5); cards.unshift({ id, name: card.name, title: card.title, company: card.company, phone: card.phone, email: card.email, address: card.address, line: card.line || '', category: card.category || '其他', createdAt: new Date().toISOString() }); added++; } saveUserCards(cards); renderCards(); updateStats(); showToast('已匯入 ' + added + ' 張名片'); }
-        function parseVCard(vcfText) { const cards = []; const blocks = vcfText.split('END:VCARD'); for (const block of blocks) { if (!block.includes('BEGIN:VCARD')) continue; const text = block + '\nEND:VCARD'; const get = (key) => { const re = new RegExp(key + ':([^\r\n]+)'); const m = text.match(re); return m ? m[1].trim() : ''; }; const fn = get('FN'); const org = get('ORG'); const title = get('TITLE'); const tel = get('TEL;TYPE=CELL') || get('TEL;TYPE=WORK') || get('TEL'); const email = get('EMAIL;TYPE=WORK') || get('EMAIL'); const addr = get('ADR;TYPE=WORK') || get('ADR'); if (!fn && !org && !tel && !email) continue; const name = fn || org || '未知姓名'; cards.push({ name, title, company: org, phone: tel.replace(/[^\d+\s()-]/g, ''), email, address: addr.replace(/; /g, ' ').replace(/;/g, ''), category: '其他' }); } return cards; }
-        
-        async function startScan(){await openScanCamera();}
-        async function startScanFromModal(){await openScanCamera();}
-        async function openScanCamera(){document.getElementById('scanModal').classList.add('show');const v=document.getElementById('video');try{v.srcObject=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});videoStream=v.srcObject;}catch(e){showToast('無法開啟相機：'+e.message);closeScan();}}
-        function closeScan(){document.getElementById('scanModal').classList.remove('show');if(videoStream){videoStream.getTracks().forEach(t=>t.stop());videoStream=null;}document.getElementById('scanProgress').classList.remove('show');}
-        
-        async function captureImage(){const v=document.getElementById('video'),c=document.getElementById('canvas'),ctx=c.getContext('2d');c.width=v.videoWidth;c.height=v.videoHeight;ctx.drawImage(v,0,0);closeScan();const progress=document.getElementById('scanProgress'),percent=document.getElementById('scanPercent');progress.classList.add('show');percent.textContent='0%';try{const p=await preprocessForOCR(c);percent.textContent='10%';Tesseract.recognize(p,'chi_tra+eng',{logger:m=>{if(m.status==='recognizing text')percent.textContent=Math.round(m.progress*88+10)+'%'}}).then(r=>{parseCardInfo(r.data.text);percent.textContent='100%';setTimeout(()=>progress.classList.remove('show'),500);}).catch(e=>{showToast('辨識失敗：'+e.message);progress.classList.remove('show');});}catch(e){showToast('辨識失敗：'+e.message);progress.classList.remove('show');}}
-        function preprocessForOCR(src){return new Promise((resolve,reject)=>{try{const c=document.createElement('canvas');const ratio=Math.min(1200/src.width,1200/src.height,1);c.width=Math.floor(src.width*ratio);c.height=Math.floor(src.height*ratio);const ctx=c.getContext('2d');ctx.imageSmoothingEnabled='high-quality';ctx.drawImage(src,0,0,c.width,c.height);const img=ctx.getImageData(0,0,c.width,c.height);const d=img.data;for(let i=0;i<d.length;i+=4){const g=d[i]*0.299+d[i+1]*0.587+d[i+2]*0.114;const c2=Math.max(0,Math.min(255,g+(g-128)*0.4));d[i]=d[i+1]=d[i+2]=Math.round(c2);}ctx.putImageData(img,0,0);resolve(c.toDataURL('image/jpeg',0.85));}catch(e){reject(e);}});}
-        
+        function generateVCard(card) {
+            return `BEGIN:VCARD\nVERSION:3.0\nFN:${card.name||''}\nTITLE:${card.title||''}\nORG:${card.company||''}\nTEL:${card.phone||''}\nEMAIL:${card.email||''}\nADR:${card.address||''}\nEND:VCARD`;
+        }
+        function downloadVCard() {
+            if (!currentShareCard) return;
+            const blob = new Blob([generateVCard(currentShareCard)], { type: 'text/vcard' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentShareCard.name || 'contact'}.vcf`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('已下載 vCard');
+        }
+        function copyVCard() {
+            if (!currentShareCard) return;
+            navigator.clipboard.writeText(generateVCard(currentShareCard)).then(() => showToast('已複製 vCard'));
+        }
+
+        // Camera / Scan
+        async function startScan() { await openScanCamera(); }
+        async function startScanFromModal() { await openScanCamera(); }
+        async function openScanCamera() {
+            document.getElementById('scanModal').classList.add('show');
+            const v = document.getElementById('video');
+            try {
+                v.srcObject = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                videoStream = v.srcObject;
+            } catch(e) {
+                showToast('無法開啟相機：' + e.message);
+                closeScan();
+            }
+        }
+        function closeScan() {
+            document.getElementById('scanModal').classList.remove('show');
+            if (videoStream) { videoStream.getTracks().forEach(t => t.stop()); videoStream = null; }
+            document.getElementById('scanProgress').classList.remove('show');
+        }
+        // ===== Client-side OCR with Tesseract.js =====
+        let tesseractWorker = null;
+
+        async function getTesseractWorker() {
+            if (!tesseractWorker) {
+                tesseractWorker = await Tesseract.createWorker('eng+chi_tra', 1, {
+                    logger: (m) => {
+                        if (m.status === 'recognizing text') {
+                            const pct = Math.round(m.progress * 100);
+                            document.getElementById('scanPercent').textContent = pct + '%';
+                        }
+                    },
+                });
+            }
+            return tesseractWorker;
+        }
+
+        async function runClientOcr(imageDataUrl) {
+            const worker = await getTesseractWorker();
+            const { data: { text } } = await worker.recognize(imageDataUrl);
+            return text;
+        }
+
+        async function captureImage() {
+            const v = document.getElementById('video'), c = document.getElementById('canvas'), ctx = c.getContext('2d');
+            c.width = v.videoWidth; c.height = v.videoHeight;
+            ctx.drawImage(v, 0, 0);
+            closeScan();
+            const progress = document.getElementById('scanProgress'), percent = document.getElementById('scanPercent');
+            progress.classList.add('show');
+            percent.textContent = '0%';
+            try {
+                const imageData = c.toDataURL('image/jpeg');
+                const text = await runClientOcr(imageData);
+                parseCardInfo(text);
+            } catch(e) { showToast('辨識失敗：' + e.message); }
+            progress.classList.remove('show');
+        }
         function parseCardInfo(text) {
             const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             let name = '', title = '', company = '', phone = '', email = '', address = '';
-            
-            // 電話號碼正規表達式（支援台灣格式）
-            const phoneRegex = /(?:\+?886|0)[\s.-]?(?:\(?\d{1,3}\)?)[\s.-]?\d{3,4}[\s.-]?\d{3,4}/g;
-            // Email 正規表達式
-            const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/gi;
-            // 職稱關鍵詞
-            const titleKeywords = ['經理', '總監', '協理', '副理', '處長', '組長', '主任', '工程師', '設計師', '開發者', '顧問', '總經理', '董事', '老師', '專員', '主管', 'CEO', 'CTO', 'CFO', 'COO', 'VP', 'PM', 'RD', 'HR', ' Manager', 'Director', 'Engineer', 'Consultant', 'President'];
-            // 公司關鍵詞
-            const companyKeywords = ['公司', '股份', '有限', '科技', '電子', '實業', '集團', '工作室', '商行', '合作社', '基金會', '協會', 'Corp', 'Inc', 'Ltd', 'Co', 'LLC', 'Studio'];
-            
-            // 掃描所有行，先找出電話和Email
-            const matchedLines = new Set();
-            
+            const phoneRegex = /(\+?886|0)[-\s]?[0-9]{1,4}[-\s]?[0-9]{3,4}[-\s]?[0-9]{3,4}/;
+            const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
             lines.forEach(l => {
-                // 電話
-                const phoneMatch = l.match(phoneRegex);
-                if (phoneMatch && !phone) {
-                    phone = phoneMatch[0].replace(/[\s.-]/g, '').replace(/^0/, '+886');
-                    matchedLines.add(l);
-                }
-                // Email
-                const emailMatch = l.match(emailRegex);
-                if (emailMatch && !email) {
-                    email = emailMatch[0];
-                    matchedLines.add(l);
-                }
+                if (phoneRegex.test(l) && !phone) phone = l.match(phoneRegex)[0];
+                else if (emailRegex.test(l) && !email) email = l.match(emailRegex)[0];
+                else if (!name) name = l;
+                else if (!title) title = l;
+                else if (!company) company = l;
+                else address += l + ' ';
             });
-            
-            // 第二次掃描：識別職稱和公司
-            const remainingLines = lines.filter(l => !matchedLines.has(l) && l.length > 1);
-            
-            remainingLines.forEach(l => {
-                const hasTitleKeyword = titleKeywords.some(k => l.includes(k));
-                const hasCompanyKeyword = companyKeywords.some(k => l.includes(k));
-                
-                if (!title && hasTitleKeyword) {
-                    title = l;
-                    matchedLines.add(l);
-                } else if (!company && hasCompanyKeyword) {
-                    company = l;
-                    matchedLines.add(l);
-                }
-            });
-            
-            // 第三次：剩餘行按順序賦值
-            const finalRemaining = lines.filter(l => !matchedLines.has(l) && l.length > 1);
-            if (!name && finalRemaining.length > 0) name = finalRemaining[0];
-            if (!title && finalRemaining.length > 1) title = finalRemaining[1];
-            if (!company && finalRemaining.length > 2) company = finalRemaining[2];
-            
-            // 地址（較長的行通常包含地址）
-            lines.forEach(l => {
-                if (matchedLines.has(l)) return;
-                if (l.length > 10 && (l.includes('市') || l.includes('區') || l.includes('路') || l.includes('街') || l.includes('巷') || l.includes('號') || l.includes('樓') || l.includes('縣') || l.includes('鎮') || l.includes('鄉'))) {
-                    address += l + ' ';
-                    matchedLines.add(l);
-                }
-            });
-            
             document.getElementById('inputName').value = name;
             document.getElementById('inputTitle').value = title;
             document.getElementById('inputCompany').value = company;
@@ -468,15 +1438,187 @@
             showToast('已自動填入名片資訊');
             document.getElementById('cardModal').classList.add('show');
         }
-        
-        // ========== Telegram Sync ==========
+
+        // Telegram Sync
         function openSyncModal() { document.getElementById('syncModal').classList.add('show'); renderTelegramLink(); }
         function closeSyncModal() { document.getElementById('syncModal').classList.remove('show'); }
         function getTelegramLink() { return JSON.parse(localStorage.getItem('telegramLink')) || {}; }
         function saveTelegramLink(data) { localStorage.setItem('telegramLink', JSON.stringify(data)); }
-        function renderTelegramLink() { const link = getTelegramLink(); document.getElementById('telegramStatus').innerHTML = link.username ? '<span style="color:var(--accent)">✅ 已綁定: @' + link.username + '</span>' : '<span style="color:var(--text2)">尚未綁定</span>'; }
-        async function linkTelegram() { const username = document.getElementById('telegramUsername').value.trim(); if (!username) { showToast('請輸入 Telegram 使用者名稱'); return; } saveTelegramLink({ username: username, linkedAt: new Date().toISOString() }); showToast('✅ 已綁定 Telegram'); renderTelegramLink(); }
-        async function syncFromTelegram() { showToast('🔄 正在同步...'); const link = getTelegramLink(); if (!link.username) { showToast('請先綁定 Telegram'); return; } const saved = localStorage.getItem('telegramCards_' + currentUser); if (saved) { const tCards = JSON.parse(saved); if (tCards.length > 0) { cards = [...tCards, ...cards]; saveUserCards(cards); renderCards(); updateStats(); showToast('✅ 同步 ' + tCards.length + ' 張名片'); } else { showToast('沒有新名片'); } } else { showToast('沒有 Telegram 名片資料'); } }
+        function renderTelegramLink() {
+            const link = getTelegramLink();
+            document.getElementById('telegramStatus').innerHTML = link.username
+                ? `<span style="color:var(--green);font-weight:600;"><i class="fa-solid fa-circle-check" style="margin-right:5px;"></i>@${link.username}</span>`
+                : `<span style="color:var(--text3);">尚未綁定</span>`;
+        }
+        function linkTelegram() {
+            const username = document.getElementById('telegramUsername').value.trim();
+            if (!username) { showToast('請輸入 Telegram 使用者名稱'); return; }
+            saveTelegramLink({ username, linkedAt: new Date().toISOString() });
+            showToast('已綁定 Telegram');
+            renderTelegramLink();
+        }
+        async function syncFromTelegram() {
+            const link = getTelegramLink();
+            if (!link.username) { showToast('請先綁定 Telegram'); return; }
+            showToast('正在同步...');
+            const saved = localStorage.getItem('telegramCards_' + currentUser);
+            if (saved) {
+                const tCards = JSON.parse(saved);
+                if (tCards.length > 0) {
+                    cards = [...tCards, ...cards];
+                    saveUserCards(cards);
+                    renderCards();
+                    updateStats();
+                    showToast('同步了 ' + tCards.length + ' 張名片');
+                } else { showToast('沒有新名片'); }
+            } else { showToast('沒有 Telegram 名片資料'); }
+        }
+
+        // Image compression helper
+        async function compressImage(file, maxWidth = 800, quality = 0.7) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let w = img.width, h = img.height;
+                        if (w > maxWidth) { h = Math.round((maxWidth / w) * h); w = maxWidth; }
+                        canvas.width = w; canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Drag & Drop for upload zone
+        function initUploadZone() {
+            const zone = document.getElementById('uploadZone');
+            if (!zone) return;
+            zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+            zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+            zone.addEventListener('drop', e => {
+                e.preventDefault();
+                zone.classList.remove('drag-over');
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    handleFileUpload({ target: { files: [file] } });
+                } else {
+                    showToast('請上傳圖片檔案');
+                }
+            });
+        }
+        document.addEventListener('DOMContentLoaded', initUploadZone);
+
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) { showToast('請上傳圖片檔案'); return; }
+            const progress = document.getElementById('scanProgress'), percent = document.getElementById('scanPercent');
+            progress.classList.add('show');
+            percent.textContent = '0%';
+            try {
+                const compressed = await compressImage(file);
+                currentCardImage = compressed;
+                document.getElementById('imagePreview').src = compressed;
+                document.getElementById('imagePreviewContainer').style.display = 'inline-block';
+                const text = await runClientOcr(compressed);
+                parseCardInfo(text);
+                showToast('圖片上傳成功');
+            } catch(e) { showToast('上傳失敗：' + e.message); }
+            progress.classList.remove('show');
+            event.target.value = '';
+        }
+
+        function clearCardImage() {
+            currentCardImage = null;
+            document.getElementById('imagePreviewContainer').style.display = 'none';
+            document.getElementById('imagePreview').src = '';
+        }
+
+        // ===== vCard Import =====
+        function handleVCardImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const card = parseVCard(text);
+                if (!card.name && !card.company) {
+                    showToast('無法解析 vCard，請確認格式');
+                    event.target.value = '';
+                    return;
+                }
+                // Pre-fill form and open modal for new card
+                openModal(); // opens blank modal first
+                setTimeout(function() {
+                    document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-file-import"></i> 匯入vCard';
+                    document.getElementById('inputName').value = card.name || '';
+                    document.getElementById('inputTitle').value = card.title || '';
+                    document.getElementById('inputCompany').value = card.company || '';
+                    document.getElementById('inputPhone').value = card.phone || '';
+                    document.getElementById('inputEmail').value = card.email || '';
+                    document.getElementById('inputAddress').value = card.address || '';
+                    showToast('vCard 已匯入，確認資料後點擊儲存');
+                }, 50);
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function parseVCard(vcfText) {
+            var card = { name: '', title: '', company: '', phone: '', email: '', address: '' };
+            var lines = vcfText.split(/\r?\n/);
+            var currentKey = '';
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i];
+                // Handle continuation lines that start with space or tab
+                if (/^[ \t]/.test(line) && currentKey) {
+                    // Append to previous field (e.g. ADR or NOTE)
+                    card[currentKey] = (card[currentKey] + ' ' + line.trim()).trim();
+                    continue;
+                }
+                var match = line.match(/^([A-Z0-9-]+)(?::(.*))?$/i);
+                if (!match) continue;
+                var key = match[1].toUpperCase();
+                var rawValue = match[2] || '';
+                // Handle quoted-printable encoding for ADR
+                if (rawValue.indexOf('=') !== -1) {
+                    rawValue = rawValue.replace(/=0D=0A/g, '\n').replace(/=([0-9A-Fa-f]{2})/g, function(m, hex) {
+                        return String.fromCharCode(parseInt(hex, 16));
+                    });
+                }
+                // Remove ADR;type=WORK,pref: or similar prefixes
+                var value = rawValue.replace(/^[^:]+:/, '').replace(/\\n/g, '\n').trim();
+                switch (key) {
+                    case 'FN':    card.name     = value; break;
+                    case 'TITLE': card.title    = value; break;
+                    case 'ORG':   card.company  = value.split(';')[0].trim(); break;
+                    case 'TEL':   card.phone    = value.replace(/^type=[^;]+;?/i, '').replace(/^tel:/i, ''); break;
+                    case 'EMAIL': card.email    = value.replace(/^type=[^;]+;?/i, '').replace(/^email:/i, ''); break;
+                    case 'ADR':
+                        // ADR:;;street;city;state;postal;country
+                        var parts = value.split(';');
+                        card.address = parts.filter(function(p) { return p.trim(); }).join(' ');
+                        break;
+                    case 'N':
+                        // N:Last;First;Middle;Prefix;Suffix
+                        if (!card.name) {
+                            var nameParts = value.split(';').filter(function(p) { return p.trim(); });
+                            if (nameParts.length >= 2) card.name = nameParts[1] + ' ' + nameParts[0];
+                            else if (nameParts.length === 1) card.name = nameParts[0];
+                        }
+                        break;
+                }
+            }
+            return card;
+        }
     </script>
 </body>
 </html>
