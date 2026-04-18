@@ -400,8 +400,8 @@
           flex-shrink: 0;
         }
         .ocr-dot {
-          width: 8px;
-          height: 8px;
+          width: 20px;
+          height: 20px;
           border-radius: 50%;
           flex-shrink: 0;
         }
@@ -592,7 +592,7 @@
         }
         @keyframes sheetIn { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .sheet-handle {
-          width: 40px;
+          width: 12px;
           height: 4px;
           border-radius: 2px;
           background: var(--border-strong);
@@ -1147,7 +1147,7 @@
         </div>
     </div>
 
-    <button class="fab hidden" id="addBtn" onclick="openModal()"><i class="fa-solid fa-plus"></i></button>
+    <button class="fab hidden" id="addBtn" aria-label="新增名片" onclick="openModal()"><i class="fa-solid fa-plus"></i></button>
     <div class="toast" id="toast"></div>
 
     <!-- Share Modal -->
