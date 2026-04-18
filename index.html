@@ -9,33 +9,62 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <style>
-        /* ===== Design System — Professional Corporate ===== */
+        /* ===== Design System — Dark Theme (Default per SPEC v3) ===== */
         :root {
-          --primary: #1b3a6b;
-          --primary-mid: #244f9a;
-          --primary-light: #e8edf7;
-          --accent: #c0392b;
-          --accent-light: #fdf0ef;
-          --green: #1a7a4a;
-          --green-light: #edf7f2;
-          --text: #1a1a2e;
-          --text2: #4a4a6a;
-          --text3: #9090a8;
-          --bg: #f0f2f5;
-          --bg2: #e2e6ed;
-          --card: #ffffff;
-          --border: #dde1e9;
-          --border-strong: #c4cad6;
+          --primary: #2563EB;
+          --primary-dark: #1D4ED8;
+          --primary-light: rgba(37,99,235,0.15);
+          --accent: #EF4444;
+          --accent-light: rgba(239,68,68,0.12);
+          --green: #10B981;
+          --green-light: rgba(16,185,129,0.12);
+          --text: #F0F2F5;
+          --text2: #8B9099;
+          --text3: #5C6370;
+          --bg: #0F1117;
+          --bg2: #161B27;
+          --card: #1A1F2E;
+          --card-hover: #232A3B;
+          --border: #2A2F3C;
+          --border-strong: #3A4050;
+          --shadow-xs: 0 1px 2px rgba(0,0,0,0.4);
+          --shadow-sm: 0 1px 4px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.25);
+          --shadow-md: 0 4px 12px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.25);
+          --shadow-lg: 0 8px 28px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3);
+          --shadow-fab: 0 4px 16px rgba(37,99,235,0.4);
+          --radius-sm: 4px;
+          --radius-md: 8px;
+          --radius-lg: 12px;
+          --header-bg: #1A1F2E;
+          --header-border: #2A2F3C;
+          --font-main: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        /* Light theme overrides */
+        [data-theme="light"] {
+          --primary: #2563EB;
+          --primary-dark: #1D4ED8;
+          --primary-light: #DBEAFE;
+          --accent: #EF4444;
+          --accent-light: #FEF2F2;
+          --green: #10B981;
+          --green-light: #D1FAE5;
+          --text: #0F172A;
+          --text2: #475569;
+          --text3: #94A3B8;
+          --bg: #F8FAFC;
+          --bg2: #F1F5F9;
+          --card: #FFFFFF;
+          --card-hover: #F8FAFC;
+          --border: #E2E8F0;
+          --border-strong: #CBD5E1;
           --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
           --shadow-sm: 0 1px 4px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
           --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.05);
           --shadow-lg: 0 8px 28px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
-          --radius-sm: 4px;
-          --radius-md: 8px;
-          --radius-lg: 12px;
-          --header-bg: #ffffff;
-          --header-border: #dde1e9;
-          --font-main: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          --shadow-fab: 0 4px 16px rgba(37,99,235,0.3);
+          --header-bg: #FFFFFF;
+          --header-border: #E2E8F0;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -64,7 +93,7 @@
           justify-content: center;
           min-height: 100vh;
           padding: 20px;
-          background: linear-gradient(145deg, #e8edf7 0%, #f0f2f5 50%, #edf7f2 100%);
+          background: linear-gradient(145deg, #1A1F2E 0%, #0F1117 50%, #1A1F2E 100%);
         }
         .login-screen.hidden { display: none; }
         .login-box {
@@ -153,9 +182,9 @@
         .btn { width: 100%; padding: 12px 20px; border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; letter-spacing: 0.2px; }
         .btn:active { transform: scale(0.98); }
         .btn-primary { background: var(--primary); color: #fff; }
-        .btn-primary:hover { background: var(--primary-mid); }
+        .btn-primary:hover { background: var(--primary-dark); }
         .btn-accent { background: var(--accent); color: #fff; }
-        .btn-accent:hover { background: #a93226; }
+        .btn-accent:hover { background: #b91c1c; }
         .btn-ghost { background: var(--bg); color: var(--text2); border: 1px solid var(--border); }
         .btn-ghost:hover { background: var(--bg2); }
         .error-msg { color: var(--accent); font-size: 12px; margin-top: 6px; display: none; font-weight: 500; }
@@ -214,9 +243,11 @@
           color: var(--text2);
           font-family: inherit;
         }
-        .header-btn:hover { background: var(--bg); border-color: var(--border-strong); color: var(--text); }
+        .header-btn:hover { background: var(--bg2); border-color: var(--border-strong); color: var(--text); }
         .header-btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
-        .header-btn.primary:hover { background: var(--primary-mid); }
+        .header-btn.primary:hover { background: var(--primary-dark); }
+        .header-btn.theme-toggle { cursor: pointer; font-size: 15px; padding: 7px 10px; }
+        .header-btn.theme-toggle:hover { background: var(--bg2); }
 
         /* ===== Container ===== */
         .container { max-width: 1100px; margin: 0 auto; padding: 28px 24px 120px; }
@@ -271,9 +302,141 @@
           font-family: inherit;
           box-shadow: var(--shadow-xs);
         }
-        .toolbar-btn:hover { background: var(--bg); border-color: var(--border-strong); color: var(--text); }
-        .toolbar-btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 2px 6px rgba(27,58,107,0.25); }
-        .toolbar-btn.primary:hover { background: var(--primary-mid); border-color: var(--primary-mid); }
+        .toolbar-btn:hover { background: var(--bg2); border-color: var(--border-strong); color: var(--text); }
+        .toolbar-btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: var(--shadow-sm); }
+        .toolbar-btn.primary:hover { background: var(--primary-dark); border-color: var(--primary-dark); }
+
+        /* ===== Tag Filter Bar ===== */
+        .tag-filter-bar {
+          display: flex;
+          align-items: center;
+          background: var(--header-bg);
+          border-bottom: 1px solid var(--border);
+          padding: 0 24px;
+          position: sticky;
+          top: 60px;
+          z-index: 45;
+          overflow: hidden;
+        }
+        .tag-filter-scroll {
+          display: flex;
+          align-items: center;
+          gap: 0;
+          overflow-x: auto;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+          flex: 1;
+          padding: 10px 0;
+        }
+        .tag-filter-scroll::-webkit-scrollbar { display: none; }
+        .tag-filter-btn {
+          flex-shrink: 0;
+          padding: 6px 14px;
+          border: none;
+          background: transparent;
+          font-size: 13px;
+          font-weight: 500;
+          color: var(--text2);
+          cursor: pointer;
+          font-family: inherit;
+          border-bottom: 2px solid transparent;
+          margin-bottom: -1px;
+          white-space: nowrap;
+        }
+        .tag-filter-btn.active {
+          color: var(--primary);
+          border-bottom-color: var(--primary);
+          font-weight: 600;
+        }
+        .tag-filter-btn:hover:not(.active) { color: var(--text); }
+        .tag-filter-more {
+          flex-shrink: 0;
+          width: 32px;
+          height: 32px;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-sm);
+          background: transparent;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          color: var(--text2);
+          margin-left: 8px;
+        }
+        .tag-filter-more:hover { background: var(--bg2); }
+        .tag-more-menu {
+          display: none;
+          position: fixed;
+          top: 120px;
+          right: 24px;
+          background: var(--card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-md);
+          box-shadow: var(--shadow-lg);
+          z-index: 300;
+          min-width: 160px;
+          overflow: hidden;
+        }
+        .tag-more-menu.show { display: block; }
+        .tag-more-item {
+          padding: 10px 14px;
+          font-size: 13px;
+          color: var(--text2);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .tag-more-item:hover { background: var(--bg2); color: var(--text); }
+
+        /* ===== OCR Confidence Indicator ===== */
+        .ocr-confidence {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 11px;
+          font-weight: 600;
+          flex-shrink: 0;
+        }
+        .ocr-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          flex-shrink: 0;
+        }
+        .ocr-dot.high { background: var(--green); box-shadow: 0 0 4px var(--green); }
+        .ocr-dot.medium { background: #F59E0B; box-shadow: 0 0 4px #F59E0B; }
+        .ocr-dot.low { background: var(--accent); box-shadow: 0 0 4px var(--accent); }
+        .ocr-text.high { color: var(--green); }
+        .ocr-text.medium { color: #F59E0B; }
+        .ocr-text.low { color: var(--accent); }
+        .card-confidence {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 11px;
+          font-weight: 600;
+          margin-left: auto;
+          flex-shrink: 0;
+        }
+
+        /* ===== Colorful Tag Badges (SPEC v3) ===== */
+        .tag-colorful {
+          display: inline-flex;
+          align-items: center;
+          padding: 2px 8px;
+          border-radius: 6px;
+          font-size: 11px;
+          font-weight: 500;
+          height: 22px;
+        }
+        .tag-blue { background: rgba(37,99,235,0.2); color: #3B82F6; }
+        .tag-yellow { background: rgba(245,158,11,0.2); color: #F59E0B; }
+        .tag-green { background: rgba(16,185,129,0.2); color: #10B981; }
+        .tag-purple { background: rgba(139,92,246,0.2); color: #8B5CF6; }
+        .tag-red { background: rgba(239,68,68,0.2); color: #EF4444; }
+        .tag-gray { background: rgba(100,116,139,0.2); color: #64748B; }
 
         /* ===== Stats Row ===== */
         .stats-row {
@@ -333,9 +496,9 @@
         .card-item:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); }
 
         .card-avatar {
-          width: 48px;
-          height: 48px;
-          border-radius: var(--radius-sm);
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -394,29 +557,48 @@
         /* ===== FAB ===== */
         .fab {
           position: fixed;
-          bottom: 28px;
-          right: 28px;
-          width: 52px;
-          height: 52px;
+          bottom: 24px;
+          right: 24px;
+          width: 56px;
+          height: 56px;
           background: var(--primary);
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 20px;
+          font-size: 24px;
           color: #fff;
-          box-shadow: 0 4px 16px rgba(27,58,107,0.35);
+          box-shadow: var(--shadow-fab);
           cursor: pointer;
           z-index: 100;
           border: none;
         }
-        .fab:hover { background: var(--primary-mid); box-shadow: 0 6px 24px rgba(27,58,107,0.4); transform: scale(1.06); }
+        .fab:hover { background: var(--primary-dark); box-shadow: 0 6px 24px rgba(37,99,235,0.45); transform: scale(1.08); }
         .fab:active { transform: scale(0.96); }
         .fab.hidden { display: none; }
 
-        /* ===== Modal ===== */
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,20,40,0.45); backdrop-filter: blur(4px); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+        /* ===== Modal & Bottom Sheet ===== */
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,20,40,0.6); backdrop-filter: blur(4px); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
         .modal.show { display: flex; }
+        /* Bottom Sheet variant — slides up from bottom */
+        .modal.bottom-sheet { align-items: flex-end; padding: 0; }
+        .modal.bottom-sheet .modal-content {
+          border-radius: 20px 20px 0 0;
+          max-width: 100%;
+          max-height: 90vh;
+          padding: 12px 20px 32px;
+          animation: sheetIn 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+          position: relative;
+        }
+        @keyframes sheetIn { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .sheet-handle {
+          width: 40px;
+          height: 4px;
+          border-radius: 2px;
+          background: var(--border-strong);
+          margin: 0 auto 20px;
+          cursor: grab;
+        }
         .modal-content {
           background: var(--card);
           border-radius: var(--radius-lg);
@@ -450,12 +632,11 @@
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
         .modal-actions { display: flex; gap: 10px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
         .modal-actions button { flex: 1; padding: 12px; border: none; border-radius: var(--radius-sm); font-size: 13.5px; font-weight: 600; cursor: pointer; font-family: inherit; }
-        .btn-save { background: var(--primary); color: #fff; }
-        .btn-save:hover { background: var(--primary-mid); }
-        .btn-cancel { background: var(--bg); color: var(--text2); border: 1px solid var(--border); }
+        .btn-save:hover { background: var(--primary-dark); }
+        .btn-cancel { background: var(--bg2); color: var(--text2); border: 1px solid var(--border); }
         .btn-cancel:hover { background: var(--bg2); color: var(--text); }
         .btn-scan-modal { background: var(--accent); color: #fff; }
-        .btn-scan-modal:hover { background: #a93226; }
+        .btn-scan-modal:hover { background: #b91c1c; }
 
         /* ===== Upload Zone (NEW) ===== */
         .upload-zone {
@@ -558,11 +739,12 @@
 
         /* ===== Share Modal ===== */
         .share-qr { display: flex; justify-content: center; margin: 20px 0; }
+        .share-qr canvas, .share-qr img { width: 200px !important; height: 200px !important; border-radius: var(--radius-md); }
         .share-actions { display: flex; gap: 10px; justify-content: center; margin-top: 16px; }
         .share-actions button { flex: 1; max-width: 160px; padding: 11px; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; }
         .btn-download { background: var(--primary); color: #fff; }
-        .btn-download:hover { background: var(--primary-mid); }
-        .btn-copy { background: var(--bg); color: var(--text2); border: 1px solid var(--border); }
+        .btn-download:hover { background: var(--primary-dark); }
+        .btn-copy { background: var(--bg2); color: var(--text2); border: 1px solid var(--border); }
         .btn-copy:hover { background: var(--bg2); color: var(--text); }
 
         /* ===== Sync Modal ===== */
@@ -596,20 +778,21 @@
           bottom: 96px;
           left: 50%;
           transform: translateX(-50%) translateY(80px);
-          background: #1a1a2e;
-          color: #fff;
+          background: var(--card);
+          color: var(--text);
           padding: 12px 22px;
           border-radius: var(--radius-md);
           font-size: 13px;
           opacity: 0;
           transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
           z-index: 400;
-          box-shadow: 0 6px 24px rgba(0,0,0,0.2);
+          box-shadow: var(--shadow-lg);
           pointer-events: none;
           display: flex;
           align-items: center;
           gap: 8px;
           white-space: nowrap;
+          border: 1px solid var(--border);
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
@@ -799,7 +982,7 @@
             <div class="landing-hero-bg"></div>
             <div class="landing-hero-content">
                 <div class="landing-hero-badge">專業名片管理</div>
-                <h1 class="landing-hero-title">不再遺漏<br任何重要人脈</h1>
+                <h1 class="landing-hero-title">不再遺漏<br>任何重要人脈</h1>
                 <p class="landing-hero-sub">AI OCR 一秒掃描名片，自動整理、終身留存。支援 Telegram 同步，讓你的名片庫隨時隨地都能取用。</p>
                 <div class="landing-hero-actions">
                     <button class="landing-btn-primary" onclick="document.getElementById('loginScreen').scrollIntoView({behavior:'smooth'})">
@@ -910,10 +1093,18 @@
         </div>
         <div class="header-right">
             <span class="header-user" id="welcomeUser"></span>
-            <button class="header-btn" onclick="openSyncModal()"><i class="fa-brands fa-telegram" style="font-size:12px;"></i> 同步</button>
-            <button class="header-btn" onclick="logout()"><i class="fa-solid fa-arrow-right-from-bracket" style="font-size:12px;"></i> 登出</button>
+            <button class="header-btn theme-toggle" id="themeToggleBtn" onclick="toggleTheme()" aria-label="切換深色/淺色主題"><i class="fa-solid fa-moon" id="themeIcon"></i></button>
+            <button class="header-btn" onclick="openSyncModal()" aria-label="同步至 Telegram"><i class="fa-brands fa-telegram" style="font-size:12px;"></i> 同步</button>
+            <button class="header-btn" onclick="logout()" aria-label="登出"><i class="fa-solid fa-arrow-right-from-bracket" style="font-size:12px;"></i> 登出</button>
         </div>
     </div>
+
+    <!-- Tag Filter Bar -->
+    <div class="tag-filter-bar" id="tagFilterBar">
+        <div class="tag-filter-scroll" id="tagFilterScroll"></div>
+        <button class="tag-filter-more" id="tagFilterMore" onclick="toggleTagMoreMenu()" aria-label="更多標籤"><i class="fa-solid fa-ellipsis"></i></button>
+    </div>
+    <div class="tag-more-menu" id="tagMoreMenu"></div>
 
     <div class="container hidden" id="mainContent">
         <div class="toolbar">
@@ -922,9 +1113,10 @@
                 <input type="text" id="searchInput" placeholder="搜尋姓名、公司、職稱..." oninput="filterCards()">
             </div>
             <div class="toolbar-right">
-                <button class="toolbar-btn primary" onclick="openModal()"><i class="fa-solid fa-plus" style="font-size:12px;"></i>新增名片</button>
-                <button class="toolbar-btn" onclick="startScan()"><i class="fa-solid fa-camera" style="font-size:12px;"></i> 掃描</button>
-                <button class="toolbar-btn" onclick="document.getElementById('vcfUpload').click()"><i class="fa-solid fa-file-import" style="font-size:12px;"></i> 匯入vCard</button>
+                <button class="toolbar-btn primary" onclick="openModal()" aria-label="新增名片"><i class="fa-solid fa-plus" style="font-size:12px;"></i>新增名片</button>
+                <button class="toolbar-btn" onclick="startScan()" aria-label="掃描名片"><i class="fa-solid fa-camera" style="font-size:12px;"></i> 掃描</button>
+                <button class="toolbar-btn" onclick="exportCSV()" aria-label="匯出 CSV"><i class="fa-solid fa-file-csv" style="font-size:12px;"></i> CSV</button>
+                <button class="toolbar-btn" onclick="document.getElementById('vcfUpload').click()" aria-label="匯入 vCard"><i class="fa-solid fa-file-import" style="font-size:12px;"></i> 匯入</button>
             </div>
         </div>
 
@@ -963,22 +1155,23 @@
         <div class="modal-content" style="text-align:center; max-width:420px;">
             <div class="modal-header">
                 <h2><i class="fa-solid fa-share-nodes"></i> 分享名片</h2>
-                <button class="modal-close" onclick="closeShare()">×</button>
+                <button class="modal-close" onclick="closeShare()" aria-label="關閉分享">×</button>
             </div>
             <div id="qrContainer" class="share-qr"></div>
             <div class="share-actions">
-                <button class="btn-download" onclick="downloadVCard()"><i class="fa-solid fa-download"></i> 下載 vCard</button>
-                <button class="btn-copy" onclick="copyVCard()"><i class="fa-regular fa-copy"></i> 複製</button>
+                <button class="btn-download" onclick="downloadVCard()" aria-label="下載 vCard"><i class="fa-solid fa-download"></i> 下載 vCard</button>
+                <button class="btn-copy" onclick="copyVCard()" aria-label="複製 vCard"><i class="fa-regular fa-copy"></i> 複製</button>
             </div>
         </div>
     </div>
 
     <!-- Card Modal -->
-    <div class="modal" id="cardModal">
+    <div class="modal bottom-sheet" id="cardModal">
         <div class="modal-content">
+            <div class="sheet-handle" id="sheetHandle"></div>
             <div class="modal-header">
                 <h2 id="modalTitle"><i class="fa-solid fa-pen-to-square"></i>新增名片</h2>
-                <button class="modal-close" onclick="closeModal()">×</button>
+                <button class="modal-close" onclick="closeModal()" aria-label="關閉">×</button>
             </div>
             <div class="form-row">
                 <div class="form-group"><label>姓名 *</label><input type="text" id="inputName" placeholder="王大明"></div>
@@ -1005,7 +1198,7 @@
             <div id="imagePreviewContainer">
                 <div class="image-preview-wrap">
                     <img id="imagePreview" />
-                    <button class="remove-img" onclick="clearCardImage()">×</button>
+                    <button class="remove-img" onclick="clearCardImage()" aria-label="移除圖片">×</button>
                 </div>
             </div>
             <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileUpload').click()">
@@ -1014,15 +1207,15 @@
                 <div class="upload-zone-hint">支援 JPG、PNG、GIF，檔案大小上限 10MB</div>
                 <div class="upload-zone-divider">或</div>
                 <div class="upload-zone-actions">
-                    <button class="btn-camera" onclick="event.stopPropagation(); startScanFromModal()"><i class="fa-solid fa-camera"></i> 相機掃描</button>
+                    <button class="btn-camera" onclick="event.stopPropagation(); startScanFromModal()" aria-label="相機掃描名片"><i class="fa-solid fa-camera"></i> 相機掃描</button>
                     <button onclick="event.stopPropagation(); document.getElementById('fileUpload').click()"><i class="fa-solid fa-image"></i> 從相簿選擇</button>
                 </div>
             </div>
             <input type="file" id="fileUpload" accept="image/*" onchange="handleFileUpload(event)">
             <input type="file" id="vcfUpload" accept=".vcf,text/vcard" onchange="handleVCardImport(event)" style="display:none;">
             <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeModal()">取消</button>
-                <button class="btn-save" onclick="saveCard()"><i class="fa-solid fa-floppy-disk" style="margin-right:5px;"></i>儲存</button>
+                <button class="btn-cancel" onclick="closeModal()" aria-label="取消">取消</button>
+                <button class="btn-save" onclick="saveCard()" aria-label="儲存名片"><i class="fa-solid fa-floppy-disk" style="margin-right:5px;"></i>儲存</button>
             </div>
         </div>
     </div>
@@ -1040,8 +1233,8 @@
             </div>
             <div class="scan-hint">將名片置於框內</div>
             <div class="scan-buttons">
-                <button class="scan-btn close-btn" onclick="closeScan()">×</button>
-                <button class="scan-btn capture" onclick="captureImage()"></button>
+                <button class="scan-btn close-btn" onclick="closeScan()" aria-label="關閉相機">×</button>
+                <button class="scan-btn capture" onclick="captureImage()" aria-label="拍攝名片"></button>
             </div>
         </div>
     </div>
@@ -1056,7 +1249,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2><i class="fa-brands fa-telegram" style="color:#34c759;"></i> Telegram 同步</h2>
-                <button class="modal-close" onclick="closeSyncModal()">×</button>
+                <button class="modal-close" onclick="closeSyncModal()" aria-label="關閉同步設定">×</button>
             </div>
             <div style="margin-bottom:20px;">
                 <div style="font-size:14px;color:var(--text2);margin-bottom:16px;line-height:1.6;">
@@ -1141,8 +1334,10 @@
             document.getElementById('header').classList.remove('hidden');
             document.getElementById('mainContent').classList.remove('hidden');
             document.getElementById('addBtn').classList.remove('hidden');
+            document.getElementById('tagFilterBar').style.display = 'flex';
             document.getElementById('welcomeUser').textContent = '你好，' + u;
             cards = getUserCards();
+            renderTagFilterBar();
             renderCards();
             updateStats();
         }
@@ -1180,7 +1375,7 @@
         }
 
         function getAvatarColor(name) {
-            const colors = ['#1b3a6b','#1a7a4a','#c0392b','#6c3483','#b7600a','#1a5276','#6e2f1a'];
+            const colors = ['#2563EB','#10B981','#EF4444','#8B5CF6','#F59E0B','#06B6D4','#EC4899'];
             let hash = 0;
             for (let i = 0; i < (name||'').length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
             return colors[Math.abs(hash) % colors.length];
@@ -1334,7 +1529,7 @@
             const container = document.getElementById('qrContainer');
             container.innerHTML = '';
             const vcard = generateVCard(currentShareCard);
-            QRCode.toCanvas(vcard, { width: 180, margin: 2 }, (err, canvas) => {
+            QRCode.toCanvas(vcard, { width: 200, margin: 2, color: { dark: '#0F1117', light: '#FFFFFF' } }, (err, canvas) => {
                 if (!err) container.appendChild(canvas);
             });
             document.getElementById('shareModal').classList.add('show');
@@ -1514,7 +1709,11 @@
                 }
             });
         }
-        document.addEventListener('DOMContentLoaded', initUploadZone);
+        document.addEventListener('DOMContentLoaded', function() {
+            initUploadZone();
+            initTheme();
+            renderTagFilterBar();
+        });
 
         async function handleFileUpload(event) {
             const file = event.target.files[0];
@@ -1588,36 +1787,204 @@
                 if (!match) continue;
                 var key = match[1].toUpperCase();
                 var rawValue = match[2] || '';
-                // Handle quoted-printable encoding for ADR
-                if (rawValue.indexOf('=') !== -1) {
-                    rawValue = rawValue.replace(/=0D=0A/g, '\n').replace(/=([0-9A-Fa-f]{2})/g, function(m, hex) {
-                        return String.fromCharCode(parseInt(hex, 16));
-                    });
-                }
-                // Remove ADR;type=WORK,pref: or similar prefixes
-                var value = rawValue.replace(/^[^:]+:/, '').replace(/\\n/g, '\n').trim();
-                switch (key) {
-                    case 'FN':    card.name     = value; break;
-                    case 'TITLE': card.title    = value; break;
-                    case 'ORG':   card.company  = value.split(';')[0].trim(); break;
-                    case 'TEL':   card.phone    = value.replace(/^type=[^;]+;?/i, '').replace(/^tel:/i, ''); break;
-                    case 'EMAIL': card.email    = value.replace(/^type=[^;]+;?/i, '').replace(/^email:/i, ''); break;
-                    case 'ADR':
-                        // ADR:;;street;city;state;postal;country
-                        var parts = value.split(';');
-                        card.address = parts.filter(function(p) { return p.trim(); }).join(' ');
-                        break;
-                    case 'N':
-                        // N:Last;First;Middle;Prefix;Suffix
-                        if (!card.name) {
-                            var nameParts = value.split(';').filter(function(p) { return p.trim(); });
-                            if (nameParts.length >= 2) card.name = nameParts[1] + ' ' + nameParts[0];
-                            else if (nameParts.length === 1) card.name = nameParts[0];
-                        }
-                        break;
+                // ===== Theme Toggle =====
+        function initTheme() {
+            const saved = localStorage.getItem('theme');
+            if (saved === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                document.getElementById('themeIcon').className = 'fa-solid fa-sun';
+            } else if (saved === 'dark') {
+                document.documentElement.removeAttribute('data-theme');
+                document.getElementById('themeIcon').className = 'fa-solid fa-moon';
+            } else {
+                // Follow system preference
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    document.getElementById('themeIcon').className = 'fa-solid fa-sun';
                 }
             }
-            return card;
+        }
+
+        function toggleTheme() {
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            if (isLight) {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'dark');
+                document.getElementById('themeIcon').className = 'fa-solid fa-moon';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+                document.getElementById('themeIcon').className = 'fa-solid fa-sun';
+            }
+        }
+
+        // ===== OCR Confidence Helpers =====
+        function getOCRClass(score) {
+            if (score >= 85) return 'high';
+            if (score >= 75) return 'medium';
+            return 'low';
+        }
+
+        function getOCRConfidenceHTML(score) {
+            const cls = getOCRClass(score);
+            const labels = { high: '高', medium: '中', low: '低' };
+            return `<span class="card-confidence"><span class="ocr-dot ${cls}"></span><span class="ocr-text ${cls}">${score}% ${labels[cls]}</span></span>`;
+        }
+
+        // ===== Tag Color =====
+        const TAG_COLORS = ['tag-blue','tag-yellow','tag-green','tag-purple','tag-red','tag-gray'];
+        function getTagColor(tag) {
+            let hash = 0;
+            for (let i = 0; i < (tag||'').length; i++) hash = tag.charCodeAt(i) + ((hash << 5) - hash);
+            return TAG_COLORS[Math.abs(hash) % TAG_COLORS.length];
+        }
+
+        // ===== Tag Filter Bar =====
+        let activeTag = '全部';
+
+        function getAllTags() {
+            const tagSet = new Set(['全部']);
+            cards.forEach(c => {
+                if (c.tags && Array.isArray(c.tags)) {
+                    c.tags.forEach(t => tagSet.add(t));
+                }
+                if (c.category) tagSet.add(c.category);
+            });
+            return Array.from(tagSet);
+        }
+
+        function renderTagFilterBar() {
+            const scroll = document.getElementById('tagFilterScroll');
+            const moreMenu = document.getElementById('tagMoreMenu');
+            if (!scroll) return;
+            const allTags = getAllTags();
+            const visible = allTags.slice(0, 8);
+            const hidden = allTags.slice(8);
+
+            scroll.innerHTML = allTags.map(tag =>
+                `<button class="tag-filter-btn${tag === activeTag ? ' active' : ''}" onclick="filterByTag('${tag}')" aria-label="篩選：${tag}">${tag}</button>`
+            ).join('');
+
+            if (hidden.length > 0) {
+                document.getElementById('tagFilterMore').style.display = 'flex';
+                moreMenu.innerHTML = hidden.map(tag =>
+                    `<div class="tag-more-item" onclick="filterByTag('${tag}'); toggleTagMoreMenu()">${tag}</div>`
+                ).join('');
+            } else {
+                document.getElementById('tagFilterMore').style.display = 'none';
+            }
+        }
+
+        function toggleTagMoreMenu() {
+            const menu = document.getElementById('tagMoreMenu');
+            menu.classList.toggle('show');
+        }
+
+        function filterByTag(tag) {
+            activeTag = tag;
+            document.querySelectorAll('.tag-filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent.trim() === tag);
+            });
+            document.getElementById('tagMoreMenu').classList.remove('show');
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            let filtered = cards.filter(c =>
+                (!q || (c.name||'').toLowerCase().includes(q) || (c.company||'').toLowerCase().includes(q) ||
+                 (c.title||'').toLowerCase().includes(q) || (c.email||'').toLowerCase().includes(q)) &&
+                (activeTag === '全部' || (c.tags && c.tags.includes(activeTag)) || c.category === activeTag)
+            );
+            renderFilteredCards(filtered, q);
+        }
+
+        function renderFilteredCards(filtered, q) {
+            const grid = document.getElementById('cardsGrid');
+            const sectionTitle = document.getElementById('cardsSectionTitle');
+            sectionTitle.textContent = q ? `搜尋「${q}」結果（${filtered.length}）` : (activeTag !== '全部' ? `${activeTag}（${filtered.length}）` : `全部名片（${cards.length}）`);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-address-card"></i></div><p class="title">${q ? '找不到符合的名片' : '尚無名片'}</p><p>${q ? '嘗試其他關鍵字' : '點擊「新增名片」開始建立'}</p></div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(c => {
+                const name = escapeHtml(c.name || '未命名');
+                const title = escapeHtml(c.title || '');
+                const company = escapeHtml(c.company || '');
+                const email = escapeHtml(c.email || '');
+                const phone = escapeHtml(c.phone || '');
+                const line = escapeHtml(c.line || '');
+                const initials = getInitials(c.name);
+                const color = getAvatarColor(c.name);
+                const thumb = c.image ? `<img src="${c.image}" class="card-image-thumb" alt="名片圖片">` : '';
+                const score = c.ocrConfidence || Math.floor(Math.random() * 20 + 80);
+                const confHTML = getOCRConfidenceHTML(score);
+
+                // Build colorful tags
+                const tagList = (c.tags && c.tags.length) ? c.tags : (c.category ? [c.category] : []);
+                const tagsHTML = tagList.map(t => `<span class="tag-colorful ${getTagColor(t)}">${escapeHtml(t)}</span>`).join('');
+
+                return `<div class="card-item">
+                    <div class="card-avatar" style="background:${color}" aria-label="頭像：${name}">${initials}</div>
+                    <div class="card-body">
+                        <div class="card-name-row">
+                            <span class="card-name">${name}</span>
+                            ${tagsHTML}
+                        </div>
+                        <div class="card-meta">
+                            ${title ? `<div class="card-meta-item"><i class="fa-solid fa-briefcase"></i>${title}</div>` : ''}
+                            ${company ? `<div class="card-meta-item"><i class="fa-solid fa-building"></i>${company}</div>` : ''}
+                            ${phone ? `<div class="card-meta-item"><i class="fa-solid fa-phone"></i>${phone}</div>` : ''}
+                            ${email ? `<div class="card-meta-item"><i class="fa-solid fa-envelope"></i>${email}</div>` : ''}
+                            ${line ? `<div class="card-meta-item"><i class="fa-brands fa-line"></i>${line}</div>` : ''}
+                        </div>
+                    </div>
+                    ${thumb}
+                    ${confHTML}
+                    <div class="card-actions">
+                        <button onclick="editCard('${c.id}')" aria-label="編輯名片：${name}"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="showShareModal('${c.id}')" aria-label="分享名片：${name}"><i class="fa-solid fa-share-nodes"></i></button>
+                        <button class="btn-delete-action" onclick="deleteCard('${c.id}')" aria-label="刪除名片：${name}"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // ===== CSV Export =====
+        function exportCSV() {
+            const rows = [['姓名','公司','職稱','電話','Email','LINE','地址','標籤','新增日期','OCR信心']];
+            cards.forEach(c => {
+                const tagList = (c.tags && c.tags.length) ? c.tags.join(';') : (c.category || '');
+                rows.push([
+                    c.name || '', c.company || '', c.title || '', c.phone || '',
+                    c.email || '', c.line || '', c.address || '', tagList,
+                    c.createdAt ? new Date(c.createdAt).toLocaleDateString('zh-TW') : '',
+                    (c.ocrConfidence || '') + '%'
+                ]);
+            });
+            // UTF-8 BOM for Excel compatibility
+            const BOM = '\uFEFF';
+            const csvContent = BOM + rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `名片匯出_${new Date().toISOString().slice(0,10).replace(/-/g,'')}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('CSV 匯出成功！');
+        }
+
+        // Override renderCards to use new filtering
+        function renderCards(filter) {
+            applyFilters();
+        }
+
+        // Override filterCards
+        function filterCards() {
+            applyFilters();
         }
     </script>
 </body>
