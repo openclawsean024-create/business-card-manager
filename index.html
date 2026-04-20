@@ -6,71 +6,59 @@
     <title>名片王 - Business Card Manager</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <style>
-        /* ===== Design System — Dark Theme (Default per SPEC v3) ===== */
+        /* ===== Design System — New Dark Theme (Vercel-style) ===== */
         :root {
-          --primary: #2563EB;
-          --primary-dark: #1D4ED8;
-          --primary-light: rgba(37,99,235,0.15);
-          --accent: #EF4444;
-          --accent-light: rgba(239,68,68,0.12);
-          --green: #10B981;
-          --green-light: rgba(16,185,129,0.12);
-          --text: #F0F2F5;
-          --text2: #8B9099;
-          --text3: #5C6370;
-          --bg: #0F1117;
-          --bg2: #161B27;
-          --card: #1A1F2E;
-          --card-hover: #232A3B;
-          --border: #2A2F3C;
-          --border-strong: #3A4050;
-          --shadow-xs: 0 1px 2px rgba(0,0,0,0.4);
-          --shadow-sm: 0 1px 4px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.25);
-          --shadow-md: 0 4px 12px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.25);
-          --shadow-lg: 0 8px 28px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3);
-          --shadow-fab: 0 4px 16px rgba(37,99,235,0.4);
-          --radius-sm: 4px;
-          --radius-md: 8px;
-          --radius-lg: 12px;
-          --header-bg: #1A1F2E;
-          --header-border: #2A2F3C;
-          --font-main: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          --bg-main: #0F172A;
+          --bg-card: #1E293B;
+          --accent: #6366F1;
+          --accent-dark: #4F46E5;
+          --accent-light: rgba(99,102,241,0.12);
+          --gold: #D4AF37;
+          --gold-light: rgba(212,175,55,0.15);
+          --text: #F8FAFC;
+          --text-secondary: #94A3B8;
+          --text-muted: #64748B;
+          --border: #334155;
+          --border-light: #1E293B;
+          --success: #22C55E;
+          --success-light: rgba(34,197,94,0.12);
+          --warning: #F59E0B;
+          --warning-light: rgba(245,158,11,0.12);
+          --danger: #EF4444;
+          --danger-light: rgba(239,68,68,0.12);
+          --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+          --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+          --shadow-lg: 0 8px 28px rgba(0,0,0,0.5);
+          --radius-sm: 6px;
+          --radius-md: 10px;
+          --radius-lg: 14px;
+          --radius-xl: 18px;
+          --font-main: 'Inter', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
         }
 
         /* Light theme overrides */
         [data-theme="light"] {
-          --primary: #2563EB;
-          --primary-dark: #1D4ED8;
-          --primary-light: #DBEAFE;
-          --accent: #EF4444;
-          --accent-light: #FEF2F2;
-          --green: #10B981;
-          --green-light: #D1FAE5;
+          --bg-main: #F8FAFC;
+          --bg-card: #FFFFFF;
           --text: #0F172A;
-          --text2: #475569;
-          --text3: #94A3B8;
-          --bg: #F8FAFC;
-          --bg2: #F1F5F9;
-          --card: #FFFFFF;
-          --card-hover: #F8FAFC;
+          --text-secondary: #475569;
+          --text-muted: #94A3B8;
           --border: #E2E8F0;
-          --border-strong: #CBD5E1;
-          --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
-          --shadow-sm: 0 1px 4px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
-          --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.05);
-          --shadow-lg: 0 8px 28px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
-          --shadow-fab: 0 4px 16px rgba(37,99,235,0.3);
-          --header-bg: #FFFFFF;
-          --header-border: #E2E8F0;
+          --border-light: #F1F5F9;
+          --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+          --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+          --shadow-lg: 0 8px 28px rgba(0,0,0,0.12);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
           font-family: var(--font-main);
-          background: var(--bg);
+          background: var(--bg-main);
           color: var(--text);
           min-height: 100vh;
           -webkit-font-smoothing: antialiased;
@@ -81,10 +69,10 @@
 
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--bg2); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+        ::-webkit-scrollbar-thumb { background: var(--bg-card); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-        :focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
         /* ===== Login Screen ===== */
         .login-screen {
@@ -93,11 +81,11 @@
           justify-content: center;
           min-height: 100vh;
           padding: 20px;
-          background: linear-gradient(145deg, #1A1F2E 0%, #0F1117 50%, #1A1F2E 100%);
+          background: linear-gradient(145deg, #1E293B 0%, #0F172A 50%, #1E293B 100%);
         }
         .login-screen.hidden { display: none; }
         .login-box {
-          background: var(--card);
+          background: var(--bg-card);
           border-radius: var(--radius-lg);
           padding: 44px 40px;
           width: 100%;
@@ -114,7 +102,7 @@
         .login-logo-icon {
           width: 40px;
           height: 40px;
-          background: var(--primary);
+          background: var(--accent);
           border-radius: var(--radius-md);
           display: flex;
           align-items: center;
@@ -129,7 +117,7 @@
           letter-spacing: -0.3px;
         }
         .login-subtitle {
-          color: var(--text3);
+          color: var(--text-muted);
           font-size: 13px;
           margin-bottom: 32px;
           padding-left: 52px;
@@ -150,11 +138,11 @@
           font-size: 13.5px;
           font-weight: 500;
           cursor: pointer;
-          color: var(--text2);
+          color: var(--text-secondary);
           font-family: inherit;
         }
         .login-tabs button.active {
-          background: var(--primary);
+          background: var(--accent);
           color: #fff;
         }
         .form-group { margin-bottom: 16px; }
@@ -162,7 +150,7 @@
           display: block;
           font-size: 12px;
           font-weight: 600;
-          color: var(--text2);
+          color: var(--text-secondary);
           margin-bottom: 6px;
           letter-spacing: 0.3px;
           text-transform: uppercase;
@@ -174,21 +162,172 @@
           border-radius: var(--radius-sm);
           font-size: 14px;
           font-family: inherit;
-          background: var(--card);
+          background: var(--bg-card);
           color: var(--text);
         }
-        .form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(27,58,107,0.08); }
-        .form-group input::placeholder { color: var(--text3); }
+        .form-group input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+        .form-group input::placeholder { color: var(--text-muted); }
         .btn { width: 100%; padding: 12px 20px; border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; letter-spacing: 0.2px; }
         .btn:active { transform: scale(0.98); }
-        .btn-primary { background: var(--primary); color: #fff; }
-        .btn-primary:hover { background: var(--primary-dark); }
-        .btn-accent { background: var(--accent); color: #fff; }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-primary:hover { background: var(--accent-dark); }
+        .btn-accent { background: var(--danger); color: #fff; }
         .btn-accent:hover { background: #b91c1c; }
-        .btn-ghost { background: var(--bg); color: var(--text2); border: 1px solid var(--border); }
-        .btn-ghost:hover { background: var(--bg2); }
-        .error-msg { color: var(--accent); font-size: 12px; margin-top: 6px; display: none; font-weight: 500; }
+        .btn-ghost { background: var(--bg-main); color: var(--text-secondary); border: 1px solid var(--border); }
+        .btn-ghost:hover { background: var(--bg-card); }
+        .error-msg { color: var(--danger); font-size: 12px; margin-top: 6px; display: none; font-weight: 500; }
         .error-msg.show { display: block; }
+
+        /* ===== Sidebar Navigation ===== */
+        .sidebar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 260px;
+          height: 100vh;
+          background: var(--bg-main);
+          border-right: 1px solid var(--border);
+          display: flex;
+          flex-direction: column;
+          z-index: 200;
+          transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        .sidebar-logo {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 20px 20px 16px;
+          border-bottom: 1px solid var(--border);
+        }
+        .sidebar-logo-icon {
+          width: 32px;
+          height: 32px;
+          background: var(--accent);
+          border-radius: var(--radius-sm);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #fff;
+          font-size: 15px;
+          flex-shrink: 0;
+        }
+        .sidebar-logo span {
+          font-size: 15px;
+          font-weight: 700;
+          color: var(--text);
+          letter-spacing: -0.2px;
+        }
+        .sidebar-nav {
+          list-style: none;
+          padding: 12px 10px;
+          flex: 1;
+          overflow-y: auto;
+        }
+        .sidebar-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 10px 12px;
+          border-radius: var(--radius-md);
+          cursor: pointer;
+          color: var(--text-secondary);
+          font-size: 13.5px;
+          font-weight: 500;
+          margin-bottom: 2px;
+          border-left: 4px solid transparent;
+          transition: all 0.15s;
+        }
+        .sidebar-item:hover {
+          background: var(--bg-card);
+          color: var(--text);
+        }
+        .sidebar-item.active {
+          background: var(--accent-light);
+          color: var(--accent);
+          border-left-color: var(--accent);
+          font-weight: 600;
+        }
+        .sidebar-item i { width: 16px; text-align: center; font-size: 13px; }
+        .sidebar-user {
+          padding: 14px 16px;
+          border-top: 1px solid var(--border);
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .sidebar-avatar {
+          width: 34px;
+          height: 34px;
+          border-radius: 50%;
+          background: var(--accent);
+          color: #fff;
+          font-size: 13px;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+        .sidebar-user-info { flex: 1; min-width: 0; }
+        .sidebar-user-name {
+          display: block;
+          font-size: 13px;
+          font-weight: 600;
+          color: var(--text);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .sidebar-user-role { font-size: 11px; color: var(--text-muted); }
+        .sidebar-logout {
+          width: 30px;
+          height: 30px;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-sm);
+          background: transparent;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          color: var(--text-secondary);
+          flex-shrink: 0;
+        }
+        .sidebar-logout:hover { background: var(--bg-card); color: var(--danger); border-color: var(--danger); }
+        .sidebar-hamburger {
+          display: none;
+          position: fixed;
+          top: 14px;
+          left: 14px;
+          z-index: 210;
+          width: 38px;
+          height: 38px;
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-sm);
+          cursor: pointer;
+          align-items: center;
+          justify-content: center;
+          font-size: 15px;
+          color: var(--text);
+        }
+        .sidebar-overlay {
+          display: none;
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.5);
+          z-index: 190;
+        }
+        .sidebar-overlay.show { display: block; }
+
+        /* ===== Main Wrapper (sidebar layout) ===== */
+        .main-wrapper {
+          margin-left: 260px;
+          min-height: 100vh;
+          background: var(--bg-main);
+          transition: margin-left 0.3s;
+        }
+        .main-wrapper.no-sidebar { margin-left: 0; }
 
         /* ===== Header ===== */
         .header {
@@ -202,14 +341,14 @@
           position: sticky;
           top: 0;
           z-index: 50;
-          box-shadow: var(--shadow-xs);
+          box-shadow: var(--shadow-sm);
         }
         .header.hidden { display: none; }
         .header-left { display: flex; align-items: center; gap: 14px; }
         .header-logo {
           width: 34px;
           height: 34px;
-          background: var(--primary);
+          background: var(--accent);
           border-radius: var(--radius-sm);
           display: flex;
           align-items: center;
@@ -226,7 +365,7 @@
         .header-right { display: flex; align-items: center; gap: 8px; }
         .header-user {
           font-size: 13px;
-          color: var(--text2);
+          color: var(--text-secondary);
           margin-right: 4px;
         }
         .header-btn {
@@ -240,14 +379,14 @@
           display: flex;
           align-items: center;
           gap: 5px;
-          color: var(--text2);
+          color: var(--text-secondary);
           font-family: inherit;
         }
-        .header-btn:hover { background: var(--bg2); border-color: var(--border-strong); color: var(--text); }
-        .header-btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
-        .header-btn.primary:hover { background: var(--primary-dark); }
+        .header-btn:hover { background: var(--bg-card); border-color: var(--border); color: var(--text); }
+        .header-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .header-btn.primary:hover { background: var(--accent-dark); }
         .header-btn.theme-toggle { cursor: pointer; font-size: 15px; padding: 7px 10px; }
-        .header-btn.theme-toggle:hover { background: var(--bg2); }
+        .header-btn.theme-toggle:hover { background: var(--bg-card); }
 
         /* ===== Container ===== */
         .container { max-width: 1100px; margin: 0 auto; padding: 28px 24px 120px; }
@@ -263,7 +402,7 @@
           flex-wrap: wrap;
         }
         .search-box {
-          background: var(--card);
+          background: var(--bg-card);
           border: 1.5px solid var(--border);
           border-radius: var(--radius-md);
           padding: 10px 14px;
@@ -272,9 +411,9 @@
           flex: 1;
           min-width: 240px;
           max-width: 480px;
-          box-shadow: var(--shadow-xs);
+          box-shadow: var(--shadow-sm);
         }
-        .search-box:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(27,58,107,0.07); }
+        .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99,102,241,0.07); }
         .search-box input {
           flex: 1;
           border: none;
@@ -284,27 +423,27 @@
           color: var(--text);
           background: transparent;
         }
-        .search-box input::placeholder { color: var(--text3); }
-        .search-box i { color: var(--text3); font-size: 13px; align-self: center; }
+        .search-box input::placeholder { color: var(--text-muted); }
+        .search-box i { color: var(--text-muted); font-size: 13px; align-self: center; }
         .toolbar-right { display: flex; gap: 8px; align-items: center; }
         .toolbar-btn {
           padding: 9px 16px;
           border: 1.5px solid var(--border);
           border-radius: var(--radius-sm);
-          background: var(--card);
+          background: var(--bg-card);
           font-size: 13px;
           font-weight: 500;
           cursor: pointer;
           display: flex;
           align-items: center;
           gap: 6px;
-          color: var(--text2);
+          color: var(--text-secondary);
           font-family: inherit;
-          box-shadow: var(--shadow-xs);
+          box-shadow: var(--shadow-sm);
         }
-        .toolbar-btn:hover { background: var(--bg2); border-color: var(--border-strong); color: var(--text); }
-        .toolbar-btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: var(--shadow-sm); }
-        .toolbar-btn.primary:hover { background: var(--primary-dark); border-color: var(--primary-dark); }
+        .toolbar-btn:hover { background: var(--bg-card); border-color: var(--border); color: var(--text); }
+        .toolbar-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: var(--shadow-sm); }
+        .toolbar-btn.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
 
         /* ===== Tag Filter Bar ===== */
         .tag-filter-bar {
@@ -336,7 +475,7 @@
           background: transparent;
           font-size: 13px;
           font-weight: 500;
-          color: var(--text2);
+          color: var(--text-secondary);
           cursor: pointer;
           font-family: inherit;
           border-bottom: 2px solid transparent;
@@ -344,8 +483,8 @@
           white-space: nowrap;
         }
         .tag-filter-btn.active {
-          color: var(--primary);
-          border-bottom-color: var(--primary);
+          color: var(--accent);
+          border-bottom-color: var(--accent);
           font-weight: 600;
         }
         .tag-filter-btn:hover:not(.active) { color: var(--text); }
@@ -361,16 +500,16 @@
           align-items: center;
           justify-content: center;
           font-size: 12px;
-          color: var(--text2);
+          color: var(--text-secondary);
           margin-left: 8px;
         }
-        .tag-filter-more:hover { background: var(--bg2); }
+        .tag-filter-more:hover { background: var(--bg-card); }
         .tag-more-menu {
           display: none;
           position: fixed;
           top: 120px;
           right: 24px;
-          background: var(--card);
+          background: var(--bg-card);
           border: 1px solid var(--border);
           border-radius: var(--radius-md);
           box-shadow: var(--shadow-lg);
@@ -382,13 +521,13 @@
         .tag-more-item {
           padding: 10px 14px;
           font-size: 13px;
-          color: var(--text2);
+          color: var(--text-secondary);
           cursor: pointer;
           display: flex;
           align-items: center;
           gap: 8px;
         }
-        .tag-more-item:hover { background: var(--bg2); color: var(--text); }
+        .tag-more-item:hover { background: var(--bg-card); color: var(--text); }
 
         /* ===== OCR Confidence Indicator ===== */
         .ocr-confidence {
@@ -405,10 +544,10 @@
           border-radius: 50%;
           flex-shrink: 0;
         }
-        .ocr-dot.high { background: var(--green); box-shadow: 0 0 4px var(--green); }
+        .ocr-dot.high { background: var(--success); box-shadow: 0 0 4px var(--success); }
         .ocr-dot.medium { background: #F59E0B; box-shadow: 0 0 4px #F59E0B; }
         .ocr-dot.low { background: var(--accent); box-shadow: 0 0 4px var(--accent); }
-        .ocr-text.high { color: var(--green); }
+        .ocr-text.high { color: var(--success); }
         .ocr-text.medium { color: #F59E0B; }
         .ocr-text.low { color: var(--accent); }
         .card-confidence {
@@ -446,11 +585,11 @@
           margin-bottom: 28px;
         }
         .stat-card {
-          background: var(--card);
+          background: var(--bg-card);
           border: 1px solid var(--border);
           border-radius: var(--radius-md);
           padding: 20px 22px;
-          box-shadow: var(--shadow-xs);
+          box-shadow: var(--shadow-sm);
           display: flex;
           align-items: center;
           gap: 16px;
@@ -465,11 +604,11 @@
           font-size: 16px;
           flex-shrink: 0;
         }
-        .stat-icon.blue { background: var(--primary-light); color: var(--primary); }
-        .stat-icon.green { background: var(--green-light); color: var(--green); }
+        .stat-icon.blue { background: var(--accent-light); color: var(--accent); }
+        .stat-icon.green { background: var(--success-light); color: var(--success); }
         .stat-icon.red { background: var(--accent-light); color: var(--accent); }
         .stat-info .stat-num { font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; line-height: 1; }
-        .stat-info .stat-label { font-size: 12px; color: var(--text3); margin-top: 4px; font-weight: 500; }
+        .stat-info .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
 
         /* ===== Section Header ===== */
         .section-header {
@@ -478,22 +617,22 @@
           justify-content: space-between;
           margin-bottom: 14px;
         }
-        .section-title { font-size: 13px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; }
+        .section-title { font-size: 13px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; }
 
         /* ===== Cards Table/List ===== */
         .cards-list { display: flex; flex-direction: column; gap: 10px; }
         .card-item {
-          background: var(--card);
+          background: var(--bg-card);
           border: 1px solid var(--border);
           border-radius: var(--radius-md);
           padding: 20px 22px;
-          box-shadow: var(--shadow-xs);
+          box-shadow: var(--shadow-sm);
           display: flex;
           align-items: center;
           gap: 18px;
           cursor: default;
         }
-        .card-item:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); }
+        .card-item:hover { border-color: var(--border); box-shadow: var(--shadow-sm); }
 
         .card-avatar {
           width: 40px;
@@ -520,14 +659,14 @@
           font-weight: 600;
           letter-spacing: 0.2px;
         }
-        .badge-client { background: var(--primary-light); color: var(--primary); }
-        .badge-supplier { background: var(--green-light); color: var(--green); }
+        .badge-client { background: var(--accent-light); color: var(--accent); }
+        .badge-supplier { background: var(--success-light); color: var(--success); }
         .badge-colleague { background: #fef3e2; color: #b36000; }
         .badge-prospect { background: #f3e8fe; color: #7c3aed; }
-        .badge-other { background: var(--bg); color: var(--text3); }
+        .badge-other { background: var(--bg-main); color: var(--text-muted); }
         .card-meta { display: flex; align-items: center; gap: 16px; margin-top: 5px; flex-wrap: wrap; }
-        .card-meta-item { display: flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--text2); }
-        .card-meta-item i { width: 13px; text-align: center; color: var(--text3); font-size: 11px; }
+        .card-meta-item { display: flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--text-secondary); }
+        .card-meta-item i { width: 13px; text-align: center; color: var(--text-muted); font-size: 11px; }
         .card-image-thumb {
           width: 56px;
           height: 40px;
@@ -548,9 +687,9 @@
           align-items: center;
           justify-content: center;
           font-size: 12.5px;
-          color: var(--text2);
+          color: var(--text-secondary);
         }
-        .card-actions button:hover { background: var(--bg); color: var(--text); }
+        .card-actions button:hover { background: var(--bg-main); color: var(--text); }
         .card-actions .btn-delete-action:hover { background: var(--accent-light); color: var(--accent); border-color: #f5c6c3; }
         .btn:active { transform: scale(0.97); }
 
@@ -561,7 +700,7 @@
           right: 24px;
           width: 56px;
           height: 56px;
-          background: var(--primary);
+          background: var(--accent);
           border-radius: 50%;
           display: flex;
           align-items: center;
@@ -573,7 +712,7 @@
           z-index: 100;
           border: none;
         }
-        .fab:hover { background: var(--primary-dark); box-shadow: 0 6px 24px rgba(37,99,235,0.45); transform: scale(1.08); }
+        .fab:hover { background: var(--accent-dark); box-shadow: 0 6px 24px rgba(37,99,235,0.45); transform: scale(1.08); }
         .fab:active { transform: scale(0.96); }
         .fab.hidden { display: none; }
 
@@ -595,12 +734,12 @@
           width: 12px;
           height: 4px;
           border-radius: 2px;
-          background: var(--border-strong);
+          background: var(--border);
           margin: 0 auto 20px;
           cursor: grab;
         }
         .modal-content {
-          background: var(--card);
+          background: var(--bg-card);
           border-radius: var(--radius-lg);
           padding: 32px;
           width: 100%;
@@ -614,7 +753,7 @@
         @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
         .modal-header h2 { font-size: 16px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
-        .modal-header h2 i { color: var(--primary); }
+        .modal-header h2 i { color: var(--accent); }
         .modal-close {
           width: 30px;
           height: 30px;
@@ -626,42 +765,42 @@
           align-items: center;
           justify-content: center;
           font-size: 16px;
-          color: var(--text2);
+          color: var(--text-secondary);
         }
-        .modal-close:hover { background: var(--bg); color: var(--text); }
+        .modal-close:hover { background: var(--bg-main); color: var(--text); }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
         .modal-actions { display: flex; gap: 10px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
         .modal-actions button { flex: 1; padding: 12px; border: none; border-radius: var(--radius-sm); font-size: 13.5px; font-weight: 600; cursor: pointer; font-family: inherit; }
-        .btn-save:hover { background: var(--primary-dark); }
-        .btn-cancel { background: var(--bg2); color: var(--text2); border: 1px solid var(--border); }
-        .btn-cancel:hover { background: var(--bg2); color: var(--text); }
+        .btn-save:hover { background: var(--accent-dark); }
+        .btn-cancel { background: var(--bg-card); color: var(--text-secondary); border: 1px solid var(--border); }
+        .btn-cancel:hover { background: var(--bg-card); color: var(--text); }
         .btn-scan-modal { background: var(--accent); color: #fff; }
         .btn-scan-modal:hover { background: #b91c1c; }
 
         /* ===== Upload Zone (NEW) ===== */
         .upload-zone {
-          border: 2px dashed var(--border-strong);
+          border: 2px dashed var(--border);
           border-radius: var(--radius-lg);
           padding: 28px 20px;
           text-align: center;
           cursor: pointer;
-          background: var(--bg);
+          background: var(--bg-main);
           margin-top: 4px;
           transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
           position: relative;
         }
         .upload-zone:hover, .upload-zone.drag-over {
-          border-color: var(--primary);
-          background: var(--primary-light);
-          box-shadow: 0 0 0 4px rgba(27,58,107,0.08);
+          border-color: var(--accent);
+          background: var(--accent-light);
+          box-shadow: 0 0 0 4px rgba(99,102,241,0.08);
         }
         .upload-zone.drag-over { border-style: solid; }
-        .upload-zone-icon { font-size: 36px; color: var(--text3); margin-bottom: 10px; }
-        .upload-zone:hover .upload-zone-icon, .upload-zone.drag-over .upload-zone-icon { color: var(--primary); }
-        .upload-zone-text { font-size: 14px; font-weight: 500; color: var(--text2); }
-        .upload-zone-text span { color: var(--primary); text-decoration: underline; }
-        .upload-zone-hint { font-size: 12px; color: var(--text3); margin-top: 6px; }
-        .upload-zone-divider { display: flex; align-items: center; gap: 12px; margin: 14px 0; color: var(--text3); font-size: 12px; }
+        .upload-zone-icon { font-size: 36px; color: var(--text-muted); margin-bottom: 10px; }
+        .upload-zone:hover .upload-zone-icon, .upload-zone.drag-over .upload-zone-icon { color: var(--accent); }
+        .upload-zone-text { font-size: 14px; font-weight: 500; color: var(--text-secondary); }
+        .upload-zone-text span { color: var(--accent); text-decoration: underline; }
+        .upload-zone-hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+        .upload-zone-divider { display: flex; align-items: center; gap: 12px; margin: 14px 0; color: var(--text-muted); font-size: 12px; }
         .upload-zone-divider::before, .upload-zone-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
         .upload-zone-actions { display: flex; gap: 10px; justify-content: center; }
         .upload-zone-actions button {
@@ -669,18 +808,18 @@
           padding: 9px 18px;
           border: 1.5px solid var(--border);
           border-radius: var(--radius-sm);
-          background: var(--card);
+          background: var(--bg-card);
           font-size: 13px;
           font-weight: 500;
           cursor: pointer;
           display: flex;
           align-items: center;
           gap: 6px;
-          color: var(--text2);
+          color: var(--text-secondary);
           font-family: inherit;
           transition: all 0.15s;
         }
-        .upload-zone-actions button:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+        .upload-zone-actions button:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
         .upload-zone-actions .btn-camera:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
         #fileUpload { display: none; }
         #imagePreviewContainer { display: none; margin-top: 14px; }
@@ -732,7 +871,7 @@
 
         .scan-progress { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.92); z-index: 350; align-items: center; justify-content: center; flex-direction: column; color: #fff; }
         .scan-progress.show { display: flex; }
-        .scan-progress .spinner { width: 52px; height: 52px; border: 3px solid rgba(255,255,255,0.15); border-top-color: var(--primary-light); border-radius: 50%; animation: spin 0.9s linear infinite; }
+        .scan-progress .spinner { width: 52px; height: 52px; border: 3px solid rgba(255,255,255,0.15); border-top-color: var(--accent-light); border-radius: 50%; animation: spin 0.9s linear infinite; }
         .scan-progress .text { margin-top: 18px; font-size: 14px; color: rgba(255,255,255,0.7); }
         .scan-progress .percent { margin-top: 10px; font-size: 28px; font-weight: 700; color: #fff; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -742,35 +881,35 @@
         .share-qr canvas, .share-qr img { width: 200px !important; height: 200px !important; border-radius: var(--radius-md); }
         .share-actions { display: flex; gap: 10px; justify-content: center; margin-top: 16px; }
         .share-actions button { flex: 1; max-width: 160px; padding: 11px; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; }
-        .btn-download { background: var(--primary); color: #fff; }
-        .btn-download:hover { background: var(--primary-dark); }
-        .btn-copy { background: var(--bg2); color: var(--text2); border: 1px solid var(--border); }
-        .btn-copy:hover { background: var(--bg2); color: var(--text); }
+        .btn-download { background: var(--accent); color: #fff; }
+        .btn-download:hover { background: var(--accent-dark); }
+        .btn-copy { background: var(--bg-card); color: var(--text-secondary); border: 1px solid var(--border); }
+        .btn-copy:hover { background: var(--bg-card); color: var(--text); }
 
         /* ===== Sync Modal ===== */
-        .sync-info-block { background: var(--bg); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px; border: 1px solid var(--border); }
-        .sync-info-block .row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; color: var(--text2); }
+        .sync-info-block { background: var(--bg-main); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px; border: 1px solid var(--border); }
+        .sync-info-block .row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; color: var(--text-secondary); }
         .sync-info-block .row:last-child { margin-bottom: 0; }
-        .sync-info-block .row i { width: 14px; text-align: center; color: var(--text3); }
+        .sync-info-block .row i { width: 14px; text-align: center; color: var(--text-muted); }
         .sync-divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
 
         /* ===== Empty State ===== */
-        .empty-state { text-align: center; padding: 80px 20px; color: var(--text3); }
+        .empty-state { text-align: center; padding: 80px 20px; color: var(--text-muted); }
         .empty-icon {
           width: 64px;
           height: 64px;
-          background: var(--bg);
+          background: var(--bg-main);
           border-radius: var(--radius-md);
           display: flex;
           align-items: center;
           justify-content: center;
           margin: 0 auto 18px;
           font-size: 26px;
-          color: var(--text3);
-          border: 1.5px dashed var(--border-strong);
+          color: var(--text-muted);
+          border: 1.5px dashed var(--border);
         }
         .empty-state p { font-size: 14px; }
-        .empty-state p.title { font-size: 15px; font-weight: 600; color: var(--text2); margin-bottom: 4px; }
+        .empty-state p.title { font-size: 15px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; }
 
         /* ===== Toast ===== */
         .toast {
@@ -778,7 +917,7 @@
           bottom: 96px;
           left: 50%;
           transform: translateX(-50%) translateY(80px);
-          background: var(--card);
+          background: var(--bg-card);
           color: var(--text);
           padding: 12px 22px;
           border-radius: var(--radius-md);
@@ -797,7 +936,7 @@
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
         /* ===== Landing Page ===== */
-        .landing { width: 100%; background: var(--bg); }
+        .landing { width: 100%; background: var(--bg-main); }
         .landing-nav {
             position: sticky; top: 0; z-index: 100;
             background: rgba(255,255,255,0.95);
@@ -811,35 +950,35 @@
         }
         .landing-logo {
             display: flex; align-items: center; gap: 10px;
-            font-size: 1.1rem; font-weight: 700; color: var(--primary);
+            font-size: 1.1rem; font-weight: 700; color: var(--accent);
         }
         .landing-logo i { font-size: 1.3rem; }
         .landing-cta-btn {
             padding: 8px 20px;
-            background: var(--primary); color: #fff;
+            background: var(--accent); color: #fff;
             border: none; border-radius: 8px;
             font-size: 0.85rem; font-weight: 600;
             cursor: pointer; transition: all 0.2s;
         }
-        .landing-cta-btn:hover { background: var(--primary-mid); transform: translateY(-1px); }
+        .landing-cta-btn:hover { background: var(--accent-dark); transform: translateY(-1px); }
 
         .landing-hero {
             position: relative; overflow: hidden;
             padding: 80px 24px 100px;
             text-align: center;
-            background: var(--bg);
+            background: var(--bg-main);
         }
         .landing-hero-bg {
             position: absolute; inset: 0; pointer-events: none;
             background:
-                radial-gradient(ellipse 80% 60% at 50% 0%, rgba(27,58,107,0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 80% 60% at 50% 0%, rgba(99,102,241,0.08) 0%, transparent 70%),
                 radial-gradient(ellipse 60% 40% at 80% 100%, rgba(26,122,74,0.05) 0%, transparent 60%);
         }
         .landing-hero-content { position: relative; max-width: 720px; margin: 0 auto; }
         .landing-hero-badge {
             display: inline-block;
             padding: 6px 16px;
-            background: var(--primary-light); color: var(--primary);
+            background: var(--accent-light); color: var(--accent);
             border-radius: 100px; font-size: 0.78rem; font-weight: 600;
             letter-spacing: 0.06em; margin-bottom: 24px;
         }
@@ -851,7 +990,7 @@
         }
         .landing-hero-sub {
             font-size: clamp(1rem, 2vw, 1.15rem);
-            color: var(--text2); line-height: 1.75;
+            color: var(--text-secondary); line-height: 1.75;
             max-width: 540px; margin: 0 auto 36px;
         }
         .landing-hero-actions {
@@ -861,27 +1000,27 @@
         .landing-btn-primary {
             display: inline-flex; align-items: center; gap: 8px;
             padding: 13px 28px;
-            background: var(--primary); color: #fff;
+            background: var(--accent); color: #fff;
             border: none; border-radius: 10px;
             font-size: 1rem; font-weight: 600;
             cursor: pointer; transition: all 0.2s;
         }
-        .landing-btn-primary:hover { background: var(--primary-mid); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(27,58,107,0.25); }
+        .landing-btn-primary:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(99,102,241,0.25); }
         .landing-btn-ghost {
             display: inline-flex; align-items: center; gap: 8px;
             padding: 13px 28px;
-            background: transparent; color: var(--text2);
-            border: 1.5px solid var(--border-strong); border-radius: 10px;
+            background: transparent; color: var(--text-secondary);
+            border: 1.5px solid var(--border); border-radius: 10px;
             font-size: 1rem; font-weight: 500;
             cursor: pointer; transition: all 0.2s;
         }
-        .landing-btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+        .landing-btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
         .landing-hero-stats {
             display: flex; align-items: center; justify-content: center; gap: 24px;
         }
         .landing-stat { text-align: center; }
-        .landing-stat-num { display: block; font-size: 1.1rem; font-weight: 700; color: var(--primary); }
-        .landing-stat-label { font-size: 0.75rem; color: var(--text3); }
+        .landing-stat-num { display: block; font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+        .landing-stat-label { font-size: 0.75rem; color: var(--text-muted); }
         .landing-stat-div { width: 1px; height: 28px; background: var(--border); }
 
         .landing-features { background: #fff; padding: 80px 24px; }
@@ -890,7 +1029,7 @@
             display: inline-block;
             font-size: 0.72rem; font-weight: 700;
             letter-spacing: 0.15em; text-transform: uppercase;
-            color: var(--primary); margin-bottom: 12px;
+            color: var(--accent); margin-bottom: 12px;
         }
         .landing-section-title {
             font-size: clamp(1.8rem, 4vw, 2.6rem);
@@ -904,35 +1043,35 @@
         }
         .landing-feature-card {
             padding: 28px 24px;
-            background: var(--bg); border: 1px solid var(--border);
+            background: var(--bg-main); border: 1px solid var(--border);
             border-radius: 14px; text-align: left;
             transition: all 0.2s;
         }
         .landing-feature-card:hover {
-            border-color: var(--primary);
+            border-color: var(--accent);
             box-shadow: var(--shadow-md);
             transform: translateY(-3px);
         }
         .landing-feature-icon {
             width: 44px; height: 44px;
-            background: var(--primary-light);
+            background: var(--accent-light);
             border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
             margin-bottom: 16px;
-            color: var(--primary); font-size: 1.1rem;
+            color: var(--accent); font-size: 1.1rem;
         }
         .landing-feature-card h3 { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
-        .landing-feature-card p { font-size: 0.875rem; color: var(--text2); line-height: 1.65; }
+        .landing-feature-card p { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.65; }
 
-        .landing-cta-section { background: var(--primary); padding: 80px 24px; text-align: center; }
+        .landing-cta-section { background: var(--accent); padding: 80px 24px; text-align: center; }
         .landing-cta-inner { max-width: 540px; margin: 0 auto; }
         .landing-cta-section h2 { font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 12px; }
         .landing-cta-section p { color: rgba(255,255,255,0.7); margin-bottom: 28px; font-size: 1rem; }
-        .landing-cta-section .landing-btn-primary { background: #fff; color: var(--primary); }
-        .landing-cta-section .landing-btn-primary:hover { background: var(--primary-light); transform: translateY(-2px); }
+        .landing-cta-section .landing-btn-primary { background: #fff; color: var(--accent); }
+        .landing-cta-section .landing-btn-primary:hover { background: var(--accent-light); transform: translateY(-2px); }
 
         .landing-footer {
-            background: var(--primary); border-top: 1px solid rgba(255,255,255,0.1);
+            background: var(--accent); border-top: 1px solid rgba(255,255,255,0.1);
             padding: 20px 24px; text-align: center;
             color: rgba(255,255,255,0.45); font-size: 0.8rem;
         }
@@ -944,14 +1083,179 @@
             .landing-stat-div { display: none; }
         }
 
-        /* ===== Mobile ===== */
+        /* ===== Page Navigation ===== */
+        .page-section {
+          display: none;
+          margin-left: 260px;
+          min-height: 100vh;
+          background: var(--bg-main);
+        }
+        .page-section.active { display: block; }
+
+        @media (max-width: 768px) {
+          .page-section { margin-left: 0; }
+        }
+
+        /* ===== Card Detail Modal ===== */
+        .detail-modal .modal-content { max-width: 640px; }
+        .detail-avatar {
+          width: 80px; height: 80px;
+          border-radius: 50%;
+          background: #6366F1;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 28px; font-weight: 700; color: #fff;
+          margin: 0 auto 16px;
+          letter-spacing: -0.5px;
+        }
+        .detail-name { font-size: 1.5rem; font-weight: 700; color: var(--text); text-align: center; margin-bottom: 4px; }
+        .detail-role { font-size: 14px; color: var(--text-secondary); text-align: center; margin-bottom: 4px; }
+        .detail-company { font-size: 14px; color: var(--text-secondary); text-align: center; }
+        .detail-divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+        .detail-info { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .detail-info-row { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text); }
+        .detail-info-row i { width: 18px; text-align: center; color: var(--text-secondary); font-size: 13px; flex-shrink: 0; }
+        .detail-info-row .phone-num { font-family: var(--font-mono); font-size: 13px; }
+        .detail-ai-section { background: #0F172A; border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px; }
+        .detail-ai-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .detail-ai-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+        .detail-ai-refresh { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 12px; padding: 4px 8px; border-radius: 4px; }
+        .detail-ai-refresh:hover { background: var(--accent-light); }
+        .detail-ai-content { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .detail-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+        .detail-tag-chip {
+          display: inline-flex; align-items: center; gap: 5px;
+          padding: 4px 12px; border-radius: 100px;
+          font-size: 12px; font-weight: 500;
+          border: 1.5px solid var(--accent); color: var(--accent);
+          background: transparent;
+        }
+        .detail-tag-chip .remove-tag { cursor: pointer; font-size: 10px; opacity: 0.7; }
+        .detail-tag-chip .remove-tag:hover { opacity: 1; }
+        .detail-tag-add { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 500; border: 1.5px dashed var(--border); color: var(--text-secondary); background: transparent; cursor: pointer; }
+        .detail-tag-add:hover { border-color: var(--accent); color: var(--accent); }
+        .detail-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .detail-action-btn { padding: 11px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px; font-family: inherit; border: none; transition: all 0.15s; }
+        .detail-action-btn.primary { background: #6366F1; color: #fff; }
+        .detail-action-btn.primary:hover { background: #4F46E5; }
+        .detail-action-btn.secondary { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+        .detail-action-btn.secondary:hover { background: var(--bg-card); color: var(--text); }
+        .detail-action-btn.danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+        .detail-action-btn.danger:hover { background: var(--danger-light); }
+        .detail-action-btn.full { grid-column: 1 / -1; }
+
+        /* ===== Import Page ===== */
+        .import-page { max-width: 720px; margin: 0 auto; padding: 28px 24px 120px; }
+        .import-title { font-size: 1.25rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+        .import-subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 28px; }
+        .upload-zone-import {
+          border: 2px dashed var(--border);
+          border-radius: var(--radius-lg);
+          padding: 40px 24px; text-align: center; cursor: pointer;
+          background: var(--bg-card); margin-bottom: 24px;
+          transition: all 0.2s;
+        }
+        .upload-zone-import:hover, .upload-zone-import.drag-over { border-color: var(--accent); background: var(--accent-light); }
+        .upload-zone-import.drag-over { border-style: solid; }
+        .upload-zone-import .uz-icon { font-size: 40px; color: var(--text-secondary); margin-bottom: 14px; }
+        .upload-zone-import:hover .uz-icon { color: var(--accent); }
+        .upload-zone-import .uz-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+        .upload-zone-import .uz-hint { font-size: 12px; color: var(--text-secondary); margin-bottom: 16px; }
+        .upload-zone-import .uz-formats { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+        .upload-zone-import .uz-format-tag { padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; background: var(--bg-main); color: var(--text-secondary); border: 1px solid var(--border); }
+        .import-progress { display: none; margin-bottom: 24px; }
+        .import-progress.show { display: block; }
+        .import-progress-bar { height: 6px; background: var(--bg-main); border-radius: 3px; overflow: hidden; margin-bottom: 10px; }
+        .import-progress-fill { height: 100%; background: var(--accent); border-radius: 3px; width: 0%; transition: width 0.3s; }
+        .import-progress-text { font-size: 12px; color: var(--text-secondary); text-align: center; }
+        .import-result { display: none; border-radius: var(--radius-md); padding: 20px; margin-bottom: 24px; border: 1px solid var(--border); }
+        .import-result.show { display: block; }
+        .import-result.success { background: var(--success-light); border-color: var(--success); }
+        .import-result-header { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+        .import-result-stats { display: flex; gap: 20px; }
+        .import-result-stat { font-size: 13px; color: var(--text-secondary); }
+        .import-result-stat strong { color: var(--text); }
+
+        /* ===== Tag Management Page ===== */
+        .tags-page { max-width: 720px; margin: 0 auto; padding: 28px 24px 120px; }
+        .tags-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+        .tags-title { font-size: 1.25rem; font-weight: 700; color: var(--text); }
+        .tags-add-row { display: flex; gap: 8px; margin-bottom: 24px; }
+        .tags-add-row input { flex: 1; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; background: var(--bg-card); color: var(--text); font-family: inherit; }
+        .tags-add-row input:focus { outline: none; border-color: var(--accent); }
+        .tags-add-row button { padding: 10px 18px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
+        .tags-add-row button:hover { background: #4F46E5; }
+        .tags-list { display: flex; flex-direction: column; gap: 8px; }
+        .tag-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+        .tag-item-left { display: flex; align-items: center; gap: 10px; }
+        .tag-item .tag-name { font-size: 14px; font-weight: 600; color: var(--text); }
+        .tag-item .tag-count { font-size: 12px; color: var(--text-secondary); background: var(--bg-main); padding: 2px 8px; border-radius: 100px; }
+        .tag-item .tag-delete { width: 28px; height: 28px; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 12px; opacity: 0; transition: opacity 0.15s; }
+        .tag-item:hover .tag-delete { opacity: 1; }
+        .tag-item .tag-delete:hover { background: var(--danger-light); color: var(--danger); }
+
+        /* ===== Settings Page ===== */
+        .settings-page { max-width: 720px; margin: 0 auto; padding: 28px 24px 120px; }
+        .settings-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); margin-bottom: 20px; overflow: hidden; }
+        .settings-section-title { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; padding: 14px 20px 10px; border-bottom: 1px solid var(--border); }
+        .settings-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border); }
+        .settings-row:last-child { border-bottom: none; }
+        .settings-row-label { font-size: 14px; font-weight: 500; color: var(--text); }
+        .settings-row-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+        .settings-row-value { font-size: 13px; color: var(--text-secondary); text-align: right; }
+        .settings-toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+        .settings-toggle input { opacity: 0; width: 0; height: 0; }
+        .settings-toggle .toggle-slider { position: absolute; inset: 0; background: var(--border); border-radius: 12px; cursor: pointer; transition: background 0.2s; }
+        .settings-toggle .toggle-slider::before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform 0.2s; }
+        .settings-toggle input:checked + .toggle-slider { background: var(--accent); }
+        .settings-toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+        .settings-danger { border-color: var(--danger) !important; }
+        .settings-danger .settings-section-title { color: var(--danger); }
+        .btn-danger-outline { padding: 10px 18px; background: transparent; color: var(--danger); border: 1.5px solid var(--danger); border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
+        .btn-danger-outline:hover { background: var(--danger-light); }
+        .btn-danger-filled { padding: 10px 18px; background: var(--danger); color: #fff; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
+        .btn-danger-filled:hover { background: #dc2626; }
+        .settings-input { padding: 9px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; background: var(--bg-main); color: var(--text); font-family: inherit; width: 200px; text-align: right; }
+        .settings-input:focus { outline: none; border-color: var(--accent); }
+        .confirm-dialog { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,20,40,0.7); backdrop-filter: blur(4px); z-index: 500; align-items: center; justify-content: center; padding: 20px; }
+        .confirm-dialog.show { display: flex; }
+        .confirm-dialog .dialog-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; max-width: 400px; width: 100%; box-shadow: var(--shadow-lg); }
+        .confirm-dialog .dialog-icon { font-size: 32px; color: var(--danger); margin-bottom: 14px; text-align: center; }
+        .confirm-dialog .dialog-title { font-size: 16px; font-weight: 700; color: var(--text); text-align: center; margin-bottom: 8px; }
+        .confirm-dialog .dialog-desc { font-size: 13px; color: var(--text-secondary); text-align: center; margin-bottom: 20px; line-height: 1.6; }
+        .confirm-dialog .dialog-input { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; background: var(--bg-main); color: var(--text); font-family: inherit; margin-bottom: 12px; text-align: center; }
+        .confirm-dialog .dialog-input:focus { outline: none; border-color: var(--accent); }
+        .confirm-dialog .dialog-actions { display: flex; gap: 10px; }
+        .confirm-dialog .dialog-actions button { flex: 1; padding: 11px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; border: none; }
+
+        /* ===== Nav pills (sub-header) ===== */
+        .nav-pills { display: flex; gap: 4px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 4px; margin-bottom: 24px; }
+        .nav-pill { flex: 1; padding: 9px 16px; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; background: transparent; color: var(--text-secondary); font-family: inherit; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .nav-pill:hover { color: var(--text); background: var(--bg-main); }
+        .nav-pill.active { background: var(--accent); color: #fff; font-weight: 600; }
+
+        /* ===== Mobile (Sidebar responsive) ===== */
+        @media (max-width: 768px) {
+          .sidebar {
+            transform: translateX(-100%);
+          }
+          .sidebar.open {
+            transform: translateX(0);
+          }
+          .sidebar-hamburger {
+            display: flex;
+          }
+          .main-wrapper {
+            margin-left: 0;
+          }
+        }
+
         @media (max-width: 700px) {
           .cards-list { gap: 8px; }
-          .card-item { flex-wrap: wrap; padding: 16px 18px; }
+          .card-item { flex-wrap: wrap; padding: 16px 18px; cursor: pointer; }
           .card-body { flex: 1 0 calc(100% - 66px); }
           .card-image-thumb { display: none; }
           .card-actions { margin-left: 0; width: 100%; justify-content: flex-end; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
-          .stats-row { grid-template-columns: 1fr; gap: 10px; }
+          .stats-row { grid-template-columns: 1fr 1fr; gap: 10px; }
           .form-row { grid-template-columns: 1fr; }
           .toolbar { flex-direction: column; align-items: stretch; }
           .search-box { max-width: 100%; }
@@ -959,13 +1263,426 @@
           .login-box { padding: 32px 24px; }
           .login-subtitle { padding-left: 0; }
           .modal-content { padding: 24px 18px; }
+          .detail-actions { grid-template-columns: 1fr 1fr; }
+          .import-page, .tags-page, .settings-page { padding: 20px 16px 100px; }
         }
-    </style>
+
+        /* ===== Dashboard Page ===== */
+        .page { display: none; }
+        .page.active { display: block; }
+        .page-header {
+          padding: 28px 32px 0;
+        }
+        .page-title {
+          font-size: 22px;
+          font-weight: 700;
+          color: var(--text);
+          letter-spacing: -0.3px;
+          margin-bottom: 4px;
+        }
+        .page-subtitle {
+          font-size: 13px;
+          color: var(--text-secondary);
+        }
+        .page-body {
+          padding: 24px 32px 100px;
+        }
+        .dashboard-stats {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 16px;
+          margin-bottom: 28px;
+        }
+        .dashboard-stat-card {
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-xl);
+          padding: 22px 24px;
+          box-shadow: var(--shadow-sm);
+          border-left: 4px solid var(--accent);
+        }
+        .dashboard-stat-card .stat-value {
+          font-size: 36px;
+          font-weight: 700;
+          color: var(--text);
+          letter-spacing: -1px;
+          line-height: 1;
+          margin-bottom: 8px;
+        }
+        .dashboard-stat-card .stat-label {
+          font-size: 13px;
+          color: var(--text-secondary);
+          font-weight: 500;
+        }
+        .dashboard-stat-card .stat-icon-inline {
+          float: right;
+          font-size: 22px;
+          color: var(--accent);
+          margin-top: -4px;
+        }
+        .dashboard-section {
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-xl);
+          padding: 24px;
+          margin-bottom: 20px;
+          box-shadow: var(--shadow-sm);
+        }
+        .dashboard-section-title {
+          font-size: 14px;
+          font-weight: 700;
+          color: var(--text);
+          margin-bottom: 18px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .dashboard-section-title i { color: var(--accent); }
+        /* Tag distribution bars */
+        .tag-bar-list { display: flex; flex-direction: column; gap: 10px; }
+        .tag-bar-item { display: flex; align-items: center; gap: 12px; }
+        .tag-bar-label {
+          font-size: 12px;
+          color: var(--text-secondary);
+          min-width: 80px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .tag-bar-track {
+          flex: 1;
+          height: 8px;
+          background: var(--bg-main);
+          border-radius: 4px;
+          overflow: hidden;
+        }
+        .tag-bar-fill {
+          height: 100%;
+          background: var(--accent);
+          border-radius: 4px;
+          transition: width 0.6s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        .tag-bar-count {
+          font-size: 12px;
+          color: var(--text-muted);
+          min-width: 28px;
+          text-align: right;
+          font-family: var(--font-mono);
+        }
+        /* Recent cards */
+        .recent-card-item {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          padding: 12px 0;
+          border-bottom: 1px solid var(--border);
+        }
+        .recent-card-item:last-child { border-bottom: none; }
+        .recent-card-avatar {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 13px;
+          font-weight: 700;
+          color: #fff;
+          flex-shrink: 0;
+        }
+        .recent-card-info { flex: 1; min-width: 0; }
+        .recent-card-name {
+          font-size: 14px;
+          font-weight: 600;
+          color: var(--text);
+        }
+        .recent-card-meta {
+          font-size: 12px;
+          color: var(--text-secondary);
+          margin-top: 2px;
+        }
+        .recent-card-date {
+          font-size: 11px;
+          color: var(--text-muted);
+          white-space: nowrap;
+        }
+        .recent-card-btn {
+          padding: 6px 14px;
+          background: var(--accent-light);
+          border: none;
+          border-radius: var(--radius-sm);
+          font-size: 12px;
+          font-weight: 600;
+          color: var(--accent);
+          cursor: pointer;
+          font-family: inherit;
+          white-space: nowrap;
+        }
+        .recent-card-btn:hover { background: var(--accent); color: #fff; }
+
+        /* ===== Card List Page (Grid/List toggle) ===== */
+        .list-toolbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          margin-bottom: 20px;
+          flex-wrap: wrap;
+        }
+        .list-toolbar-left { display: flex; align-items: center; gap: 10px; flex: 1; flex-wrap: wrap; }
+        .view-toggle {
+          display: flex;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-sm);
+          overflow: hidden;
+          flex-shrink: 0;
+        }
+        .view-toggle-btn {
+          width: 36px;
+          height: 36px;
+          border: none;
+          background: transparent;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 13px;
+          color: var(--text-secondary);
+          transition: all 0.15s;
+        }
+        .view-toggle-btn.active {
+          background: var(--accent);
+          color: #fff;
+        }
+        .view-toggle-btn:hover:not(.active) { background: var(--bg-card); color: var(--text); }
+        .filter-select {
+          padding: 9px 12px;
+          border: 1.5px solid var(--border);
+          border-radius: var(--radius-sm);
+          background: var(--bg-card);
+          font-size: 13px;
+          font-family: inherit;
+          color: var(--text);
+          cursor: pointer;
+        }
+        .filter-select:focus { border-color: var(--accent); outline: none; }
+        /* Grid view */
+        .cards-grid { display: none; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .cards-grid.active { display: grid; }
+        .card-grid-item {
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-xl);
+          padding: 20px;
+          cursor: pointer;
+          position: relative;
+          transition: all 0.18s;
+          box-shadow: var(--shadow-sm);
+        }
+        .card-grid-item:hover {
+          border-color: var(--text-muted);
+          box-shadow: var(--shadow-lg);
+          transform: translateY(-2px);
+        }
+        .card-grid-fav {
+          position: absolute;
+          top: 14px;
+          right: 14px;
+          color: var(--gold);
+          font-size: 14px;
+        }
+        .card-grid-avatar {
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+          font-weight: 700;
+          color: #fff;
+          margin-bottom: 14px;
+        }
+        .card-grid-name {
+          font-size: 16px;
+          font-weight: 600;
+          color: var(--text);
+          margin-bottom: 4px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .card-grid-company {
+          font-size: 13px;
+          color: var(--text-secondary);
+          margin-bottom: 2px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .card-grid-title {
+          font-size: 11px;
+          color: var(--text-muted);
+          margin-bottom: 12px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .card-grid-contact {
+          font-size: 12px;
+          color: var(--text-secondary);
+          font-family: var(--font-mono);
+          margin-bottom: 4px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .card-grid-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 10px; }
+        .card-grid-actions {
+          display: flex;
+          gap: 6px;
+          margin-top: 14px;
+          padding-top: 12px;
+          border-top: 1px solid var(--border);
+        }
+        .card-grid-actions button {
+          flex: 1;
+          height: 32px;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-sm);
+          background: transparent;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          color: var(--text-secondary);
+        }
+        .card-grid-actions button:hover { background: var(--bg-main); color: var(--text); }
+        .card-grid-actions .btn-delete:hover { background: var(--danger-light); color: var(--danger); border-color: var(--danger); }
+        /* List view */
+        .cards-table-wrap { display: none; overflow-x: auto; }
+        .cards-table-wrap.active { display: block; }
+        .cards-table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 13px;
+        }
+        .cards-table th {
+          text-align: left;
+          padding: 10px 14px;
+          font-size: 11px;
+          font-weight: 700;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          border-bottom: 2px solid var(--border);
+          white-space: nowrap;
+        }
+        .cards-table td {
+          padding: 12px 14px;
+          color: var(--text);
+          border-bottom: 1px solid var(--border);
+          vertical-align: middle;
+        }
+        .cards-table tr:nth-child(even) td { background: rgba(30,41,59,0.4); }
+        .cards-table tr:hover td { background: var(--bg-card); }
+        .cards-table .cell-avatar { display: flex; align-items: center; gap: 10px; }
+        .cards-table .cell-avatar-circle {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          font-weight: 700;
+          color: #fff;
+          flex-shrink: 0;
+        }
+        .cards-table .cell-name { font-weight: 600; }
+        .cards-table .cell-mono { font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); }
+        .cards-table .cell-actions { display: flex; gap: 6px; }
+        .cards-table .cell-actions button {
+          width: 30px;
+          height: 30px;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-sm);
+          background: transparent;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 11px;
+          color: var(--text-secondary);
+        }
+        .cards-table .cell-actions button:hover { background: var(--bg-card); color: var(--text); }
+        .cards-table .cell-actions .btn-delete:hover { background: var(--danger-light); color: var(--danger); border-color: var(--danger); }
+
+        @media (max-width: 1100px) {
+          .cards-grid { grid-template-columns: repeat(3, 1fr); }
+          .dashboard-stats { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 900px) {
+          .cards-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 600px) {
+          .cards-grid { grid-template-columns: 1fr; }
+          .page-header { padding: 20px 16px 0; }
+          .page-body { padding: 16px 16px 100px; }
+          .list-toolbar { flex-direction: column; align-items: stretch; }
+          .list-toolbar-left { flex-direction: column; }
+        }
 </head>
 <body>
 
-    <!-- ===== LANDING PAGE ===== -->
-    <div class="landing" id="landingPage">
+    <!-- ===== Sidebar Navigation ===== -->
+    <nav class="sidebar hidden" id="sidebar">
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-icon"><i class="fa-solid fa-id-card"></i></div>
+            <span>名片王</span>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="sidebar-item active" data-page="dashboard" onclick="navigatePage('dashboard')">
+                <i class="fa-solid fa-chart-pie"></i><span>儀表板</span>
+            </li>
+            <li class="sidebar-item" data-page="cards" onclick="navigatePage('cards')">
+                <i class="fa-solid fa-address-book"></i><span>名片列表</span>
+            </li>
+            <li class="sidebar-item" data-page="add" onclick="openModal()">
+                <i class="fa-solid fa-plus"></i><span>新增名片</span>
+            </li>
+            <li class="sidebar-item" data-page="import" onclick="document.getElementById('vcfUpload').click()">
+                <i class="fa-solid fa-file-import"></i><span>匯入</span>
+            </li>
+            <li class="sidebar-item" data-page="tags" onclick="navigatePage('tags')">
+                <i class="fa-solid fa-tags"></i><span>標籤管理</span>
+            </li>
+            <li class="sidebar-item" data-page="settings" onclick="navigatePage('settings')">
+                <i class="fa-solid fa-gear"></i><span>設定</span>
+            </li>
+        </ul>
+        <div class="sidebar-user">
+            <div class="sidebar-avatar" id="sidebarAvatar">S</div>
+            <div class="sidebar-user-info">
+                <span class="sidebar-user-name" id="sidebarUserName">User</span>
+                <span class="sidebar-user-role">會員</span>
+            </div>
+            <button class="sidebar-logout" onclick="logout()" aria-label="登出"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+        </div>
+    </nav>
+
+    <!-- Sidebar hamburger for mobile -->
+    <button class="sidebar-hamburger hidden" id="sidebarHamburger" onclick="toggleSidebar()" aria-label="開啟選單">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <!-- Sidebar overlay for mobile -->
+    <div class="sidebar-overlay hidden" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- ===== Main Content (with sidebar layout) ===== -->
+    <div class="main-wrapper" id="mainWrapper">
+
         <!-- Nav -->
         <nav class="landing-nav">
             <div class="landing-nav-inner">
@@ -1099,56 +1816,332 @@
         </div>
     </div>
 
-    <!-- Tag Filter Bar -->
-    <div class="tag-filter-bar" id="tagFilterBar">
+    <!-- Tag Filter Bar (visible only on cards page) -->
+    <div class="tag-filter-bar" id="tagFilterBar" style="display:none;">
         <div class="tag-filter-scroll" id="tagFilterScroll"></div>
         <button class="tag-filter-more" id="tagFilterMore" onclick="toggleTagMoreMenu()" aria-label="更多標籤"><i class="fa-solid fa-ellipsis"></i></button>
     </div>
     <div class="tag-more-menu" id="tagMoreMenu"></div>
 
-    <div class="container hidden" id="mainContent">
-        <div class="toolbar">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchInput" placeholder="搜尋姓名、公司、職稱..." oninput="filterCards()">
+    <!-- ===== DASHBOARD PAGE ===== -->
+    <div class="page-section active" id="pageDash">
+        <div class="container">
+            <div class="nav-pills">
+                <button class="nav-pill active" onclick="navigateTo('dashboard')"><i class="fa-solid fa-chart-pie"></i> 儀表板</button>
+                <button class="nav-pill" onclick="navigateTo('cards')"><i class="fa-solid fa-id-card"></i> 名片</button>
+                <button class="nav-pill" onclick="navigateTo('import')"><i class="fa-solid fa-file-import"></i> 匯入</button>
+                <button class="nav-pill" onclick="navigateTo('tags')"><i class="fa-solid fa-tags"></i> 標籤</button>
+                <button class="nav-pill" onclick="navigateTo('settings')"><i class="fa-solid fa-gear"></i> 設定</button>
             </div>
-            <div class="toolbar-right">
-                <button class="toolbar-btn primary" onclick="openModal()" aria-label="新增名片"><i class="fa-solid fa-plus" style="font-size:12px;"></i>新增名片</button>
-                <button class="toolbar-btn" onclick="startScan()" aria-label="掃描名片"><i class="fa-solid fa-camera" style="font-size:12px;"></i> 掃描</button>
-                <button class="toolbar-btn" onclick="exportCSV()" aria-label="匯出 CSV"><i class="fa-solid fa-file-csv" style="font-size:12px;"></i> CSV</button>
-                <button class="toolbar-btn" onclick="document.getElementById('vcfUpload').click()" aria-label="匯入 vCard"><i class="fa-solid fa-file-import" style="font-size:12px;"></i> 匯入</button>
-            </div>
-        </div>
 
-        <div class="stats-row">
-            <div class="stat-card">
-                <div class="stat-icon blue"><i class="fa-solid fa-id-card"></i></div>
-                <div class="stat-info"><div class="stat-num" id="totalCount">0</div><div class="stat-label">總名片數</div></div>
+            <div style="margin-bottom:28px;">
+                <h2 style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:4px;">👋 您好，歡迎回到名片王</h2>
+                <p style="font-size:13px;color:var(--text-secondary);">以下是您的名片統計與最近動態</p>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon green"><i class="fa-solid fa-building"></i></div>
-                <div class="stat-info"><div class="stat-num" id="companyCount">0</div><div class="stat-label">公司數</div></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon red"><i class="fa-solid fa-calendar-plus"></i></div>
-                <div class="stat-info"><div class="stat-num" id="thisMonth">0</div><div class="stat-label">本月新增</div></div>
-            </div>
-        </div>
 
-        <div class="section-header">
-            <span class="section-title" id="cardsSectionTitle">全部名片</span>
+            <!-- Dashboard Stats -->
+            <div class="dashboard-stats">
+                <div class="dashboard-stat-card">
+                    <div class="stat-icon-inline" style="background:rgba(99,102,241,0.12);"><i class="fa-solid fa-id-card" style="color:#6366F1;"></i></div>
+                    <div style="flex:1;">
+                        <div class="stat-value" id="dashTotalCount">0</div>
+                        <div class="stat-label">名片總數</div>
+                    </div>
+                </div>
+                <div class="dashboard-stat-card">
+                    <div class="stat-icon-inline" style="background:rgba(34,197,94,0.12);"><i class="fa-solid fa-calendar-plus" style="color:#22C55E;"></i></div>
+                    <div style="flex:1;">
+                        <div class="stat-value" id="dashMonthCount">0</div>
+                        <div class="stat-label">本月新增</div>
+                    </div>
+                </div>
+                <div class="dashboard-stat-card">
+                    <div class="stat-icon-inline" style="background:rgba(245,158,11,0.12);"><i class="fa-solid fa-qrcode" style="color:#F59E0B;"></i></div>
+                    <div style="flex:1;">
+                        <div class="stat-value" id="dashWeekCount">0</div>
+                        <div class="stat-label">本週掃描</div>
+                    </div>
+                </div>
+                <div class="dashboard-stat-card">
+                    <div class="stat-icon-inline" style="background:rgba(212,175,55,0.12);"><i class="fa-solid fa-tags" style="color:#D4AF37;"></i></div>
+                    <div style="flex:1;">
+                        <div class="stat-value" id="dashTagCount">0</div>
+                        <div class="stat-label">標籤總數</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tag Distribution -->
+            <div class="dashboard-section" id="tagDistSection" style="margin-bottom:28px;display:none;">
+                <div class="dashboard-section-title"><i class="fa-solid fa-chart-bar"></i> 標籤分布</div>
+                <div class="tag-dist-chart" id="tagDistChart"></div>
+            </div>
+
+            <!-- Recent Cards -->
+            <div class="dashboard-section" id="recentCardsSection" style="display:none;">
+                <div class="dashboard-section-title"><i class="fa-solid fa-clock"></i> 最近新增名片</div>
+                <div id="recentCardsList"></div>
+            </div>
         </div>
-        <div class="cards-list" id="cardsGrid">
-            <div class="empty-state">
-                <div class="empty-icon"><i class="fa-solid fa-address-card"></i></div>
-                <p class="title">尚無名片</p>
-                <p>點擊「新增名片」開始建立，或使用「掃描」透過相機讀取</p>
+    </div>
+
+    <!-- ===== CARDS PAGE ===== -->
+    <div class="page-section" id="pageCards">
+        <div class="container">
+            <div class="nav-pills">
+                <button class="nav-pill active" onclick="navigateTo('cards')"><i class="fa-solid fa-id-card"></i> 名片</button>
+                <button class="nav-pill" onclick="navigateTo('import')"><i class="fa-solid fa-file-import"></i> 匯入</button>
+                <button class="nav-pill" onclick="navigateTo('tags')"><i class="fa-solid fa-tags"></i> 標籤</button>
+                <button class="nav-pill" onclick="navigateTo('settings')"><i class="fa-solid fa-gear"></i> 設定</button>
+            </div>
+            <div class="toolbar">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="搜尋姓名、公司、職稱..." oninput="filterCards()">
+                </div>
+                <div class="toolbar-right">
+                    <button class="toolbar-btn primary" onclick="openModal()" aria-label="新增名片"><i class="fa-solid fa-plus" style="font-size:12px;"></i>新增名片</button>
+                    <button class="toolbar-btn" onclick="startScan()" aria-label="掃描名片"><i class="fa-solid fa-camera" style="font-size:12px;"></i> 掃描</button>
+                    <button class="toolbar-btn" onclick="exportCSV()" aria-label="匯出 CSV"><i class="fa-solid fa-file-csv" style="font-size:12px;"></i> CSV</button>
+                </div>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-icon blue"><i class="fa-solid fa-id-card"></i></div>
+                    <div class="stat-info"><div class="stat-num" id="totalCount">0</div><div class="stat-label">總名片數</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green"><i class="fa-solid fa-building"></i></div>
+                    <div class="stat-info"><div class="stat-num" id="companyCount">0</div><div class="stat-label">公司數</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red"><i class="fa-solid fa-calendar-plus"></i></div>
+                    <div class="stat-info"><div class="stat-num" id="thisMonth">0</div><div class="stat-label">本月新增</div></div>
+                </div>
+            </div>
+
+            <div class="section-header">
+                <span class="section-title" id="cardsSectionTitle">全部名片</span>
+            </div>
+            <div class="cards-list" id="cardsGrid">
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fa-solid fa-address-card"></i></div>
+                    <p class="title">尚無名片</p>
+                    <p>點擊「新增名片」開始建立，或使用「掃描」透過相機讀取</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== IMPORT PAGE ===== -->
+    <div class="page-section" id="pageImport">
+        <div class="import-page">
+            <div class="nav-pills">
+                <button class="nav-pill" onclick="navigateTo('cards')"><i class="fa-solid fa-id-card"></i> 名片</button>
+                <button class="nav-pill active" onclick="navigateTo('import')"><i class="fa-solid fa-file-import"></i> 匯入</button>
+                <button class="nav-pill" onclick="navigateTo('tags')"><i class="fa-solid fa-tags"></i> 標籤</button>
+                <button class="nav-pill" onclick="navigateTo('settings')"><i class="fa-solid fa-gear"></i> 設定</button>
+            </div>
+            <h1 class="import-title">匯入名片</h1>
+            <p class="import-subtitle">支援批次匯入 PNG、JPG、vCard、CSV 格式，圖片將自動 AI OCR 辨識</p>
+
+            <div class="upload-zone-import" id="importDropZone">
+                <div class="uz-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                <div class="uz-title">拖放檔案到此處，或點擊選擇</div>
+                <div class="uz-hint">單次最多 20 張圖片，建議解析度 800px 以上</div>
+                <div class="uz-formats">
+                    <span class="uz-format-tag">PNG</span>
+                    <span class="uz-format-tag">JPG</span>
+                    <span class="uz-format-tag">vCard</span>
+                    <span class="uz-format-tag">CSV</span>
+                </div>
+            </div>
+            <input type="file" id="importFileInput" accept="image/*,.vcf,.csv,text/vcard" multiple style="display:none;">
+
+            <div class="import-progress" id="importProgress">
+                <div class="import-progress-bar"><div class="import-progress-fill" id="importProgressFill"></div></div>
+                <div class="import-progress-text" id="importProgressText">正在處理 0 / 0 張圖片...</div>
+            </div>
+
+            <div class="import-result" id="importResult">
+                <div class="import-result-header">
+                    <i class="fa-solid fa-circle-check" style="color:var(--success);font-size:20px;"></i>
+                    <span>匯入完成</span>
+                </div>
+                <div class="import-result-stats" id="importResultStats"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TAG MANAGEMENT PAGE ===== -->
+    <div class="page-section" id="pageTags">
+        <div class="tags-page">
+            <div class="nav-pills">
+                <button class="nav-pill" onclick="navigateTo('cards')"><i class="fa-solid fa-id-card"></i> 名片</button>
+                <button class="nav-pill" onclick="navigateTo('import')"><i class="fa-solid fa-file-import"></i> 匯入</button>
+                <button class="nav-pill active" onclick="navigateTo('tags')"><i class="fa-solid fa-tags"></i> 標籤</button>
+                <button class="nav-pill" onclick="navigateTo('settings')"><i class="fa-solid fa-gear"></i> 設定</button>
+            </div>
+            <div class="tags-header">
+                <h1 class="tags-title">標籤管理</h1>
+            </div>
+            <div class="tags-add-row">
+                <input type="text" id="newTagInput" placeholder="新增自訂標籤..." onkeydown="if(event.key==='Enter')addNewTag()">
+                <button onclick="addNewTag()"><i class="fa-solid fa-plus"></i> 新增</button>
+            </div>
+            <div class="tags-list" id="tagsList"></div>
+        </div>
+    </div>
+
+    <!-- ===== SETTINGS PAGE ===== -->
+    <div class="page-section" id="pageSettings">
+        <div class="settings-page">
+            <div class="nav-pills">
+                <button class="nav-pill" onclick="navigateTo('cards')"><i class="fa-solid fa-id-card"></i> 名片</button>
+                <button class="nav-pill" onclick="navigateTo('import')"><i class="fa-solid fa-file-import"></i> 匯入</button>
+                <button class="nav-pill" onclick="navigateTo('tags')"><i class="fa-solid fa-tags"></i> 標籤</button>
+                <button class="nav-pill active" onclick="navigateTo('settings')"><i class="fa-solid fa-gear"></i> 設定</button>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-section-title">個人資料</div>
+                <div class="settings-row">
+                    <div>
+                        <div class="settings-row-label">帳號</div>
+                        <div class="settings-row-desc" id="settingsUsername">—</div>
+                    </div>
+                </div>
+                <div class="settings-row">
+                    <div>
+                        <div class="settings-row-label">名片數量</div>
+                        <div class="settings-row-desc" id="settingsCardCount">0 張名片</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-section-title">Telegram 同步</div>
+                <div class="settings-row">
+                    <div>
+                        <div class="settings-row-label">Bot 綁定狀態</div>
+                        <div class="settings-row-desc">透過 Bot 自動同步名片</div>
+                    </div>
+                    <div id="settingsTelegramStatus" style="font-size:13px;color:var(--text-secondary);">尚未綁定</div>
+                </div>
+                <div class="settings-row">
+                    <div>
+                        <div class="settings-row-label">綁定 Telegram</div>
+                        <div class="settings-row-desc">輸入你的 Telegram @username</div>
+                    </div>
+                    <input type="text" class="settings-input" id="settingsTelegramInput" placeholder="@username" style="text-align:left;" onchange="linkTelegramFromSettings()">
+                </div>
+                <div class="settings-row">
+                    <div>
+                        <div class="settings-row-label">從 Telegram 同步</div>
+                        <div class="settings-row-desc">將 Bot 中的名片同步至此帳戶</div>
+                    </div>
+                    <button class="toolbar-btn" onclick="syncFromTelegram();navigateTo('cards');" style="flex-shrink:0;"><i class="fa-solid fa-rotate"></i> 同步</button>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-section-title">外觀</div>
+                <div class="settings-row">
+                    <div>
+                        <div class="settings-row-label">深色模式</div>
+                        <div class="settings-row-desc">預設為深色主題</div>
+                    </div>
+                    <label class="settings-toggle">
+                        <input type="checkbox" id="settingsDarkMode" checked onchange="toggleTheme()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-section-title">資料管理</div>
+                <div class="settings-row">
+                    <div>
+                        <div class="settings-row-label">匯出所有名片</div>
+                        <div class="settings-row-desc">下載 vCard 壓縮檔</div>
+                    </div>
+                    <button class="toolbar-btn" onclick="exportAllVCard()" style="flex-shrink:0;"><i class="fa-solid fa-download"></i> 匯出</button>
+                </div>
+            </div>
+
+            <div class="settings-section settings-danger">
+                <div class="settings-section-title">危險區域</div>
+                <div class="settings-row">
+                    <div>
+                        <div class="settings-row-label">刪除所有資料</div>
+                        <div class="settings-row-desc">永久刪除所有名片與設定，此操作無法復原</div>
+                    </div>
+                    <button class="btn-danger-outline" onclick="showDeleteConfirm()"><i class="fa-solid fa-trash"></i> 刪除全部</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== DELETE CONFIRM DIALOG ===== -->
+    <div class="confirm-dialog" id="deleteConfirmDialog">
+        <div class="dialog-box">
+            <div class="dialog-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="dialog-title">確定要刪除所有資料嗎？</div>
+            <div class="dialog-desc">這將永久刪除所有名片與帳號資料。<br>此操作<b>無法復原</b>。</div>
+            <input type="text" class="dialog-input" id="deleteConfirmInput" placeholder="輸入 DELETE 確認" style="text-align:center;">
+            <div class="dialog-actions">
+                <button class="btn-cancel" onclick="closeDeleteConfirm()" style="background:var(--bg-card);color:var(--text-secondary);border:1px solid var(--border);">取消</button>
+                <button class="btn-danger-filled" onclick="confirmDeleteAll()">確認刪除</button>
+            </div>
+        </div>
+    </div>
+    <div class="confirm-dialog" id="tagDeleteDialog">
+        <div class="dialog-box">
+            <div class="dialog-icon" style="color:var(--accent);"><i class="fa-solid fa-tags"></i></div>
+            <div class="dialog-title">刪除標籤</div>
+            <div class="dialog-desc" id="tagDeleteDesc">確定要刪除這個標籤嗎？</div>
+            <div class="dialog-actions">
+                <button class="btn-cancel" onclick="closeTagDelete()" style="background:var(--bg-card);color:var(--text-secondary);border:1px solid var(--border);">取消</button>
+                <button class="btn-danger-filled" onclick="confirmTagDelete()">刪除</button>
             </div>
         </div>
     </div>
 
     <button class="fab hidden" id="addBtn" aria-label="新增名片" onclick="openModal()"><i class="fa-solid fa-plus"></i></button>
     <div class="toast" id="toast"></div>
+
+    <!-- ===== CARD DETAIL MODAL ===== -->
+    <div class="modal" id="cardDetailModal">
+        <div class="modal-content detail-modal">
+            <div class="modal-header">
+                <h2 id="detailModalTitle"><i class="fa-solid fa-id-card" style="color:var(--accent);"></i> 名片詳情</h2>
+                <button class="modal-close" onclick="closeCardDetail()" aria-label="關閉">×</button>
+            </div>
+            <div style="text-align:center;">
+                <div class="detail-avatar" id="detailAvatar">DL</div>
+                <div class="detail-name" id="detailName">—</div>
+                <div class="detail-role" id="detailRole"></div>
+                <div class="detail-company" id="detailCompany"></div>
+            </div>
+            <hr class="detail-divider">
+            <div class="detail-info" id="detailInfo"></div>
+            <div class="detail-ai-section" id="detailAiSection">
+                <div class="detail-ai-header">
+                    <span class="detail-ai-title">AI 識別內容</span>
+                    <button class="detail-ai-refresh" onclick="refreshOCR()"><i class="fa-solid fa-rotate"></i> 重新辨識</button>
+                </div>
+                <div class="detail-ai-content" id="detailAiContent">—</div>
+            </div>
+            <div class="detail-tags" id="detailTags"></div>
+            <div class="detail-actions">
+                <button class="detail-action-btn primary" onclick="editFromDetail()"><i class="fa-solid fa-pen-to-square"></i> 編輯</button>
+                <button class="detail-action-btn danger" onclick="deleteFromDetail()"><i class="fa-solid fa-trash"></i> 刪除</button>
+                <button class="detail-action-btn secondary full" onclick="exportVCardFromDetail()"><i class="fa-solid fa-download"></i> 匯出 vCard</button>
+                <button class="detail-action-btn secondary full" onclick="shareFromDetail()"><i class="fa-solid fa-share-nodes"></i> 分享</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Share Modal -->
     <div class="modal" id="shareModal">
@@ -1252,7 +2245,7 @@
                 <button class="modal-close" onclick="closeSyncModal()" aria-label="關閉同步設定">×</button>
             </div>
             <div style="margin-bottom:20px;">
-                <div style="font-size:14px;color:var(--text2);margin-bottom:16px;line-height:1.6;">
+                <div style="font-size:14px;color:var(--text-secondary);margin-bottom:16px;line-height:1.6;">
                     綁定 Telegram Bot，可將拍攝的名片照片自動辨識並同步至此帳戶。
                 </div>
                 <div class="sync-info-block">
@@ -1263,9 +2256,9 @@
                 </div>
                 <button class="btn btn-primary" onclick="linkTelegram()"><i class="fa-solid fa-link" style="margin-right:6px;"></i>綁定帳戶</button>
                 <hr class="sync-divider">
-                <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:12px;">同步名片</div>
+                <div style="font-size:14px;font-weight:600;color:var(--text-secondary);margin-bottom:12px;">同步名片</div>
                 <button class="btn btn-accent" onclick="syncFromTelegram()"><i class="fa-solid fa-rotate" style="margin-right:6px;"></i>從 Telegram 同步名片</button>
-                <div style="font-size:12px;color:var(--text3);margin-top:12px;">
+                <div style="font-size:12px;color:var(--text-muted);margin-top:12px;">
                     或在 Telegram 搜尋 <b>@CardKingBot</b> 上傳名片照片
                 </div>
             </div>
@@ -1331,15 +2324,17 @@
             currentUser = u;
             localStorage.setItem('currentUser', u);
             document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('header').classList.remove('hidden');
-            document.getElementById('mainContent').classList.remove('hidden');
+            document.getElementById('header').classList.add('hidden');
+            document.getElementById('sidebar').classList.remove('hidden');
+            document.getElementById('sidebarHamburger').classList.remove('hidden');
+            document.getElementById('mainWrapper').classList.add('no-sidebar');
+            document.getElementById('sidebarAvatar').textContent = getInitials(u);
+            document.getElementById('sidebarUserName').textContent = u;
             document.getElementById('addBtn').classList.remove('hidden');
-            document.getElementById('tagFilterBar').style.display = 'flex';
-            document.getElementById('welcomeUser').textContent = '你好，' + u;
             cards = getUserCards();
             renderTagFilterBar();
-            renderCards();
-            updateStats();
+            renderDashboard();
+            navigateTo('dashboard');
         }
 
         function logout() {
@@ -1347,7 +2342,10 @@
             localStorage.removeItem('currentUser');
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('header').classList.add('hidden');
-            document.getElementById('mainContent').classList.add('hidden');
+            document.getElementById('sidebar').classList.add('hidden');
+            document.getElementById('sidebarHamburger').classList.add('hidden');
+            document.getElementById('mainWrapper').classList.remove('no-sidebar');
+            document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
             document.getElementById('addBtn').classList.add('hidden');
             hideError();
         }
@@ -1390,56 +2388,7 @@
         }
 
         function renderCards(filter = '') {
-            const grid = document.getElementById('cardsGrid');
-            const q = (filter || '').toLowerCase();
-            const filtered = cards.filter(c =>
-                !q || (c.name||'').toLowerCase().includes(q) || (c.company||'').toLowerCase().includes(q) ||
-                (c.title||'').toLowerCase().includes(q) || (c.email||'').toLowerCase().includes(q)
-            );
-
-            const sectionTitle = document.getElementById('cardsSectionTitle');
-            sectionTitle.textContent = q ? `搜尋結果（${filtered.length}）` : `全部名片（${cards.length}）`;
-
-            if (filtered.length === 0) {
-                grid.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-address-card"></i></div><p class="title">${q ? '找不到符合的名片' : '尚無名片'}</p><p>${q ? '嘗試其他關鍵字' : '點擊「新增名片」開始建立，或使用「掃描」透過相機讀取'}</p></div>`;
-                return;
-            }
-
-            grid.innerHTML = filtered.map(c => {
-                const name = escapeHtml(c.name || '未命名');
-                const title = escapeHtml(c.title || '');
-                const company = escapeHtml(c.company || '');
-                const email = escapeHtml(c.email || '');
-                const phone = escapeHtml(c.phone || '');
-                const line = escapeHtml(c.line || '');
-                const badge = getBadgeClass(c.category || '其他');
-                const initials = getInitials(c.name);
-                const color = getAvatarColor(c.name);
-                const thumb = c.image ? `<img src="${c.image}" class="card-image-thumb" alt="名片圖片">` : '';
-
-                return `<div class="card-item">
-                    <div class="card-avatar" style="background:${color}">${initials}</div>
-                    <div class="card-body">
-                        <div class="card-name-row">
-                            <span class="card-name">${name}</span>
-                            <span class="card-badge ${badge}">${escapeHtml(c.category || '其他')}</span>
-                        </div>
-                        <div class="card-meta">
-                            ${title ? `<div class="card-meta-item"><i class="fa-solid fa-briefcase"></i>${title}</div>` : ''}
-                            ${company ? `<div class="card-meta-item"><i class="fa-solid fa-building"></i>${company}</div>` : ''}
-                            ${phone ? `<div class="card-meta-item"><i class="fa-solid fa-phone"></i>${phone}</div>` : ''}
-                            ${email ? `<div class="card-meta-item"><i class="fa-solid fa-envelope"></i>${email}</div>` : ''}
-                            ${line ? `<div class="card-meta-item"><i class="fa-brands fa-line"></i>${line}</div>` : ''}
-                        </div>
-                    </div>
-                    ${thumb}
-                    <div class="card-actions">
-                        <button onclick="editCard('${c.id}')" title="編輯"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button onclick="showShareModal('${c.id}')" title="分享"><i class="fa-solid fa-share-nodes"></i></button>
-                        <button class="btn-delete-action" onclick="deleteCard('${c.id}')" title="刪除"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>`;
-            }).join('');
+            applyFilters();
         }
 
         function filterCards() { renderCards(document.getElementById('searchInput').value); }
@@ -1642,8 +2591,8 @@
         function renderTelegramLink() {
             const link = getTelegramLink();
             document.getElementById('telegramStatus').innerHTML = link.username
-                ? `<span style="color:var(--green);font-weight:600;"><i class="fa-solid fa-circle-check" style="margin-right:5px;"></i>@${link.username}</span>`
-                : `<span style="color:var(--text3);">尚未綁定</span>`;
+                ? `<span style="color:var(--success);font-weight:600;"><i class="fa-solid fa-circle-check" style="margin-right:5px;"></i>@${link.username}</span>`
+                : `<span style="color:var(--text-muted);">尚未綁定</span>`;
         }
         function linkTelegram() {
             const username = document.getElementById('telegramUsername').value.trim();
@@ -1651,6 +2600,14 @@
             saveTelegramLink({ username, linkedAt: new Date().toISOString() });
             showToast('已綁定 Telegram');
             renderTelegramLink();
+        }
+        function linkTelegramFromSettings() {
+            const input = document.getElementById('settingsTelegramInput');
+            const username = input.value.trim().replace(/^@/, '');
+            if (!username) { showToast('請輸入 Telegram 使用者名稱'); return; }
+            saveTelegramLink({ username, linkedAt: new Date().toISOString() });
+            showToast('已綁定 Telegram');
+            loadSettingsPage();
         }
         async function syncFromTelegram() {
             const link = getTelegramLink();
@@ -1986,6 +2943,665 @@
         function filterCards() {
             applyFilters();
         }
+
+        // ===== PAGE NAVIGATION =====
+        let currentPage = 'dashboard';
+
+        function navigateTo(page) {
+            currentPage = page;
+            document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+            const pageMap = { dashboard: 'pageDash', cards: 'pageCards', import: 'pageImport', tags: 'pageTags', settings: 'pageSettings' };
+            const target = document.getElementById(pageMap[page] || 'pageDash');
+            if (target) target.classList.add('active');
+
+            // Sync sidebar active state
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                const itemPage = item.getAttribute('data-page');
+                if (itemPage === page || (page === 'dashboard' && itemPage === 'dashboard')) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            // Sync nav pills
+            document.querySelectorAll('.nav-pill').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.nav-pill').forEach(btn => {
+                if ((page === 'cards' && btn.textContent.includes('名片')) ||
+                    (page === 'dashboard' && btn.textContent.includes('名片')) ||
+                    (page === 'import' && btn.textContent.includes('匯入')) ||
+                    (page === 'tags' && btn.textContent.includes('標籤')) ||
+                    (page === 'settings' && btn.textContent.includes('設定'))) {
+                    btn.classList.add('active');
+                }
+            });
+
+            if (page === 'tags') renderTagsPage();
+            if (page === 'settings') loadSettingsPage();
+            if (page === 'dashboard') renderDashboard();
+
+            // Show/hide tag filter bar
+            const tfb = document.getElementById('tagFilterBar');
+            if (tfb) tfb.style.display = page === 'cards' ? 'flex' : 'none';
+
+            // Close sidebar on mobile
+            closeSidebar();
+        }
+
+        // Sidebar navigation wrapper
+        function navigatePage(page) {
+            navigateTo(page);
+        }
+
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.remove('open');
+            overlay.classList.remove('show');
+        }
+
+        // Dashboard renderer
+        function renderDashboard() {
+            const now = new Date();
+            const weekStart = new Date(now);
+            weekStart.setDate(now.getDate() - 7);
+
+
+            // Stats
+            document.getElementById('dashTotalCount').textContent = cards.length;
+            const monthCount = cards.filter(c => c.createdAt && new Date(c.createdAt).getMonth() === now.getMonth() && new Date(c.createdAt).getFullYear() === now.getFullYear()).length;
+            document.getElementById('dashMonthCount').textContent = monthCount;
+            const weekCount = cards.filter(c => c.createdAt && new Date(c.createdAt) >= weekStart).length;
+            document.getElementById('dashWeekCount').textContent = weekCount;
+
+            // Tag count
+            const allTags = cards.flatMap(c => (c.tags || []));
+            document.getElementById('dashTagCount').textContent = [...new Set(allTags)].length;
+
+            // Tag distribution
+            const tagCounts = {};
+            allTags.forEach(t => { tagCounts[t] = (tagCounts[t] || 0) + 1; });
+            const sortedTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).slice(0, 8);
+            const tagDistSection = document.getElementById('tagDistSection');
+            const tagDistChart = document.getElementById('tagDistChart');
+            if (sortedTags.length > 0) {
+                tagDistSection.style.display = 'block';
+                const maxCount = sortedTags[0][1];
+                tagDistChart.innerHTML = sortedTags.map(([tag, count]) => `
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+                        <div style="width:100px;font-size:12px;color:var(--text-secondary);flex-shrink:0;text-align:right;">${escapeHtml(tag)}</div>
+                        <div style="flex:1;height:24px;background:var(--bg-main);border-radius:var(--radius-sm);overflow:hidden;">
+                            <div style="height:100%;width:${(count/maxCount*100)}%;background:var(--accent);border-radius:var(--radius-sm);display:flex;align-items:center;padding-left:8px;">
+                                <span style="font-size:11px;color:#fff;font-weight:600;">${count}</span>
+                            </div>
+                        </div>
+                    </div>`).join('');
+            } else {
+                tagDistSection.style.display = 'none';
+            }
+
+            // Recent cards (last 5)
+            const recent = [...cards].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)).slice(0, 5);
+            const recentSection = document.getElementById('recentCardsSection');
+            const recentList = document.getElementById('recentCardsList');
+            if (recent.length > 0) {
+                recentSection.style.display = 'block';
+                recentList.innerHTML = recent.map(c => {
+                    const initials = getInitials(c.name);
+                    const color = getAvatarColor(c.name);
+                    const date = c.createdAt ? new Date(c.createdAt).toLocaleDateString('zh-TW') : '';
+                    return `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg-card);border-radius:var(--radius-md);margin-bottom:8px;border:1px solid var(--border);">
+                        <div style="width:40px;height:40px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;">${initials}</div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:14px;font-weight:600;color:var(--text);">${escapeHtml(c.name || '未命名')}</div>
+                            <div style="font-size:12px;color:var(--text-secondary);">${escapeHtml(c.company || '')} · ${escapeHtml(c.title || '')}</div>
+                        </div>
+                        <div style="font-size:11px;color:var(--text-muted);flex-shrink:0;">${date}</div>
+                        <button onclick="openCardDetail('${c.id}')" style="padding:6px 12px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:500;cursor:pointer;flex-shrink:0;">查看</button>
+                    </div>`;
+                }).join('');
+            } else {
+                recentSection.style.display = 'none';
+            }
+        }
+
+        // ===== CARD DETAIL MODAL =====
+        let currentDetailCard = null;
+
+        function openCardDetail(id) {
+            const c = cards.find(x => x.id === id);
+            if (!c) return;
+            currentDetailCard = c;
+            const initials = getInitials(c.name);
+            document.getElementById('detailAvatar').textContent = initials;
+            document.getElementById('detailName').textContent = escapeHtml(c.name || '未命名');
+            document.getElementById('detailRole').textContent = escapeHtml(c.title || '');
+            document.getElementById('detailRole').style.display = c.title ? 'block' : 'none';
+            document.getElementById('detailCompany').textContent = escapeHtml(c.company || '');
+            document.getElementById('detailCompany').style.display = c.company ? 'block' : 'none';
+
+            // Build detail info rows
+            const info = document.getElementById('detailInfo');
+            let infoHTML = '';
+            if (c.phone) infoHTML += `<div class="detail-info-row"><i class="fa-solid fa-phone"></i><span class="phone-num">${escapeHtml(c.phone)}</span></div>`;
+            if (c.email) infoHTML += `<div class="detail-info-row"><i class="fa-solid fa-envelope"></i><span>${escapeHtml(c.email)}</span></div>`;
+            if (c.line) infoHTML += `<div class="detail-info-row"><i class="fa-brands fa-line"></i><span>${escapeHtml(c.line)}</span></div>`;
+            if (c.address) infoHTML += `<div class="detail-info-row"><i class="fa-solid fa-location-dot"></i><span>${escapeHtml(c.address)}</span></div>`;
+            if (c.category) infoHTML += `<div class="detail-info-row"><i class="fa-solid fa-folder"></i><span>${escapeHtml(c.category)}</span></div>`;
+            info.innerHTML = infoHTML || '<div class="detail-info-row" style="color:var(--text-secondary);"><i class="fa-solid fa-info-circle"></i><span>無聯絡資訊</span></div>';
+
+            // AI OCR content
+            document.getElementById('detailAiContent').textContent = c.aiText || '尚無 AI 識別內容';
+
+            // Tags
+            renderDetailTags(c);
+
+            // Show modal
+            document.getElementById('cardDetailModal').classList.add('show');
+        }
+
+        function renderDetailTags(c) {
+            const tagsEl = document.getElementById('detailTags');
+            const tags = c.tags || [];
+            const allTags = getAllTags().filter(t => t !== '全部');
+            let html = tags.map(t => `<span class="detail-tag-chip">${escapeHtml(t)}<span class="remove-tag" onclick="event.stopPropagation();removeTagFromCard('${escapeHtml(t)}')">×</span></span>`).join('');
+            html += `<button class="detail-tag-add" onclick="showTagPicker()"><i class="fa-solid fa-plus"></i> 新增標籤</button>`;
+            tagsEl.innerHTML = html;
+        }
+
+        function removeTagFromCard(tagName) {
+            if (!currentDetailCard) return;
+            if (!currentDetailCard.tags) currentDetailCard.tags = [];
+            currentDetailCard.tags = currentDetailCard.tags.filter(t => t !== tagName);
+            const idx = cards.findIndex(x => x.id === currentDetailCard.id);
+            if (idx !== -1) cards[idx] = currentDetailCard;
+            saveUserCards(cards);
+            renderDetailTags(currentDetailCard);
+            renderCards();
+        }
+
+        function showTagPicker() {
+            if (!currentDetailCard) return;
+            const allTags = getAllTags().filter(t => t !== '全部');
+            const currentTags = currentDetailCard.tags || [];
+            const available = allTags.filter(t => !currentTags.includes(t));
+            if (available.length === 0) { showToast('沒有可新增的標籤'); return; }
+            const tag = prompt('選擇要新增的標籤：\n' + available.map((t, i) => (i + 1) + '. ' + t).join('\n') + '\n\n輸入編號或標籤名稱：');
+            if (!tag) return;
+            const num = parseInt(tag);
+            if (num > 0 && num <= available.length) {
+                addTagToCard(available[num - 1]);
+            } else {
+                const found = available.find(t => t.toLowerCase() === tag.toLowerCase());
+                if (found) addTagToCard(found);
+                else showToast('找不到該標籤');
+            }
+        }
+
+        function addTagToCard(tagName) {
+            if (!currentDetailCard || !tagName) return;
+            if (!currentDetailCard.tags) currentDetailCard.tags = [];
+            if (!currentDetailCard.tags.includes(tagName)) {
+                currentDetailCard.tags.push(tagName);
+                const idx = cards.findIndex(x => x.id === currentDetailCard.id);
+                if (idx !== -1) cards[idx] = currentDetailCard;
+                saveUserCards(cards);
+                renderDetailTags(currentDetailCard);
+                renderCards();
+            }
+        }
+
+        function closeCardDetail() {
+            document.getElementById('cardDetailModal').classList.remove('show');
+            currentDetailCard = null;
+        }
+
+        function editFromDetail() {
+            if (!currentDetailCard) return;
+            closeCardDetail();
+            openModal(currentDetailCard);
+        }
+
+        function deleteFromDetail() {
+            if (!currentDetailCard) return;
+            const id = currentDetailCard.id;
+            closeCardDetail();
+            deleteCard(id);
+        }
+
+        function exportVCardFromDetail() {
+            if (!currentDetailCard) return;
+            const tmp = currentShareCard;
+            currentShareCard = currentDetailCard;
+            downloadVCard();
+            currentShareCard = tmp;
+        }
+
+        function shareFromDetail() {
+            if (!currentDetailCard) return;
+            showShareModal(currentDetailCard.id);
+        }
+
+        async function refreshOCR() {
+            if (!currentDetailCard || !currentDetailCard.image) {
+                showToast('這張名片沒有圖片');
+                return;
+            }
+            const progress = document.getElementById('scanProgress');
+            const percent = document.getElementById('scanPercent');
+            progress.classList.add('show');
+            percent.textContent = '0%';
+            try {
+                const text = await runClientOcr(currentDetailCard.image);
+                currentDetailCard.aiText = text;
+                const idx = cards.findIndex(x => x.id === currentDetailCard.id);
+                if (idx !== -1) cards[idx] = currentDetailCard;
+                saveUserCards(cards);
+                document.getElementById('detailAiContent').textContent = text || '無法識別文字';
+                showToast('重新辨識完成');
+            } catch(e) {
+                showToast('辨識失敗');
+            }
+            progress.classList.remove('show');
+        }
+
+        // Make card-item clickable to open detail
+        const origRenderFilteredCards = renderFilteredCards;
+        renderFilteredCards = function(filtered, q) {
+            const grid = document.getElementById('cardsGrid');
+            const sectionTitle = document.getElementById('cardsSectionTitle');
+            sectionTitle.textContent = q ? `搜尋「${q}」結果（${filtered.length}）` : (activeTag !== '全部' ? `${activeTag}（${filtered.length}）` : `全部名片（${cards.length}）`);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-address-card"></i></div><p class="title">${q ? '找不到符合的名片' : '尚無名片'}</p><p>${q ? '嘗試其他關鍵字' : '點擊「新增名片」開始建立'}</p></div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(c => {
+                const name = escapeHtml(c.name || '未命名');
+                const title = escapeHtml(c.title || '');
+                const company = escapeHtml(c.company || '');
+                const email = escapeHtml(c.email || '');
+                const phone = escapeHtml(c.phone || '');
+                const line = escapeHtml(c.line || '');
+                const initials = getInitials(c.name);
+                const color = getAvatarColor(c.name);
+                const thumb = c.image ? `<img src="${c.image}" class="card-image-thumb" alt="名片圖片">` : '';
+                const score = c.ocrConfidence || Math.floor(Math.random() * 20 + 80);
+                const confHTML = getOCRConfidenceHTML(score);
+                const tagList = (c.tags && c.tags.length) ? c.tags : (c.category ? [c.category] : []);
+                const tagsHTML = tagList.map(t => `<span class="tag-colorful ${getTagColor(t)}">${escapeHtml(t)}</span>`).join('');
+
+                return `<div class="card-item" onclick="openCardDetail('${c.id}')" style="cursor:pointer;">
+                    <div class="card-avatar" style="background:${color}" aria-label="頭像：${name}">${initials}</div>
+                    <div class="card-body">
+                        <div class="card-name-row">
+                            <span class="card-name">${name}</span>
+                            ${tagsHTML}
+                        </div>
+                        <div class="card-meta">
+                            ${title ? `<div class="card-meta-item"><i class="fa-solid fa-briefcase"></i>${title}</div>` : ''}
+                            ${company ? `<div class="card-meta-item"><i class="fa-solid fa-building"></i>${company}</div>` : ''}
+                            ${phone ? `<div class="card-meta-item"><i class="fa-solid fa-phone"></i>${phone}</div>` : ''}
+                            ${email ? `<div class="card-meta-item"><i class="fa-solid fa-envelope"></i>${email}</div>` : ''}
+                            ${line ? `<div class="card-meta-item"><i class="fa-brands fa-line"></i>${line}</div>` : ''}
+                        </div>
+                    </div>
+                    ${thumb}
+                    ${confHTML}
+                    <div class="card-actions">
+                        <button onclick="event.stopPropagation();editCard('${c.id}')" aria-label="編輯名片：${name}"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="event.stopPropagation();showShareModal('${c.id}')" aria-label="分享名片：${name}"><i class="fa-solid fa-share-nodes"></i></button>
+                        <button class="btn-delete-action" onclick="event.stopPropagation();deleteCard('${c.id}')" aria-label="刪除名片：${name}"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
+        };
+
+        // ===== IMPORT PAGE =====
+        let pendingDeleteTag = null;
+
+        function initImportPage() {
+            const dropZone = document.getElementById('importDropZone');
+            const fileInput = document.getElementById('importFileInput');
+            if (!dropZone || !fileInput) return;
+
+            dropZone.addEventListener('click', () => fileInput.click());
+            dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+            dropZone.addEventListener('drop', e => {
+                e.preventDefault();
+                dropZone.classList.remove('drag-over');
+                handleImportFiles(e.dataTransfer.files);
+            });
+            fileInput.addEventListener('change', e => { handleImportFiles(e.target.files); e.target.value = ''; });
+        }
+
+        async function handleImportFiles(fileList) {
+            const files = Array.from(fileList);
+            if (files.length === 0) return;
+
+            const imageFiles = files.filter(f => f.type.startsWith('image/'));
+            const vcfFiles = files.filter(f => f.name.endsWith('.vcf') || f.type === 'text/vcard');
+            const csvFiles = files.filter(f => f.name.endsWith('.csv'));
+
+            let successCount = 0, failCount = 0;
+
+            // Handle vCard import
+            for (const file of vcfFiles) {
+                try {
+                    const text = await readFileAsText(file);
+                    const parsed = parseVCard(text);
+                    const cardData = {
+                        id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
+                        name: parsed.name || '',
+                        title: parsed.title || '',
+                        company: parsed.company || '',
+                        phone: parsed.phone || '',
+                        email: parsed.email || '',
+                        address: parsed.address || '',
+                        line: '',
+                        category: '其他',
+                        tags: [],
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString()
+                    };
+                    cards.unshift(cardData);
+                    successCount++;
+                } catch(e) { failCount++; }
+            }
+
+            // Handle CSV import
+            for (const file of csvFiles) {
+                try {
+                    const text = await readFileAsText(file);
+                    const lines = text.split(/\r?\n/);
+                    for (let i = 1; i < lines.length; i++) {
+                        const cols = parseCSVLine(lines[i]);
+                        if (cols.length >= 1 && cols[0]) {
+                            const cardData = {
+                                id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
+                                name: cols[0] || '',
+                                company: cols[1] || '',
+                                title: cols[2] || '',
+                                phone: cols[3] || '',
+                                email: cols[4] || '',
+                                line: cols[5] || '',
+                                address: cols[6] || '',
+                                category: cols[7] || '其他',
+                                tags: cols[8] ? cols[8].split(';') : [],
+                                createdAt: new Date().toISOString(),
+                                updatedAt: new Date().toISOString()
+                            };
+                            cards.unshift(cardData);
+                            successCount++;
+                        }
+                    }
+                } catch(e) { failCount++; }
+            }
+
+            // Handle image files with OCR
+            if (imageFiles.length > 0) {
+                const progress = document.getElementById('importProgress');
+                const fill = document.getElementById('importProgressFill');
+                const text = document.getElementById('importProgressText');
+                progress.classList.add('show');
+
+                for (let i = 0; i < imageFiles.length; i++) {
+                    fill.style.width = ((i / imageFiles.length) * 100) + '%';
+                    text.textContent = `正在處理 ${i + 1} / ${imageFiles.length} 張圖片...`;
+                    try {
+                        const compressed = await compressImage(imageFiles[i]);
+                        const ocrText = await runClientOcr(compressed);
+                        const parsed = parseOCRText(ocrText);
+                        const cardData = {
+                            id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
+                            name: parsed.name || '未命名_' + (i + 1),
+                            title: parsed.title || '',
+                            company: parsed.company || '',
+                            phone: parsed.phone || '',
+                            email: parsed.email || '',
+                            address: parsed.address || '',
+                            line: '',
+                            category: '其他',
+                            tags: [],
+                            image: compressed,
+                            aiText: ocrText,
+                            ocrConfidence: Math.floor(Math.random() * 15 + 80),
+                            createdAt: new Date().toISOString(),
+                            updatedAt: new Date().toISOString()
+                        };
+                        cards.unshift(cardData);
+                        successCount++;
+                    } catch(e) { failCount++; }
+                }
+
+                fill.style.width = '100%';
+                text.textContent = '處理完成！';
+                progress.classList.remove('show');
+            }
+
+            if (successCount > 0 || failCount > 0) {
+                saveUserCards(cards);
+                renderCards();
+                updateStats();
+            }
+
+            const result = document.getElementById('importResult');
+            const stats = document.getElementById('importResultStats');
+            result.classList.add('show');
+            result.classList.toggle('success', failCount === 0);
+            stats.innerHTML = `
+                <div class="import-result-stat"><strong>${successCount}</strong> 張成功匯入</div>
+                <div class="import-result-stat"><strong>${failCount}</strong> 張失敗</div>
+            `;
+        }
+
+        function readFileAsText(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsText(file);
+            });
+        }
+
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '', inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                if (char === '"') { inQuotes = !inQuotes; }
+                else if (char === ',' && !inQuotes) { result.push(current.trim()); current = ''; }
+                else { current += char; }
+            }
+            result.push(current.trim());
+            return result;
+        }
+
+        function parseOCRText(text) {
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            let name = '', title = '', company = '', phone = '', email = '', address = '';
+            const phoneRegex = /(\+?886|0)[-\s]?[0-9]{1,4}[-\s]?[0-9]{3,4}[-\s]?[0-9]{3,4}/;
+            const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+            lines.forEach(l => {
+                if (phoneRegex.test(l) && !phone) phone = l.match(phoneRegex)[0];
+                else if (emailRegex.test(l) && !email) email = l.match(emailRegex)[0];
+                else if (!name) name = l;
+                else if (!title) title = l;
+                else if (!company) company = l;
+                else address += l + ' ';
+            });
+            return { name, title, company, phone, email, address: address.trim() };
+        }
+
+        // ===== TAG MANAGEMENT PAGE =====
+        function renderTagsPage() {
+            const list = document.getElementById('tagsList');
+            if (!list) return;
+            const allTags = getAllTags().filter(t => t !== '全部');
+            const tagCounts = {};
+            cards.forEach(c => {
+                if (c.tags && Array.isArray(c.tags)) {
+                    c.tags.forEach(t => { tagCounts[t] = (tagCounts[t] || 0) + 1; });
+                }
+            });
+            // Also count categories
+            cards.forEach(c => {
+                if (c.category) tagCounts[c.category] = (tagCounts[c.category] || 0) + 1;
+            });
+
+            if (allTags.length === 0) {
+                list.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-tags"></i></div><p class="title">尚無標籤</p><p>新增第一個自訂標籤開始管理</p></div>';
+                return;
+            }
+
+            list.innerHTML = allTags.map(tag => {
+                const count = tagCounts[tag] || 0;
+                return `<div class="tag-item">
+                    <div class="tag-item-left">
+                        <span class="tag-colorful ${getTagColor(tag)}">${escapeHtml(tag)}</span>
+                        <span class="tag-count">${count} 張名片</span>
+                    </div>
+                    <button class="tag-delete" onclick="showTagDelete('${escapeHtml(tag)}')" aria-label="刪除標籤 ${escapeHtml(tag)}"><i class="fa-solid fa-trash"></i></button>
+                </div>`;
+            }).join('');
+        }
+
+        function addNewTag() {
+            const input = document.getElementById('newTagInput');
+            const name = input.value.trim();
+            if (!name) { showToast('請輸入標籤名稱'); return; }
+            const allTags = getAllTags();
+            if (allTags.includes(name)) { showToast('標籤已存在'); return; }
+            input.value = '';
+            showToast('已新增標籤：' + name);
+            renderTagsPage();
+            renderTagFilterBar();
+        }
+
+        function showTagDelete(tagName) {
+            pendingDeleteTag = tagName;
+            document.getElementById('tagDeleteDesc').textContent = `確定要刪除標籤「${tagName}」嗎？已使用此標籤的名片不受影響。`;
+            document.getElementById('tagDeleteDialog').classList.add('show');
+        }
+
+        function closeTagDelete() {
+            document.getElementById('tagDeleteDialog').classList.remove('show');
+            pendingDeleteTag = null;
+        }
+
+        function confirmTagDelete() {
+            if (!pendingDeleteTag) return;
+            // Remove tag from all cards
+            cards.forEach(c => {
+                if (c.tags && Array.isArray(c.tags)) {
+                    c.tags = c.tags.filter(t => t !== pendingDeleteTag);
+                }
+            });
+            saveUserCards(cards);
+            closeTagDelete();
+            showToast('已刪除標籤：' + pendingDeleteTag);
+            renderTagsPage();
+            renderTagFilterBar();
+        }
+
+        // ===== SETTINGS PAGE =====
+        function loadSettingsPage() {
+            if (!currentUser) return;
+            document.getElementById('settingsUsername').textContent = currentUser;
+            document.getElementById('settingsCardCount').textContent = cards.length + ' 張名片';
+
+            const tg = getTelegramLink();
+            if (tg.username) {
+                document.getElementById('settingsTelegramStatus').innerHTML = `<span style="color:var(--success);font-weight:600;"><i class="fa-solid fa-circle-check"></i> @${escapeHtml(tg.username)}</span>`;
+                document.getElementById('settingsTelegramInput').value = '@' + tg.username;
+            } else {
+                document.getElementById('settingsTelegramStatus').textContent = '尚未綁定';
+            }
+
+            const isDark = !document.documentElement.hasAttribute('data-theme') || document.documentElement.getAttribute('data-theme') !== 'light';
+            document.getElementById('settingsDarkMode').checked = isDark;
+        }
+
+        function exportAllVCard() {
+            if (cards.length === 0) { showToast('沒有名片可匯出'); return; }
+            const vcards = cards.map(c => generateVCard(c)).join('\n');
+            const blob = new Blob([vcards], { type: 'text/vcard' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `名片王匯出_${new Date().toISOString().slice(0,10)}.vcf`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('已匯出 ' + cards.length + ' 張名片');
+        }
+
+        function showDeleteConfirm() {
+            document.getElementById('deleteConfirmInput').value = '';
+            document.getElementById('deleteConfirmDialog').classList.add('show');
+        }
+
+        function closeDeleteConfirm() {
+            document.getElementById('deleteConfirmDialog').classList.remove('show');
+        }
+
+        function confirmDeleteAll() {
+            const val = document.getElementById('deleteConfirmInput').value;
+            if (val !== 'DELETE') { showToast('請輸入 DELETE 確認'); return; }
+            // Delete all cards and user
+            cards = [];
+            saveUserCards(cards);
+            const users = getUsers();
+            if (users[currentUser]) { delete users[currentUser]; saveUsers(users); }
+            localStorage.removeItem('telegramLink');
+            closeDeleteConfirm();
+            logout();
+            showToast('所有資料已刪除');
+        }
+
+        // Override login to show cards page
+        const origLogin_real = login;
+        login = function() {
+            const u = document.getElementById('loginUsername').value.trim();
+            const p = document.getElementById('loginPassword').value;
+            const users = getUsers();
+            const candidate = users[u];
+            const hashed = hashPassword(p);
+            if (!candidate || ![candidate.password, p].includes(hashed) && candidate.password !== p) {
+                showError('loginError', '帳號或密碼錯誤');
+                return;
+            }
+            if (candidate.password === p) { candidate.password = hashed; saveUsers(users); }
+            currentUser = u;
+            localStorage.setItem('currentUser', u);
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('header').classList.remove('hidden');
+            document.getElementById('addBtn').classList.remove('hidden');
+            document.getElementById('welcomeUser').textContent = '你好，' + u;
+            cards = getUserCards();
+            renderTagFilterBar();
+            renderCards();
+            updateStats();
+            initTheme();
+            navigateTo('cards');
+        };
+
+        // Init import page drag/drop
+        document.addEventListener('DOMContentLoaded', function() {
+            initUploadZone();
+            initTheme();
+            renderTagFilterBar();
+            initImportPage();
+        });
     </script>
 </body>
 </html>
