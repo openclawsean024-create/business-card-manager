@@ -3,1989 +3,1370 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>名片王 - Business Card Manager</title>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>CardScan Pro — AI 智慧名片辨識平台</title>
+    <meta name="description" content="全球領先的 AI 名片辨識平台。拍照即識別，3 秒自動整理聯絡人。支援繁體中文、英文、日文，準確率高達 99%。">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#3B82F6">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <style>
-        /* ===== Design System — Dark Theme (Default per SPEC v3) ===== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-          --primary: #2563EB;
-          --primary-dark: #1D4ED8;
-          --primary-light: rgba(37,99,235,0.15);
-          --accent: #EF4444;
-          --accent-light: rgba(239,68,68,0.12);
-          --green: #10B981;
-          --green-light: rgba(16,185,129,0.12);
-          --text: #F0F2F5;
-          --text2: #8B9099;
-          --text3: #5C6370;
-          --bg: #0F1117;
-          --bg2: #161B27;
-          --card: #1A1F2E;
-          --card-hover: #232A3B;
-          --border: #2A2F3C;
-          --border-strong: #3A4050;
-          --shadow-xs: 0 1px 2px rgba(0,0,0,0.4);
-          --shadow-sm: 0 1px 4px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.25);
-          --shadow-md: 0 4px 12px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.25);
-          --shadow-lg: 0 8px 28px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3);
-          --shadow-fab: 0 4px 16px rgba(37,99,235,0.4);
-          --radius-sm: 4px;
-          --radius-md: 8px;
-          --radius-lg: 12px;
-          --header-bg: #1A1F2E;
-          --header-border: #2A2F3C;
-          --font-main: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --primary: #3B82F6;
+            --primary-dark: #2563EB;
+            --primary-light: #DBEAFE;
+            --primary-xlight: #EFF6FF;
+            --accent: #F97316;
+            --accent-dark: #EA6D10;
+            --text: #1F2937;
+            --text2: #374151;
+            --text3: #6B7280;
+            --text4: #9CA3AF;
+            --bg: #FFFFFF;
+            --bg2: #F9FAFB;
+            --bg3: #F3F4F6;
+            --border: #E5E7EB;
+            --border2: #D1D5DB;
+            --font: 'Inter', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            --radius: 12px;
+            --radius-lg: 20px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.06);
+            --shadow-blue: 0 8px 32px rgba(59,130,246,0.25);
         }
-
-        /* Light theme overrides */
-        [data-theme="light"] {
-          --primary: #2563EB;
-          --primary-dark: #1D4ED8;
-          --primary-light: #DBEAFE;
-          --accent: #EF4444;
-          --accent-light: #FEF2F2;
-          --green: #10B981;
-          --green-light: #D1FAE5;
-          --text: #0F172A;
-          --text2: #475569;
-          --text3: #94A3B8;
-          --bg: #F8FAFC;
-          --bg2: #F1F5F9;
-          --card: #FFFFFF;
-          --card-hover: #F8FAFC;
-          --border: #E2E8F0;
-          --border-strong: #CBD5E1;
-          --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
-          --shadow-sm: 0 1px 4px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
-          --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.05);
-          --shadow-lg: 0 8px 28px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
-          --shadow-fab: 0 4px 16px rgba(37,99,235,0.3);
-          --header-bg: #FFFFFF;
-          --header-border: #E2E8F0;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
         body {
-          font-family: var(--font-main);
-          background: var(--bg);
-          color: var(--text);
-          min-height: 100vh;
-          -webkit-font-smoothing: antialiased;
-          -moz-osx-font-smoothing: grayscale;
-        }
-
-        *, *::before, *::after { transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease; }
-
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--bg2); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
-
-        :focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-
-        /* ===== Login Screen ===== */
-        .login-screen {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 100vh;
-          padding: 20px;
-          background: linear-gradient(145deg, #1A1F2E 0%, #0F1117 50%, #1A1F2E 100%);
-        }
-        .login-screen.hidden { display: none; }
-        .login-box {
-          background: var(--card);
-          border-radius: var(--radius-lg);
-          padding: 44px 40px;
-          width: 100%;
-          max-width: 400px;
-          box-shadow: var(--shadow-lg);
-          border: 1px solid var(--border);
-        }
-        .login-logo {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          margin-bottom: 8px;
-        }
-        .login-logo-icon {
-          width: 40px;
-          height: 40px;
-          background: var(--primary);
-          border-radius: var(--radius-md);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #fff;
-          font-size: 18px;
-        }
-        .login-logo-text {
-          font-size: 20px;
-          font-weight: 700;
-          color: var(--text);
-          letter-spacing: -0.3px;
-        }
-        .login-subtitle {
-          color: var(--text3);
-          font-size: 13px;
-          margin-bottom: 32px;
-          padding-left: 52px;
-          letter-spacing: 0.2px;
-        }
-        .login-tabs {
-          display: flex;
-          border: 1px solid var(--border);
-          border-radius: var(--radius-md);
-          overflow: hidden;
-          margin-bottom: 28px;
-        }
-        .login-tabs button {
-          flex: 1;
-          padding: 11px;
-          border: none;
-          background: transparent;
-          font-size: 13.5px;
-          font-weight: 500;
-          cursor: pointer;
-          color: var(--text2);
-          font-family: inherit;
-        }
-        .login-tabs button.active {
-          background: var(--primary);
-          color: #fff;
-        }
-        .form-group { margin-bottom: 16px; }
-        .form-group label {
-          display: block;
-          font-size: 12px;
-          font-weight: 600;
-          color: var(--text2);
-          margin-bottom: 6px;
-          letter-spacing: 0.3px;
-          text-transform: uppercase;
-        }
-        .form-group input, .form-group select {
-          width: 100%;
-          padding: 11px 14px;
-          border: 1.5px solid var(--border);
-          border-radius: var(--radius-sm);
-          font-size: 14px;
-          font-family: inherit;
-          background: var(--card);
-          color: var(--text);
-        }
-        .form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(27,58,107,0.08); }
-        .form-group input::placeholder { color: var(--text3); }
-        .btn { width: 100%; padding: 12px 20px; border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; letter-spacing: 0.2px; }
-        .btn:active { transform: scale(0.98); }
-        .btn-primary { background: var(--primary); color: #fff; }
-        .btn-primary:hover { background: var(--primary-dark); }
-        .btn-accent { background: var(--accent); color: #fff; }
-        .btn-accent:hover { background: #b91c1c; }
-        .btn-ghost { background: var(--bg); color: var(--text2); border: 1px solid var(--border); }
-        .btn-ghost:hover { background: var(--bg2); }
-        .error-msg { color: var(--accent); font-size: 12px; margin-top: 6px; display: none; font-weight: 500; }
-        .error-msg.show { display: block; }
-
-        /* ===== Header ===== */
-        .header {
-          background: var(--header-bg);
-          border-bottom: 1px solid var(--header-border);
-          padding: 0 24px;
-          height: 60px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          position: sticky;
-          top: 0;
-          z-index: 50;
-          box-shadow: var(--shadow-xs);
-        }
-        .header.hidden { display: none; }
-        .header-left { display: flex; align-items: center; gap: 14px; }
-        .header-logo {
-          width: 34px;
-          height: 34px;
-          background: var(--primary);
-          border-radius: var(--radius-sm);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #fff;
-          font-size: 16px;
-        }
-        .header-title {
-          font-size: 15px;
-          font-weight: 700;
-          color: var(--text);
-          letter-spacing: -0.2px;
-        }
-        .header-right { display: flex; align-items: center; gap: 8px; }
-        .header-user {
-          font-size: 13px;
-          color: var(--text2);
-          margin-right: 4px;
-        }
-        .header-btn {
-          padding: 7px 14px;
-          border: 1px solid var(--border);
-          border-radius: var(--radius-sm);
-          background: transparent;
-          font-size: 12.5px;
-          font-weight: 500;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 5px;
-          color: var(--text2);
-          font-family: inherit;
-        }
-        .header-btn:hover { background: var(--bg2); border-color: var(--border-strong); color: var(--text); }
-        .header-btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
-        .header-btn.primary:hover { background: var(--primary-dark); }
-        .header-btn.theme-toggle { cursor: pointer; font-size: 15px; padding: 7px 10px; }
-        .header-btn.theme-toggle:hover { background: var(--bg2); }
-
-        /* ===== Container ===== */
-        .container { max-width: 1100px; margin: 0 auto; padding: 28px 24px 120px; }
-        .container.hidden { display: none; }
-
-        /* ===== Toolbar ===== */
-        .toolbar {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 12px;
-          margin-bottom: 24px;
-          flex-wrap: wrap;
-        }
-        .search-box {
-          background: var(--card);
-          border: 1.5px solid var(--border);
-          border-radius: var(--radius-md);
-          padding: 10px 14px;
-          display: flex;
-          gap: 8px;
-          flex: 1;
-          min-width: 240px;
-          max-width: 480px;
-          box-shadow: var(--shadow-xs);
-        }
-        .search-box:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(27,58,107,0.07); }
-        .search-box input {
-          flex: 1;
-          border: none;
-          outline: none;
-          font-size: 13.5px;
-          font-family: inherit;
-          color: var(--text);
-          background: transparent;
-        }
-        .search-box input::placeholder { color: var(--text3); }
-        .search-box i { color: var(--text3); font-size: 13px; align-self: center; }
-        .toolbar-right { display: flex; gap: 8px; align-items: center; }
-        .toolbar-btn {
-          padding: 9px 16px;
-          border: 1.5px solid var(--border);
-          border-radius: var(--radius-sm);
-          background: var(--card);
-          font-size: 13px;
-          font-weight: 500;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          color: var(--text2);
-          font-family: inherit;
-          box-shadow: var(--shadow-xs);
-        }
-        .toolbar-btn:hover { background: var(--bg2); border-color: var(--border-strong); color: var(--text); }
-        .toolbar-btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: var(--shadow-sm); }
-        .toolbar-btn.primary:hover { background: var(--primary-dark); border-color: var(--primary-dark); }
-
-        /* ===== Tag Filter Bar ===== */
-        .tag-filter-bar {
-          display: flex;
-          align-items: center;
-          background: var(--header-bg);
-          border-bottom: 1px solid var(--border);
-          padding: 0 24px;
-          position: sticky;
-          top: 60px;
-          z-index: 45;
-          overflow: hidden;
-        }
-        .tag-filter-scroll {
-          display: flex;
-          align-items: center;
-          gap: 0;
-          overflow-x: auto;
-          scrollbar-width: none;
-          -ms-overflow-style: none;
-          flex: 1;
-          padding: 10px 0;
-        }
-        .tag-filter-scroll::-webkit-scrollbar { display: none; }
-        .tag-filter-btn {
-          flex-shrink: 0;
-          padding: 6px 14px;
-          border: none;
-          background: transparent;
-          font-size: 13px;
-          font-weight: 500;
-          color: var(--text2);
-          cursor: pointer;
-          font-family: inherit;
-          border-bottom: 2px solid transparent;
-          margin-bottom: -1px;
-          white-space: nowrap;
-        }
-        .tag-filter-btn.active {
-          color: var(--primary);
-          border-bottom-color: var(--primary);
-          font-weight: 600;
-        }
-        .tag-filter-btn:hover:not(.active) { color: var(--text); }
-        .tag-filter-more {
-          flex-shrink: 0;
-          width: 32px;
-          height: 32px;
-          border: 1px solid var(--border);
-          border-radius: var(--radius-sm);
-          background: transparent;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 12px;
-          color: var(--text2);
-          margin-left: 8px;
-        }
-        .tag-filter-more:hover { background: var(--bg2); }
-        .tag-more-menu {
-          display: none;
-          position: fixed;
-          top: 120px;
-          right: 24px;
-          background: var(--card);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-md);
-          box-shadow: var(--shadow-lg);
-          z-index: 300;
-          min-width: 160px;
-          overflow: hidden;
-        }
-        .tag-more-menu.show { display: block; }
-        .tag-more-item {
-          padding: 10px 14px;
-          font-size: 13px;
-          color: var(--text2);
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-        .tag-more-item:hover { background: var(--bg2); color: var(--text); }
-
-        /* ===== OCR Confidence Indicator ===== */
-        .ocr-confidence {
-          display: inline-flex;
-          align-items: center;
-          gap: 4px;
-          font-size: 11px;
-          font-weight: 600;
-          flex-shrink: 0;
-        }
-        .ocr-dot {
-          width: 20px;
-          height: 20px;
-          border-radius: 50%;
-          flex-shrink: 0;
-        }
-        .ocr-dot.high { background: var(--green); box-shadow: 0 0 4px var(--green); }
-        .ocr-dot.medium { background: #F59E0B; box-shadow: 0 0 4px #F59E0B; }
-        .ocr-dot.low { background: var(--accent); box-shadow: 0 0 4px var(--accent); }
-        .ocr-text.high { color: var(--green); }
-        .ocr-text.medium { color: #F59E0B; }
-        .ocr-text.low { color: var(--accent); }
-        .card-confidence {
-          display: inline-flex;
-          align-items: center;
-          gap: 4px;
-          font-size: 11px;
-          font-weight: 600;
-          margin-left: auto;
-          flex-shrink: 0;
-        }
-
-        /* ===== Colorful Tag Badges (SPEC v3) ===== */
-        .tag-colorful {
-          display: inline-flex;
-          align-items: center;
-          padding: 2px 8px;
-          border-radius: 6px;
-          font-size: 11px;
-          font-weight: 500;
-          height: 22px;
-        }
-        .tag-blue { background: rgba(37,99,235,0.2); color: #3B82F6; }
-        .tag-yellow { background: rgba(245,158,11,0.2); color: #F59E0B; }
-        .tag-green { background: rgba(16,185,129,0.2); color: #10B981; }
-        .tag-purple { background: rgba(139,92,246,0.2); color: #8B5CF6; }
-        .tag-red { background: rgba(239,68,68,0.2); color: #EF4444; }
-        .tag-gray { background: rgba(100,116,139,0.2); color: #64748B; }
-
-        /* ===== Stats Row ===== */
-        .stats-row {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 16px;
-          margin-bottom: 28px;
-        }
-        .stat-card {
-          background: var(--card);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-md);
-          padding: 20px 22px;
-          box-shadow: var(--shadow-xs);
-          display: flex;
-          align-items: center;
-          gap: 16px;
-        }
-        .stat-icon {
-          width: 40px;
-          height: 40px;
-          border-radius: var(--radius-sm);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 16px;
-          flex-shrink: 0;
-        }
-        .stat-icon.blue { background: var(--primary-light); color: var(--primary); }
-        .stat-icon.green { background: var(--green-light); color: var(--green); }
-        .stat-icon.red { background: var(--accent-light); color: var(--accent); }
-        .stat-info .stat-num { font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; line-height: 1; }
-        .stat-info .stat-label { font-size: 12px; color: var(--text3); margin-top: 4px; font-weight: 500; }
-
-        /* ===== Section Header ===== */
-        .section-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-bottom: 14px;
-        }
-        .section-title { font-size: 13px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; }
-
-        /* ===== Cards Table/List ===== */
-        .cards-list { display: flex; flex-direction: column; gap: 10px; }
-        .card-item {
-          background: var(--card);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-md);
-          padding: 20px 22px;
-          box-shadow: var(--shadow-xs);
-          display: flex;
-          align-items: center;
-          gap: 18px;
-          cursor: default;
-        }
-        .card-item:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); }
-
-        .card-avatar {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 700;
-          font-size: 15px;
-          color: #fff;
-          flex-shrink: 0;
-          letter-spacing: -0.3px;
-        }
-        .card-body { flex: 1; min-width: 0; }
-        .card-name-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .card-name { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
-        .card-badge {
-          display: inline-flex;
-          align-items: center;
-          padding: 2px 9px;
-          border-radius: 3px;
-          font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.2px;
-        }
-        .badge-client { background: var(--primary-light); color: var(--primary); }
-        .badge-supplier { background: var(--green-light); color: var(--green); }
-        .badge-colleague { background: #fef3e2; color: #b36000; }
-        .badge-prospect { background: #f3e8fe; color: #7c3aed; }
-        .badge-other { background: var(--bg); color: var(--text3); }
-        .card-meta { display: flex; align-items: center; gap: 16px; margin-top: 5px; flex-wrap: wrap; }
-        .card-meta-item { display: flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--text2); }
-        .card-meta-item i { width: 13px; text-align: center; color: var(--text3); font-size: 11px; }
-        .card-image-thumb {
-          width: 56px;
-          height: 40px;
-          object-fit: cover;
-          border-radius: var(--radius-sm);
-          border: 1px solid var(--border);
-          flex-shrink: 0;
-        }
-        .card-actions { display: flex; gap: 6px; flex-shrink: 0; margin-left: auto; }
-        .card-actions button {
-          width: 34px;
-          height: 34px;
-          border: 1px solid var(--border);
-          border-radius: var(--radius-sm);
-          background: transparent;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 12.5px;
-          color: var(--text2);
-        }
-        .card-actions button:hover { background: var(--bg); color: var(--text); }
-        .card-actions .btn-delete-action:hover { background: var(--accent-light); color: var(--accent); border-color: #f5c6c3; }
-        .btn:active { transform: scale(0.97); }
-
-        /* ===== FAB ===== */
-        .fab {
-          position: fixed;
-          bottom: 24px;
-          right: 24px;
-          width: 56px;
-          height: 56px;
-          background: var(--primary);
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 24px;
-          color: #fff;
-          box-shadow: var(--shadow-fab);
-          cursor: pointer;
-          z-index: 100;
-          border: none;
-        }
-        .fab:hover { background: var(--primary-dark); box-shadow: 0 6px 24px rgba(37,99,235,0.45); transform: scale(1.08); }
-        .fab:active { transform: scale(0.96); }
-        .fab.hidden { display: none; }
-
-        /* ===== Modal & Bottom Sheet ===== */
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,20,40,0.6); backdrop-filter: blur(4px); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
-        .modal.show { display: flex; }
-        /* Bottom Sheet variant — slides up from bottom */
-        .modal.bottom-sheet { align-items: flex-end; padding: 0; }
-        .modal.bottom-sheet .modal-content {
-          border-radius: 20px 20px 0 0;
-          max-width: 100%;
-          max-height: 90vh;
-          padding: 12px 20px 32px;
-          animation: sheetIn 0.3s cubic-bezier(0.32, 0.72, 0, 1);
-          position: relative;
-        }
-        @keyframes sheetIn { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .sheet-handle {
-          width: 12px;
-          height: 4px;
-          border-radius: 2px;
-          background: var(--border-strong);
-          margin: 0 auto 20px;
-          cursor: grab;
-        }
-        .modal-content {
-          background: var(--card);
-          border-radius: var(--radius-lg);
-          padding: 32px;
-          width: 100%;
-          max-width: 520px;
-          max-height: 90vh;
-          overflow-y: auto;
-          box-shadow: var(--shadow-lg);
-          border: 1px solid var(--border);
-          animation: modalIn 0.22s cubic-bezier(0.34, 1.4, 0.64, 1);
-        }
-        @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
-        .modal-header h2 { font-size: 16px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
-        .modal-header h2 i { color: var(--primary); }
-        .modal-close {
-          width: 30px;
-          height: 30px;
-          border: 1px solid var(--border);
-          border-radius: var(--radius-sm);
-          background: transparent;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 16px;
-          color: var(--text2);
-        }
-        .modal-close:hover { background: var(--bg); color: var(--text); }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        .modal-actions { display: flex; gap: 10px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
-        .modal-actions button { flex: 1; padding: 12px; border: none; border-radius: var(--radius-sm); font-size: 13.5px; font-weight: 600; cursor: pointer; font-family: inherit; }
-        .btn-save:hover { background: var(--primary-dark); }
-        .btn-cancel { background: var(--bg2); color: var(--text2); border: 1px solid var(--border); }
-        .btn-cancel:hover { background: var(--bg2); color: var(--text); }
-        .btn-scan-modal { background: var(--accent); color: #fff; }
-        .btn-scan-modal:hover { background: #b91c1c; }
-
-        /* ===== Upload Zone (NEW) ===== */
-        .upload-zone {
-          border: 2px dashed var(--border-strong);
-          border-radius: var(--radius-lg);
-          padding: 28px 20px;
-          text-align: center;
-          cursor: pointer;
-          background: var(--bg);
-          margin-top: 4px;
-          transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
-          position: relative;
-        }
-        .upload-zone:hover, .upload-zone.drag-over {
-          border-color: var(--primary);
-          background: var(--primary-light);
-          box-shadow: 0 0 0 4px rgba(27,58,107,0.08);
-        }
-        .upload-zone.drag-over { border-style: solid; }
-        .upload-zone-icon { font-size: 36px; color: var(--text3); margin-bottom: 10px; }
-        .upload-zone:hover .upload-zone-icon, .upload-zone.drag-over .upload-zone-icon { color: var(--primary); }
-        .upload-zone-text { font-size: 14px; font-weight: 500; color: var(--text2); }
-        .upload-zone-text span { color: var(--primary); text-decoration: underline; }
-        .upload-zone-hint { font-size: 12px; color: var(--text3); margin-top: 6px; }
-        .upload-zone-divider { display: flex; align-items: center; gap: 12px; margin: 14px 0; color: var(--text3); font-size: 12px; }
-        .upload-zone-divider::before, .upload-zone-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-        .upload-zone-actions { display: flex; gap: 10px; justify-content: center; }
-        .upload-zone-actions button {
-          flex: 0 0 auto;
-          padding: 9px 18px;
-          border: 1.5px solid var(--border);
-          border-radius: var(--radius-sm);
-          background: var(--card);
-          font-size: 13px;
-          font-weight: 500;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          color: var(--text2);
-          font-family: inherit;
-          transition: all 0.15s;
-        }
-        .upload-zone-actions button:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
-        .upload-zone-actions .btn-camera:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
-        #fileUpload { display: none; }
-        #imagePreviewContainer { display: none; margin-top: 14px; }
-        .image-preview-wrap { position: relative; display: inline-block; }
-        .image-preview-wrap img { display: block; max-width: 100%; max-height: 200px; border-radius: var(--radius-md); border: 1px solid var(--border); }
-        .image-preview-wrap .remove-img {
-          position: absolute;
-          top: -10px;
-          right: -10px;
-          width: 26px;
-          height: 26px;
-          background: var(--accent);
-          color: #fff;
-          border: none;
-          border-radius: 50%;
-          font-size: 13px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: var(--shadow-sm);
-        }
-
-        /* ===== Scan Modal ===== */
-        .scan-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 300; }
-        .scan-modal.show { display: block; }
-        .scan-view { width: 100%; height: 100%; position: relative; }
-        .scan-view video { width: 100%; height: 100%; object-fit: cover; }
-        .scan-frame {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 88%;
-          height: 48%;
-          border: 2px solid rgba(255,255,255,0.6);
-          border-radius: 8px;
-        }
-        .scan-corner { position: absolute; width: 24px; height: 24px; border-color: #fff; border-style: solid; }
-        .scan-corner.tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
-        .scan-corner.tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; border-radius: 0 4px 0 0; }
-        .scan-corner.bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; border-radius: 0 0 0 4px; }
-        .scan-corner.br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
-        .scan-hint { position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.85); font-size: 13px; white-space: nowrap; letter-spacing: 0.3px; }
-        .scan-buttons { position: absolute; bottom: 40px; left: 0; right: 0; display: flex; justify-content: center; gap: 20px; }
-        .scan-btn { width: 64px; height: 64px; border-radius: 50%; border: 2.5px solid rgba(255,255,255,0.5); background: transparent; cursor: pointer; }
-        .scan-btn.capture { width: 74px; height: 74px; background: #fff; border-color: #fff; }
-        .scan-btn.close-btn { position: absolute; top: 20px; left: 20px; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.45); color: #fff; border: none; font-size: 18px; display: flex; align-items: center; justify-content: center; }
-
-        .scan-progress { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.92); z-index: 350; align-items: center; justify-content: center; flex-direction: column; color: #fff; }
-        .scan-progress.show { display: flex; }
-        .scan-progress .spinner { width: 52px; height: 52px; border: 3px solid rgba(255,255,255,0.15); border-top-color: var(--primary-light); border-radius: 50%; animation: spin 0.9s linear infinite; }
-        .scan-progress .text { margin-top: 18px; font-size: 14px; color: rgba(255,255,255,0.7); }
-        .scan-progress .percent { margin-top: 10px; font-size: 28px; font-weight: 700; color: #fff; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* ===== Share Modal ===== */
-        .share-qr { display: flex; justify-content: center; margin: 20px 0; }
-        .share-qr canvas, .share-qr img { width: 200px !important; height: 200px !important; border-radius: var(--radius-md); }
-        .share-actions { display: flex; gap: 10px; justify-content: center; margin-top: 16px; }
-        .share-actions button { flex: 1; max-width: 160px; padding: 11px; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; }
-        .btn-download { background: var(--primary); color: #fff; }
-        .btn-download:hover { background: var(--primary-dark); }
-        .btn-copy { background: var(--bg2); color: var(--text2); border: 1px solid var(--border); }
-        .btn-copy:hover { background: var(--bg2); color: var(--text); }
-
-        /* ===== Sync Modal ===== */
-        .sync-info-block { background: var(--bg); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px; border: 1px solid var(--border); }
-        .sync-info-block .row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; color: var(--text2); }
-        .sync-info-block .row:last-child { margin-bottom: 0; }
-        .sync-info-block .row i { width: 14px; text-align: center; color: var(--text3); }
-        .sync-divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
-
-        /* ===== Empty State ===== */
-        .empty-state { text-align: center; padding: 80px 20px; color: var(--text3); }
-        .empty-icon {
-          width: 64px;
-          height: 64px;
-          background: var(--bg);
-          border-radius: var(--radius-md);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin: 0 auto 18px;
-          font-size: 26px;
-          color: var(--text3);
-          border: 1.5px dashed var(--border-strong);
-        }
-        .empty-state p { font-size: 14px; }
-        .empty-state p.title { font-size: 15px; font-weight: 600; color: var(--text2); margin-bottom: 4px; }
-
-        /* ===== Toast ===== */
-        .toast {
-          position: fixed;
-          bottom: 96px;
-          left: 50%;
-          transform: translateX(-50%) translateY(80px);
-          background: var(--card);
-          color: var(--text);
-          padding: 12px 22px;
-          border-radius: var(--radius-md);
-          font-size: 13px;
-          opacity: 0;
-          transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-          z-index: 400;
-          box-shadow: var(--shadow-lg);
-          pointer-events: none;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          white-space: nowrap;
-          border: 1px solid var(--border);
-        }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-        /* ===== Landing Page ===== */
-        .landing { width: 100%; background: var(--bg); }
-        .landing-nav {
-            position: sticky; top: 0; z-index: 100;
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-        }
-        .landing-nav-inner {
-            max-width: 1100px; margin: 0 auto;
-            padding: 0 24px; height: 60px;
-            display: flex; align-items: center; justify-content: space-between;
-        }
-        .landing-logo {
-            display: flex; align-items: center; gap: 10px;
-            font-size: 1.1rem; font-weight: 700; color: var(--primary);
-        }
-        .landing-logo i { font-size: 1.3rem; }
-        .landing-cta-btn {
-            padding: 8px 20px;
-            background: var(--primary); color: #fff;
-            border: none; border-radius: 8px;
-            font-size: 0.85rem; font-weight: 600;
-            cursor: pointer; transition: all 0.2s;
-        }
-        .landing-cta-btn:hover { background: var(--primary-mid); transform: translateY(-1px); }
-
-        .landing-hero {
-            position: relative; overflow: hidden;
-            padding: 80px 24px 100px;
-            text-align: center;
+            font-family: var(--font);
+            color: var(--text);
             background: var(--bg);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
         }
-        .landing-hero-bg {
-            position: absolute; inset: 0; pointer-events: none;
-            background:
-                radial-gradient(ellipse 80% 60% at 50% 0%, rgba(27,58,107,0.08) 0%, transparent 70%),
-                radial-gradient(ellipse 60% 40% at 80% 100%, rgba(26,122,74,0.05) 0%, transparent 60%);
-        }
-        .landing-hero-content { position: relative; max-width: 720px; margin: 0 auto; }
-        .landing-hero-badge {
-            display: inline-block;
-            padding: 6px 16px;
-            background: var(--primary-light); color: var(--primary);
-            border-radius: 100px; font-size: 0.78rem; font-weight: 600;
-            letter-spacing: 0.06em; margin-bottom: 24px;
-        }
-        .landing-hero-title {
-            font-size: clamp(2.4rem, 6vw, 3.8rem);
-            font-weight: 700; line-height: 1.15;
-            color: var(--text); letter-spacing: -0.02em;
-            margin-bottom: 20px;
-        }
-        .landing-hero-sub {
-            font-size: clamp(1rem, 2vw, 1.15rem);
-            color: var(--text2); line-height: 1.75;
-            max-width: 540px; margin: 0 auto 36px;
-        }
-        .landing-hero-actions {
-            display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
-            margin-bottom: 48px;
-        }
-        .landing-btn-primary {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 13px 28px;
-            background: var(--primary); color: #fff;
-            border: none; border-radius: 10px;
-            font-size: 1rem; font-weight: 600;
-            cursor: pointer; transition: all 0.2s;
-        }
-        .landing-btn-primary:hover { background: var(--primary-mid); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(27,58,107,0.25); }
-        .landing-btn-ghost {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 13px 28px;
-            background: transparent; color: var(--text2);
-            border: 1.5px solid var(--border-strong); border-radius: 10px;
-            font-size: 1rem; font-weight: 500;
-            cursor: pointer; transition: all 0.2s;
-        }
-        .landing-btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
-        .landing-hero-stats {
-            display: flex; align-items: center; justify-content: center; gap: 24px;
-        }
-        .landing-stat { text-align: center; }
-        .landing-stat-num { display: block; font-size: 1.1rem; font-weight: 700; color: var(--primary); }
-        .landing-stat-label { font-size: 0.75rem; color: var(--text3); }
-        .landing-stat-div { width: 1px; height: 28px; background: var(--border); }
+        a { color: inherit; text-decoration: none; }
+        img { display: block; max-width: 100%; }
 
-        .landing-features { background: #fff; padding: 80px 24px; }
-        .landing-features-inner { max-width: 1100px; margin: 0 auto; }
-        .landing-section-label {
-            display: inline-block;
-            font-size: 0.72rem; font-weight: 700;
-            letter-spacing: 0.15em; text-transform: uppercase;
-            color: var(--primary); margin-bottom: 12px;
+        /* ===== NAVBAR ===== */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            transition: box-shadow 0.2s;
         }
-        .landing-section-title {
-            font-size: clamp(1.8rem, 4vw, 2.6rem);
-            font-weight: 700; color: var(--text);
-            margin-bottom: 48px; letter-spacing: -0.02em;
+        .nav.scrolled { box-shadow: var(--shadow-sm); }
+        .nav-inner {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
         }
-        .landing-features-grid {
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.5px;
+            flex-shrink: 0;
+        }
+        .nav-logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            list-style: none;
+            flex: 1;
+            justify-content: center;
+        }
+        .nav-links a {
+            padding: 8px 14px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text3);
+            border-radius: 8px;
+            transition: all 0.15s;
+        }
+        .nav-links a:hover { color: var(--text); background: var(--bg2); }
+        .nav-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        .nav-btn {
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+        .nav-btn-ghost {
+            background: transparent;
+            color: var(--text2);
+            border: 1.5px solid var(--border2);
+        }
+        .nav-btn-ghost:hover { background: var(--bg2); border-color: var(--border2); }
+        .nav-btn-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(59,130,246,0.3);
+        }
+        .nav-btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: var(--shadow-blue); }
+        .nav-mobile-toggle {
+            display: none;
+            width: 40px; height: 40px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            background: transparent;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--text2);
+        }
+        .nav-mobile-menu {
+            display: none;
+            flex-direction: column;
+            padding: 16px 24px 20px;
+            border-top: 1px solid var(--border);
+            gap: 4px;
+        }
+        .nav-mobile-menu.open { display: flex; }
+        .nav-mobile-menu a {
+            padding: 10px 14px;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text2);
+            border-radius: 8px;
+        }
+        .nav-mobile-menu a:hover { background: var(--bg2); color: var(--text); }
+        .nav-mobile-menu .nav-btn { width: 100%; text-align: center; margin-top: 8px; }
+
+        /* ===== HERO ===== */
+        .hero {
+            position: relative;
+            overflow: hidden;
+            padding: 96px 24px 80px;
+            text-align: center;
+        }
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 90% 70% at 50% -10%, rgba(59,130,246,0.10) 0%, transparent 65%),
+                radial-gradient(ellipse 50% 40% at 85% 90%, rgba(249,115,22,0.06) 0%, transparent 55%);
+        }
+        .hero-content { position: relative; max-width: 780px; margin: 0 auto; }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 16px;
+            background: var(--primary-xlight);
+            color: var(--primary);
+            border: 1px solid var(--primary-light);
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 28px;
+            letter-spacing: 0.02em;
+        }
+        .hero-badge-dot {
+            width: 6px; height: 6px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .hero-title {
+            font-size: clamp(2.6rem, 6vw, 4rem);
+            font-weight: 800;
+            line-height: 1.12;
+            color: var(--text);
+            letter-spacing: -0.03em;
+            margin-bottom: 24px;
+        }
+        .hero-title .highlight {
+            background: linear-gradient(135deg, var(--primary), #60A5FA);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-sub {
+            font-size: clamp(1rem, 2vw, 1.15rem);
+            color: var(--text3);
+            line-height: 1.75;
+            max-width: 560px;
+            margin: 0 auto 40px;
+        }
+        .hero-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 56px;
+        }
+        .btn-hero-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 30px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            box-shadow: 0 4px 16px rgba(59,130,246,0.35);
+            transition: all 0.2s;
+        }
+        .btn-hero-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(59,130,246,0.40); }
+        .btn-hero-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 30px;
+            background: var(--bg);
+            color: var(--text2);
+            border: 1.5px solid var(--border2);
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .btn-hero-secondary:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-xlight); }
+
+        /* ===== HERO STATS ===== */
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            gap: 0;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            max-width: 640px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        .hero-stat {
+            flex: 1;
+            padding: 20px 16px;
+            text-align: center;
+            border-right: 1px solid var(--border);
+        }
+        .hero-stat:last-child { border-right: none; }
+        .hero-stat-num {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        .hero-stat-label { font-size: 11.5px; color: var(--text4); font-weight: 500; }
+
+        /* ===== TRUST BAR ===== */
+        .trust-bar {
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 24px;
+        }
+        .trust-bar-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        .trust-label { font-size: 13px; color: var(--text4); font-weight: 500; white-space: nowrap; }
+        .trust-divider { width: 1px; height: 20px; background: var(--border); }
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text3);
+        }
+        .trust-item i { color: var(--text4); font-size: 14px; }
+
+        /* ===== SECTIONS ===== */
+        .section { padding: 96px 24px; }
+        .section-inner { max-width: 1180px; margin: 0 auto; }
+        .section-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+        .section-chip i { font-size: 11px; }
+        .section-title {
+            font-size: clamp(1.9rem, 4vw, 2.8rem);
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.03em;
+            line-height: 1.2;
+            margin-bottom: 16px;
+        }
+        .section-sub {
+            font-size: 1.05rem;
+            color: var(--text3);
+            max-width: 520px;
+            line-height: 1.7;
+        }
+
+        /* ===== FEATURES GRID ===== */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 52px;
+        }
+        .feature-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 26px;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), #60A5FA);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .feature-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); border-color: var(--primary-light); }
+        .feature-card:hover::before { opacity: 1; }
+        .feature-icon {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            margin-bottom: 18px;
+        }
+        .feature-icon.blue { background: var(--primary-xlight); color: var(--primary); }
+        .feature-icon.orange { background: #FFF7ED; color: var(--accent); }
+        .feature-icon.green { background: #F0FDF4; color: #16A34A; }
+        .feature-icon.purple { background: #F5F3FF; color: #7C3AED; }
+        .feature-icon.teal { background: #F0FDFA; color: #0D9488; }
+        .feature-icon.red { background: #FFF1F2; color: #E11D48; }
+        .feature-card h3 { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+        .feature-card p { font-size: 14px; color: var(--text3); line-height: 1.7; }
+
+        /* ===== FEATURE SHOWCASE (Alternating) ===== */
+        .showcase { padding: 72px 24px; }
+        .showcase:nth-child(odd) { background: var(--bg); }
+        .showcase:nth-child(even) { background: var(--bg2); }
+        .showcase-inner {
+            max-width: 1080px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 72px;
+            align-items: center;
+        }
+        .showcase-inner.reverse { direction: rtl; }
+        .showcase-inner.reverse > * { direction: ltr; }
+        .showcase-text .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+        .chip-blue { background: var(--primary-xlight); color: var(--primary); }
+        .chip-orange { background: #FFF7ED; color: var(--accent); }
+        .chip-green { background: #F0FDF4; color: #15803D; }
+        .chip-purple { background: #F5F3FF; color: #7C3AED; }
+        .showcase-title {
+            font-size: clamp(1.6rem, 3vw, 2.2rem);
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.03em;
+            line-height: 1.25;
+            margin-bottom: 16px;
+        }
+        .showcase-desc {
+            font-size: 15px;
+            color: var(--text3);
+            line-height: 1.75;
+            margin-bottom: 24px;
+        }
+        .showcase-bullets { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .showcase-bullets li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text2);
+        }
+        .showcase-bullets li i { color: var(--primary); margin-top: 3px; font-size: 13px; flex-shrink: 0; }
+        .showcase-visual {
+            background: linear-gradient(135deg, var(--primary-xlight) 0%, #E0E7FF 100%);
+            border-radius: var(--radius-lg);
+            aspect-ratio: 4/3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(59,130,246,0.1);
+        }
+        .showcase-visual-orange { background: linear-gradient(135deg, #FFF7ED, #FEE2E2); }
+        .showcase-visual-green { background: linear-gradient(135deg, #F0FDF4, #DCFCE7); }
+        .showcase-visual-purple { background: linear-gradient(135deg, #F5F3FF, #EDE9FE); }
+        .showcase-visual-inner {
+            background: white;
+            border-radius: 14px;
+            padding: 24px;
+            width: 80%;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .mock-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .mock-avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 13px; font-weight: 700;
+            flex-shrink: 0;
+        }
+        .mock-lines { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+        .mock-line { height: 10px; background: var(--border); border-radius: 4px; }
+        .mock-tag {
+            padding: 2px 8px;
+            background: var(--primary-xlight);
+            color: var(--primary);
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .mock-scan {
+            background: #1F2937;
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+        }
+        .mock-scan-frame {
+            width: 100%;
+            aspect-ratio: 1.75;
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+        }
+        .mock-scan-btn {
+            width: 36px; height: 36px;
+            background: white;
+            border-radius: 50%;
+        }
+        .mock-stat-row {
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 8px;
+        }
+        .mock-stat {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 8px;
+            text-align: center;
+        }
+        .mock-stat-n { font-size: 18px; font-weight: 800; color: var(--primary); line-height: 1; }
+        .mock-stat-l { font-size: 9px; color: var(--text4); margin-top: 2px; }
+        .accuracy-badge {
+            position: absolute;
+            top: 16px; right: 16px;
+            background: white;
+            border-radius: 8px;
+            padding: 8px 12px;
+            box-shadow: var(--shadow-md);
+            font-size: 11px;
+            font-weight: 700;
+            color: #16A34A;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* ===== HOW IT WORKS ===== */
+        .how-steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            margin-top: 56px;
+            position: relative;
+        }
+        .how-step {
+            text-align: center;
+            position: relative;
+        }
+        .how-step-num {
+            width: 56px; height: 56px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+            font-weight: 800;
+            margin: 0 auto 20px;
+            box-shadow: 0 4px 16px rgba(59,130,246,0.3);
+        }
+        .how-step h3 { font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+        .how-step p { font-size: 14px; color: var(--text3); line-height: 1.7; }
+        .how-connector {
+            position: absolute;
+            top: 28px; right: -50%;
+            width: 100%; height: 2px;
+            background: linear-gradient(90deg, var(--primary-light), transparent);
+        }
+        .how-step:last-child .how-connector { display: none; }
+
+        /* ===== PRICING ===== */
+        .pricing { background: var(--bg2); }
+        .pricing-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 24px;
+            margin-top: 52px;
+            align-items: start;
         }
-        .landing-feature-card {
-            padding: 28px 24px;
-            background: var(--bg); border: 1px solid var(--border);
-            border-radius: 14px; text-align: left;
+        .pricing-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px 28px;
+            position: relative;
+            transition: box-shadow 0.2s;
+        }
+        .pricing-card:hover { box-shadow: var(--shadow-md); }
+        .pricing-card.popular {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 1px var(--primary), var(--shadow-lg);
+        }
+        .popular-badge {
+            position: absolute;
+            top: -13px; left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 100px;
+            white-space: nowrap;
+            letter-spacing: 0.05em;
+        }
+        .pricing-name { font-size: 14px; font-weight: 700; color: var(--text3); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px; }
+        .pricing-price {
+            font-size: 2.6rem;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.04em;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        .pricing-price sup { font-size: 1.1rem; font-weight: 700; vertical-align: super; margin-right: 2px; }
+        .pricing-price sub { font-size: 14px; font-weight: 500; color: var(--text3); vertical-align: baseline; }
+        .pricing-desc { font-size: 13px; color: var(--text4); margin-bottom: 24px; }
+        .pricing-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            text-align: center;
+            transition: all 0.15s;
+            border: none;
+            margin-bottom: 24px;
+        }
+        .pricing-btn-outline {
+            background: transparent;
+            border: 1.5px solid var(--border2);
+            color: var(--text2);
+        }
+        .pricing-btn-outline:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-xlight); }
+        .pricing-btn-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(59,130,246,0.3);
+        }
+        .pricing-btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .pricing-btn-dark {
+            background: var(--text);
+            color: #fff;
+        }
+        .pricing-btn-dark:hover { background: #111827; transform: translateY(-1px); }
+        .pricing-divider { border: none; border-top: 1px solid var(--border); margin-bottom: 20px; }
+        .pricing-features { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+        .pricing-features li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text2);
+        }
+        .pricing-features li i { color: #16A34A; font-size: 12px; width: 14px; flex-shrink: 0; }
+        .pricing-features li.muted { color: var(--text4); }
+        .pricing-features li.muted i { color: var(--text4); }
+
+        /* ===== SECURITY ===== */
+        .security-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 52px;
+        }
+        .security-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px 20px;
+            text-align: center;
+            transition: box-shadow 0.2s;
+        }
+        .security-card:hover { box-shadow: var(--shadow-md); }
+        .security-icon {
+            width: 52px; height: 52px;
+            background: var(--primary-xlight);
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+            color: var(--primary);
+            margin: 0 auto 14px;
+        }
+        .security-card h4 { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+        .security-card p { font-size: 12px; color: var(--text3); line-height: 1.6; }
+
+        /* ===== CTA BANNER ===== */
+        .cta-banner {
+            padding: 96px 24px;
+            background: linear-gradient(135deg, var(--primary) 0%, #1D4ED8 100%);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(255,255,255,0.07) 0%, transparent 70%);
+        }
+        .cta-banner-inner { position: relative; max-width: 620px; margin: 0 auto; }
+        .cta-banner h2 {
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.03em;
+            line-height: 1.2;
+            margin-bottom: 16px;
+        }
+        .cta-banner p { color: rgba(255,255,255,0.75); font-size: 1rem; margin-bottom: 36px; }
+        .cta-banner-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .btn-cta-white {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 30px;
+            background: #fff;
+            color: var(--primary);
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
             transition: all 0.2s;
         }
-        .landing-feature-card:hover {
-            border-color: var(--primary);
-            box-shadow: var(--shadow-md);
-            transform: translateY(-3px);
-        }
-        .landing-feature-icon {
-            width: 44px; height: 44px;
-            background: var(--primary-light);
+        .btn-cta-white:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.2); }
+        .btn-cta-outline {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 30px;
+            background: transparent;
+            color: #fff;
+            border: 1.5px solid rgba(255,255,255,0.4);
             border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .btn-cta-outline:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.7); }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: #111827;
+            color: rgba(255,255,255,0.5);
+            padding: 56px 24px 36px;
+        }
+        .footer-inner {
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+        .footer-top {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 48px;
+        }
+        .footer-brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .footer-brand-logo-icon {
+            width: 32px; height: 32px;
+            background: var(--primary);
+            border-radius: 8px;
             display: flex; align-items: center; justify-content: center;
-            margin-bottom: 16px;
-            color: var(--primary); font-size: 1.1rem;
+            color: #fff; font-size: 15px;
         }
-        .landing-feature-card h3 { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
-        .landing-feature-card p { font-size: 0.875rem; color: var(--text2); line-height: 1.65; }
-
-        .landing-cta-section { background: var(--primary); padding: 80px 24px; text-align: center; }
-        .landing-cta-inner { max-width: 540px; margin: 0 auto; }
-        .landing-cta-section h2 { font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 12px; }
-        .landing-cta-section p { color: rgba(255,255,255,0.7); margin-bottom: 28px; font-size: 1rem; }
-        .landing-cta-section .landing-btn-primary { background: #fff; color: var(--primary); }
-        .landing-cta-section .landing-btn-primary:hover { background: var(--primary-light); transform: translateY(-2px); }
-
-        .landing-footer {
-            background: var(--primary); border-top: 1px solid rgba(255,255,255,0.1);
-            padding: 20px 24px; text-align: center;
-            color: rgba(255,255,255,0.45); font-size: 0.8rem;
+        .footer-brand-logo-text { font-size: 15px; font-weight: 800; color: #fff; }
+        .footer-brand-desc { font-size: 13px; line-height: 1.7; color: rgba(255,255,255,0.4); margin-bottom: 20px; }
+        .footer-social { display: flex; gap: 10px; }
+        .footer-social a {
+            width: 34px; height: 34px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(255,255,255,0.5);
+            font-size: 14px;
+            transition: all 0.15s;
+        }
+        .footer-social a:hover { background: var(--primary); color: #fff; }
+        .footer-col h4 { font-size: 12px; font-weight: 700; color: #fff; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
+        .footer-links { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+        .footer-links a { font-size: 13px; color: rgba(255,255,255,0.45); transition: color 0.15s; }
+        .footer-links a:hover { color: rgba(255,255,255,0.9); }
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .footer-bottom-left { font-size: 13px; }
+        .footer-badges { display: flex; gap: 10px; }
+        .footer-badge {
+            padding: 4px 10px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.4);
         }
 
-        @media (max-width: 700px) {
-            .landing-features-grid { grid-template-columns: 1fr; }
-            .landing-hero { padding: 60px 20px 70px; }
-            .landing-hero-stats { flex-direction: column; gap: 12px; }
-            .landing-stat-div { display: none; }
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .features-grid { grid-template-columns: repeat(2, 1fr); }
+            .showcase-inner { gap: 48px; }
+            .security-grid { grid-template-columns: repeat(2, 1fr); }
         }
-
-        /* ===== Mobile ===== */
-        @media (max-width: 700px) {
-          .cards-list { gap: 8px; }
-          .card-item { flex-wrap: wrap; padding: 16px 18px; }
-          .card-body { flex: 1 0 calc(100% - 66px); }
-          .card-image-thumb { display: none; }
-          .card-actions { margin-left: 0; width: 100%; justify-content: flex-end; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
-          .stats-row { grid-template-columns: 1fr; gap: 10px; }
-          .form-row { grid-template-columns: 1fr; }
-          .toolbar { flex-direction: column; align-items: stretch; }
-          .search-box { max-width: 100%; }
-          .toolbar-right { justify-content: flex-end; }
-          .login-box { padding: 32px 24px; }
-          .login-subtitle { padding-left: 0; }
-          .modal-content { padding: 24px 18px; }
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .nav-btn-ghost { display: none; }
+            .nav-mobile-toggle { display: flex; }
+            .hero { padding: 72px 20px 60px; }
+            .hero-stats { flex-direction: column; gap: 0; max-width: 280px; }
+            .hero-stat { border-right: none; border-bottom: 1px solid var(--border); }
+            .hero-stat:last-child { border-bottom: none; }
+            .features-grid { grid-template-columns: 1fr; gap: 14px; }
+            .showcase { padding: 56px 20px; }
+            .showcase-inner, .showcase-inner.reverse { grid-template-columns: 1fr; gap: 36px; direction: ltr; }
+            .showcase-visual { aspect-ratio: 16/9; }
+            .how-steps { grid-template-columns: 1fr; gap: 24px; }
+            .how-connector { display: none; }
+            .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin-left: auto; margin-right: auto; }
+            .security-grid { grid-template-columns: 1fr 1fr; }
+            .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+            .trust-bar-inner { gap: 20px; }
+            .trust-divider { display: none; }
+        }
+        @media (max-width: 480px) {
+            .hero-actions { flex-direction: column; align-items: center; }
+            .btn-hero-primary, .btn-hero-secondary { width: 100%; justify-content: center; }
+            .cta-banner-actions { flex-direction: column; align-items: center; }
+            .btn-cta-white, .btn-cta-outline { width: 100%; justify-content: center; }
+            .footer-top { grid-template-columns: 1fr; }
+            .footer-bottom { flex-direction: column; align-items: flex-start; }
+            .security-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== LANDING PAGE ===== -->
-    <div class="landing" id="landingPage">
-        <!-- Nav -->
-        <nav class="landing-nav">
-            <div class="landing-nav-inner">
-                <div class="landing-logo">
-                    <i class="fa-solid fa-id-card"></i>
-                    <span>名片王</span>
-                </div>
-                <button class="landing-cta-btn" onclick="document.getElementById('loginScreen').scrollIntoView({behavior:'smooth'})">開始使用</button>
+    <!-- ===== NAVBAR ===== -->
+    <nav class="nav" id="navbar">
+        <div class="nav-inner">
+            <a class="nav-logo" href="/">
+                <div class="nav-logo-icon"><i class="fa-solid fa-id-card"></i></div>
+                CardScan Pro
+            </a>
+            <ul class="nav-links">
+                <li><a href="#features">功能</a></li>
+                <li><a href="#pricing">定價</a></li>
+                <li><a href="#enterprise">企業版</a></li>
+                <li><a href="#security">安全性</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="nav-btn nav-btn-ghost" onclick="location.href='/app'">登入</button>
+                <button class="nav-btn nav-btn-primary" onclick="location.href='/app'">免費試用 <i class="fa-solid fa-arrow-right" style="font-size:11px;margin-left:2px;"></i></button>
             </div>
-        </nav>
+            <button class="nav-mobile-toggle" id="mobileToggle" onclick="toggleMobileMenu()" aria-label="選單">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+        <div class="nav-mobile-menu" id="mobileMenu">
+            <a href="#features">功能</a>
+            <a href="#pricing">定價</a>
+            <a href="#enterprise">企業版</a>
+            <a href="#security">安全性</a>
+            <button class="nav-btn nav-btn-ghost" onclick="location.href='/app'" style="margin-top:8px;">登入</button>
+            <button class="nav-btn nav-btn-primary" onclick="location.href='/app'">免費試用</button>
+        </div>
+    </nav>
 
-        <!-- Hero -->
-        <section class="landing-hero">
-            <div class="landing-hero-bg"></div>
-            <div class="landing-hero-content">
-                <div class="landing-hero-badge">專業名片管理</div>
-                <h1 class="landing-hero-title">不再遺漏<br>任何重要人脈</h1>
-                <p class="landing-hero-sub">AI OCR 一秒掃描名片，自動整理、終身留存。支援 Telegram 同步，讓你的名片庫隨時隨地都能取用。</p>
-                <div class="landing-hero-actions">
-                    <button class="landing-btn-primary" onclick="document.getElementById('loginScreen').scrollIntoView({behavior:'smooth'})">
-                        <i class="fa-solid fa-arrow-right"></i> 免費開始
-                    </button>
-                    <button class="landing-btn-ghost" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">
-                        了解更多
-                    </button>
-                </div>
-                <div class="landing-hero-stats">
-                    <div class="landing-stat"><span class="landing-stat-num">100%</span><span class="landing-stat-label">本地儲存</span></div>
-                    <div class="landing-stat-div"></div>
-                    <div class="landing-stat"><span class="landing-stat-num">AI</span><span class="landing-stat-label">OCR 辨識</span></div>
-                    <div class="landing-stat-div"></div>
-                    <div class="landing-stat"><span class="landing-stat-num">Telegram</span><span class="landing-stat-label">同步備份</span></div>
-                </div>
+    <!-- ===== HERO ===== -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="hero-badge-dot"></span>
+                全新 AI 名片辨識引擎 v3.0 正式上線
             </div>
-        </section>
-
-        <!-- Features -->
-        <section class="landing-features" id="features">
-            <div class="landing-features-inner">
-                <div class="landing-section-label">核心功能</div>
-                <h2 class="landing-section-title">一行名片，掌控所有人脈</h2>
-                <div class="landing-features-grid">
-                    <div class="landing-feature-card">
-                        <div class="landing-feature-icon"><i class="fa-solid fa-camera"></i></div>
-                        <h3>AI OCR 掃描</h3>
-                        <p>一拍即識別！相機對準名片，AI 自動提取姓名、公司、職稱、電話、Email，零誤差入庫。</p>
-                    </div>
-                    <div class="landing-feature-card">
-                        <div class="landing-feature-icon"><i class="fa-solid fa-mobile-screen"></i></div>
-                        <h3>Telegram 同步</h3>
-                        <p>綁定 Telegram Bot，名片資料雲端備份，隨時查詢、分享，再也不怕資料遺失。</p>
-                    </div>
-                    <div class="landing-feature-card">
-                        <div class="landing-feature-icon"><i class="fa-solid fa-qrcode"></i></div>
-                        <h3>QR Code 分享</h3>
-                        <p>一鍵生成個人 QR Code 名片，別人掃描即可存入聯絡人，交換名片面對面 instant。</p>
-                    </div>
-                    <div class="landing-feature-card">
-                        <div class="landing-feature-icon"><i class="fa-solid fa-folder-open"></i></div>
-                        <h3>分類管理</h3>
-                        <p>公司、產業標籤自訂維護，多維度檢索，找名片不再大海撈針。</p>
-                    </div>
-                    <div class="landing-feature-card">
-                        <div class="landing-feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
-                        <h3>資料安全</h3>
-                        <p>100% 本地儲存，僅你自己可存取。支援匯出 vCard，跨平台通用。</p>
-                    </div>
-                    <div class="landing-feature-card">
-                        <div class="landing-feature-icon"><i class="fa-solid fa-language"></i></div>
-                        <h3>多語言支援</h3>
-                        <p>繁體中文、簡體中文、英文、日文、韓文名片，AI 智能識別語言自動轉寫。</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Bottom CTA -->
-        <section class="landing-cta-section">
-            <div class="landing-cta-inner">
-                <h2>準備好管理你的人脈了嗎？</h2>
-                <p>完全免費，無需信用卡，立即開始</p>
-                <button class="landing-btn-primary" onclick="document.getElementById('loginScreen').scrollIntoView({behavior:'smooth'})">
-                    <i class="fa-solid fa-arrow-right"></i> 開始使用
+            <h1 class="hero-title">
+                <span class="highlight">AI 智慧名片辨識</span><br>
+                3 秒建立數位人脈
+            </h1>
+            <p class="hero-sub">
+                拍照即識別，自動整理聯絡人。支援繁體中文、英文、日文多語言，
+                讓您的商業人脈管理從此輕鬆高效。
+            </p>
+            <div class="hero-actions">
+                <button class="btn-hero-primary" onclick="location.href='/app'">
+                    <i class="fa-solid fa-camera"></i> 免費開始使用
+                </button>
+                <button class="btn-hero-secondary" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">
+                    <i class="fa-solid fa-play"></i> 了解功能特色
                 </button>
             </div>
-        </section>
-
-        <!-- Footer -->
-        <footer class="landing-footer">
-            <span>© 2026 名片王 Business Card Manager</span>
-        </footer>
-    </div>
-
-    <div class="login-screen" id="loginScreen">
-        <div class="login-box">
-            <div class="login-logo">
-                <div class="login-logo-icon"><i class="fa-solid fa-id-card"></i></div>
-                <span class="login-logo-text">名片王</span>
-            </div>
-            <p class="login-subtitle">專業名片管理平台</p>
-            <div class="login-tabs">
-                <button class="active" id="tabLogin" onclick="showTab('login')">登入</button>
-                <button id="tabRegister" onclick="showTab('register')">註冊</button>
-            </div>
-            <div id="loginForm">
-                <div class="form-group"><label>帳號</label><input type="text" id="loginUsername" placeholder="輸入帳號"></div>
-                <div class="form-group"><label>密碼</label><input type="password" id="loginPassword" placeholder="輸入密碼"></div>
-                <div class="error-msg" id="loginError"></div>
-                <button class="btn btn-primary" onclick="login()"><i class="fa-solid fa-arrow-right-to-bracket" style="margin-right:6px;"></i>登入</button>
-            </div>
-            <div id="registerForm" style="display:none;">
-                <div class="form-group"><label>帳號</label><input type="text" id="regUsername" placeholder="設定帳號"></div>
-                <div class="form-group"><label>密碼</label><input type="password" id="regPassword" placeholder="設定密碼（至少6碼）"></div>
-                <div class="form-group"><label>確認密碼</label><input type="password" id="regConfirm" placeholder="再次輸入密碼"></div>
-                <div class="error-msg" id="regError"></div>
-                <button class="btn btn-primary" onclick="register()"><i class="fa-solid fa-user-plus" style="margin-right:6px;"></i>註冊</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="header hidden" id="header">
-        <div class="header-left">
-            <div class="header-logo"><i class="fa-solid fa-id-card"></i></div>
-            <span class="header-title">名片王</span>
-        </div>
-        <div class="header-right">
-            <span class="header-user" id="welcomeUser"></span>
-            <button class="header-btn theme-toggle" id="themeToggleBtn" onclick="toggleTheme()" aria-label="切換深色/淺色主題"><i class="fa-solid fa-moon" id="themeIcon"></i></button>
-            <button class="header-btn" onclick="openSyncModal()" aria-label="同步至 Telegram"><i class="fa-brands fa-telegram" style="font-size:12px;"></i> 同步</button>
-            <button class="header-btn" onclick="logout()" aria-label="登出"><i class="fa-solid fa-arrow-right-from-bracket" style="font-size:12px;"></i> 登出</button>
-        </div>
-    </div>
-
-    <!-- Tag Filter Bar -->
-    <div class="tag-filter-bar" id="tagFilterBar">
-        <div class="tag-filter-scroll" id="tagFilterScroll"></div>
-        <button class="tag-filter-more" id="tagFilterMore" onclick="toggleTagMoreMenu()" aria-label="更多標籤"><i class="fa-solid fa-ellipsis"></i></button>
-    </div>
-    <div class="tag-more-menu" id="tagMoreMenu"></div>
-
-    <div class="container hidden" id="mainContent">
-        <div class="toolbar">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchInput" placeholder="搜尋姓名、公司、職稱..." oninput="filterCards()">
-            </div>
-            <div class="toolbar-right">
-                <button class="toolbar-btn primary" onclick="openModal()" aria-label="新增名片"><i class="fa-solid fa-plus" style="font-size:12px;"></i>新增名片</button>
-                <button class="toolbar-btn" onclick="startScan()" aria-label="掃描名片"><i class="fa-solid fa-camera" style="font-size:12px;"></i> 掃描</button>
-                <button class="toolbar-btn" onclick="exportCSV()" aria-label="匯出 CSV"><i class="fa-solid fa-file-csv" style="font-size:12px;"></i> CSV</button>
-                <button class="toolbar-btn" onclick="document.getElementById('vcfUpload').click()" aria-label="匯入 vCard"><i class="fa-solid fa-file-import" style="font-size:12px;"></i> 匯入</button>
-            </div>
-        </div>
-
-        <div class="stats-row">
-            <div class="stat-card">
-                <div class="stat-icon blue"><i class="fa-solid fa-id-card"></i></div>
-                <div class="stat-info"><div class="stat-num" id="totalCount">0</div><div class="stat-label">總名片數</div></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon green"><i class="fa-solid fa-building"></i></div>
-                <div class="stat-info"><div class="stat-num" id="companyCount">0</div><div class="stat-label">公司數</div></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon red"><i class="fa-solid fa-calendar-plus"></i></div>
-                <div class="stat-info"><div class="stat-num" id="thisMonth">0</div><div class="stat-label">本月新增</div></div>
-            </div>
-        </div>
-
-        <div class="section-header">
-            <span class="section-title" id="cardsSectionTitle">全部名片</span>
-        </div>
-        <div class="cards-list" id="cardsGrid">
-            <div class="empty-state">
-                <div class="empty-icon"><i class="fa-solid fa-address-card"></i></div>
-                <p class="title">尚無名片</p>
-                <p>點擊「新增名片」開始建立，或使用「掃描」透過相機讀取</p>
-            </div>
-        </div>
-    </div>
-
-    <button class="fab hidden" id="addBtn" aria-label="新增名片" onclick="openModal()"><i class="fa-solid fa-plus"></i></button>
-    <div class="toast" id="toast"></div>
-
-    <!-- Share Modal -->
-    <div class="modal" id="shareModal">
-        <div class="modal-content" style="text-align:center; max-width:420px;">
-            <div class="modal-header">
-                <h2><i class="fa-solid fa-share-nodes"></i> 分享名片</h2>
-                <button class="modal-close" onclick="closeShare()" aria-label="關閉分享">×</button>
-            </div>
-            <div id="qrContainer" class="share-qr"></div>
-            <div class="share-actions">
-                <button class="btn-download" onclick="downloadVCard()" aria-label="下載 vCard"><i class="fa-solid fa-download"></i> 下載 vCard</button>
-                <button class="btn-copy" onclick="copyVCard()" aria-label="複製 vCard"><i class="fa-regular fa-copy"></i> 複製</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Card Modal -->
-    <div class="modal bottom-sheet" id="cardModal">
-        <div class="modal-content">
-            <div class="sheet-handle" id="sheetHandle"></div>
-            <div class="modal-header">
-                <h2 id="modalTitle"><i class="fa-solid fa-pen-to-square"></i>新增名片</h2>
-                <button class="modal-close" onclick="closeModal()" aria-label="關閉">×</button>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>姓名 *</label><input type="text" id="inputName" placeholder="王大明"></div>
-                <div class="form-group"><label>職稱</label><input type="text" id="inputTitle" placeholder="業務經理"></div>
-            </div>
-            <div class="form-group"><label>公司</label><input type="text" id="inputCompany" placeholder="ABC 股份有限公司"></div>
-            <div class="form-row">
-                <div class="form-group"><label>電話</label><input type="tel" id="inputPhone" placeholder="+886 912 345 678"></div>
-                <div class="form-group"><label>Email</label><input type="email" id="inputEmail" placeholder="example@company.com"></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>LINE</label><input type="text" id="inputLine" placeholder="lineid"></div>
-                <div class="form-group"><label>分類</label>
-                    <select id="inputCategory">
-                        <option value="客戶">客戶</option>
-                        <option value="供應商">供應商</option>
-                        <option value="同事">同事</option>
-                        <option value="潛在客戶">潛在客戶</option>
-                        <option value="其他">其他</option>
-                    </select>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <span class="hero-stat-num">1.1億+</span>
+                    <span class="hero-stat-label">全球用戶</span>
                 </div>
-            </div>
-            <div class="form-group"><label>地址</label><input type="text" id="inputAddress" placeholder="台北市信義區忠孝東路一段"></div>
-            <div id="imagePreviewContainer">
-                <div class="image-preview-wrap">
-                    <img id="imagePreview" />
-                    <button class="remove-img" onclick="clearCardImage()" aria-label="移除圖片">×</button>
+                <div class="hero-stat">
+                    <span class="hero-stat-num">99%</span>
+                    <span class="hero-stat-label">辨識準確率</span>
                 </div>
-            </div>
-            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileUpload').click()">
-                <div class="upload-zone-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-                <div class="upload-zone-text">拖放圖片到此處，或 <span>點擊上傳</span></div>
-                <div class="upload-zone-hint">支援 JPG、PNG、GIF，檔案大小上限 10MB</div>
-                <div class="upload-zone-divider">或</div>
-                <div class="upload-zone-actions">
-                    <button class="btn-camera" onclick="event.stopPropagation(); startScanFromModal()" aria-label="相機掃描名片"><i class="fa-solid fa-camera"></i> 相機掃描</button>
-                    <button onclick="event.stopPropagation(); document.getElementById('fileUpload').click()"><i class="fa-solid fa-image"></i> 從相簿選擇</button>
+                <div class="hero-stat">
+                    <span class="hero-stat-num">200+</span>
+                    <span class="hero-stat-label">支援國家</span>
                 </div>
-            </div>
-            <input type="file" id="fileUpload" accept="image/*" onchange="handleFileUpload(event)">
-            <input type="file" id="vcfUpload" accept=".vcf,text/vcard" onchange="handleVCardImport(event)" style="display:none;">
-            <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeModal()" aria-label="取消">取消</button>
-                <button class="btn-save" onclick="saveCard()" aria-label="儲存名片"><i class="fa-solid fa-floppy-disk" style="margin-right:5px;"></i>儲存</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Scan Modal -->
-    <div class="scan-modal" id="scanModal">
-        <div class="scan-view">
-            <video id="video" autoplay playsinline></video>
-            <canvas id="canvas" style="display:none;"></canvas>
-            <div class="scan-frame">
-                <div class="scan-corner tl"></div>
-                <div class="scan-corner tr"></div>
-                <div class="scan-corner bl"></div>
-                <div class="scan-corner br"></div>
-            </div>
-            <div class="scan-hint">將名片置於框內</div>
-            <div class="scan-buttons">
-                <button class="scan-btn close-btn" onclick="closeScan()" aria-label="關閉相機">×</button>
-                <button class="scan-btn capture" onclick="captureImage()" aria-label="拍攝名片"></button>
-            </div>
-        </div>
-    </div>
-    <div class="scan-progress" id="scanProgress">
-        <div class="spinner"></div>
-        <div class="text">正在辨識名片...</div>
-        <div class="percent" id="scanPercent">0%</div>
-    </div>
-
-    <!-- Sync Modal -->
-    <div class="modal" id="syncModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fa-brands fa-telegram" style="color:#34c759;"></i> Telegram 同步</h2>
-                <button class="modal-close" onclick="closeSyncModal()" aria-label="關閉同步設定">×</button>
-            </div>
-            <div style="margin-bottom:20px;">
-                <div style="font-size:14px;color:var(--text2);margin-bottom:16px;line-height:1.6;">
-                    綁定 Telegram Bot，可將拍攝的名片照片自動辨識並同步至此帳戶。
-                </div>
-                <div class="sync-info-block">
-                    <div class="row"><i class="fa-solid fa-link"></i><span>綁定狀態：</span><span id="telegramStatus">載入中...</span></div>
-                </div>
-                <div class="form-group"><label>Telegram 使用者名稱</label>
-                    <input type="text" id="telegramUsername" placeholder="輸入 @username（不含 @）">
-                </div>
-                <button class="btn btn-primary" onclick="linkTelegram()"><i class="fa-solid fa-link" style="margin-right:6px;"></i>綁定帳戶</button>
-                <hr class="sync-divider">
-                <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:12px;">同步名片</div>
-                <button class="btn btn-accent" onclick="syncFromTelegram()"><i class="fa-solid fa-rotate" style="margin-right:6px;"></i>從 Telegram 同步名片</button>
-                <div style="font-size:12px;color:var(--text3);margin-top:12px;">
-                    或在 Telegram 搜尋 <b>@CardKingBot</b> 上傳名片照片
+                <div class="hero-stat">
+                    <span class="hero-stat-num">20萬+</span>
+                    <span class="hero-stat-label">企業客戶</span>
                 </div>
             </div>
         </div>
+    </section>
+
+    <!-- ===== TRUST BAR ===== -->
+    <div class="trust-bar">
+        <div class="trust-bar-inner">
+            <span class="trust-label">受到全球頂尖企業信賴</span>
+            <span class="trust-divider"></span>
+            <span class="trust-item"><i class="fa-solid fa-star" style="color:#F59E0B;"></i> App Store 4.8 分</span>
+            <span class="trust-divider"></span>
+            <span class="trust-item"><i class="fa-solid fa-award"></i> 600,000+ 用戶評價</span>
+            <span class="trust-divider"></span>
+            <span class="trust-item"><i class="fa-solid fa-shield-halved"></i> ISO 27001 認證</span>
+            <span class="trust-divider"></span>
+            <span class="trust-item"><i class="fa-solid fa-globe"></i> 支援 50+ 語言</span>
+        </div>
     </div>
+
+    <!-- ===== FEATURES GRID ===== -->
+    <section class="section" id="features">
+        <div class="section-inner">
+            <div class="section-chip"><i class="fa-solid fa-sparkles"></i> 核心功能</div>
+            <h2 class="section-title">一站式名片管理，<br>全面升級您的人脈效率</h2>
+            <p class="section-sub">從掃描到整理，從分享到協作，CardScan Pro 提供您所需的一切工具。</p>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon blue"><i class="fa-solid fa-robot"></i></div>
+                    <h3>AI 智慧辨識</h3>
+                    <p>最新 AI 引擎，拍照 3 秒即完成辨識。繁體中文、英文、日文精準識別，準確率高達 99%。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon orange"><i class="fa-solid fa-id-card"></i></div>
+                    <h3>數位名片</h3>
+                    <p>一鍵生成個人數位名片，自訂模板、QR Code 分享，讓交換名片更快速便利。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon green"><i class="fa-solid fa-address-book"></i></div>
+                    <h3>聯絡人管理</h3>
+                    <p>標籤分類、全文搜尋、關係備註。批量匯出 CSV / vCard，與通訊錄無縫整合。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon purple"><i class="fa-solid fa-arrows-rotate"></i></div>
+                    <h3>CRM 整合</h3>
+                    <p>自動同步至 Salesforce、HubSpot、Google Contacts，讓名片資料即時進入銷售流程。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon teal"><i class="fa-solid fa-building-user"></i></div>
+                    <h3>企業協作</h3>
+                    <p>統一管理員工名片、集中建立企業名片庫，支援多人協作與批次設定。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon red"><i class="fa-solid fa-shield-halved"></i></div>
+                    <h3>資料安全</h3>
+                    <p>256-bit AES 加密儲存，符合 GDPR 規範。您的名片資料完全受到保護。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SHOWCASE 1: AI Scan ===== -->
+    <section class="showcase">
+        <div class="showcase-inner">
+            <div class="showcase-text">
+                <div class="chip chip-blue"><i class="fa-solid fa-wand-magic-sparkles"></i> AI 辨識技術</div>
+                <h2 class="showcase-title">拍一張，<br>AI 自動填好所有資訊</h2>
+                <p class="showcase-desc">
+                    獨家 AI OCR 引擎精確辨識名片上的每一個字。姓名、公司、電話、Email 一次掌握，
+                    告別手動輸入的繁瑣，3 秒完成建檔。
+                </p>
+                <ul class="showcase-bullets">
+                    <li><i class="fa-solid fa-check"></i> 支援繁體中文、英文、日文、韓文等 16+ 語言</li>
+                    <li><i class="fa-solid fa-check"></i> 離線模式同樣可辨識，不依賴網路</li>
+                    <li><i class="fa-solid fa-check"></i> 標準名片比例 3.5:2 精準對焦框</li>
+                    <li><i class="fa-solid fa-check"></i> 辨識結果可即時手動校正</li>
+                </ul>
+            </div>
+            <div class="showcase-visual">
+                <div class="accuracy-badge"><i class="fa-solid fa-circle-check"></i> 辨識準確率 99%</div>
+                <div class="showcase-visual-inner">
+                    <div class="mock-scan">
+                        <div class="mock-scan-frame">將名片置於框內</div>
+                        <div class="mock-scan-btn"></div>
+                    </div>
+                    <div style="display:flex;gap:8px;padding:4px 0;">
+                        <div style="flex:1;height:10px;background:#E5E7EB;border-radius:4px;"></div>
+                        <div style="flex:2;height:10px;background:#DBEAFE;border-radius:4px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SHOWCASE 2: Digital Card ===== -->
+    <section class="showcase">
+        <div class="showcase-inner reverse">
+            <div class="showcase-text">
+                <div class="chip chip-orange"><i class="fa-solid fa-qrcode"></i> 數位名片</div>
+                <h2 class="showcase-title">您的名片，<br>數位化與全球分享</h2>
+                <p class="showcase-desc">
+                    建立您的個人數位名片，透過 QR Code、連結、Email 隨時分享。
+                    對方掃描即可直接存入手機通訊錄，不再需要實體名片。
+                </p>
+                <ul class="showcase-bullets">
+                    <li><i class="fa-solid fa-check"></i> 自訂名片樣式與品牌色</li>
+                    <li><i class="fa-solid fa-check"></i> 一鍵生成 QR Code 名片</li>
+                    <li><i class="fa-solid fa-check"></i> vCard 格式匯出，跨平台通用</li>
+                    <li><i class="fa-solid fa-check"></i> Email 簽名檔自動生成</li>
+                </ul>
+            </div>
+            <div class="showcase-visual showcase-visual-orange">
+                <div class="showcase-visual-inner">
+                    <div style="background:#3B82F6;border-radius:10px;padding:16px;text-align:center;color:white;">
+                        <div style="width:80px;height:80px;background:white;border-radius:8px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;">
+                            <i class="fa-solid fa-qrcode" style="color:#1F2937;font-size:40px;"></i>
+                        </div>
+                        <div style="font-size:14px;font-weight:700;">王大明</div>
+                        <div style="font-size:11px;opacity:0.8;">業務總監 · ABC 科技</div>
+                    </div>
+                    <div style="display:flex;gap:8px;margin-top:4px;">
+                        <div style="flex:1;padding:8px;background:#F3F4F6;border-radius:8px;text-align:center;font-size:11px;font-weight:600;color:#374151;"><i class="fa-solid fa-share-nodes" style="display:block;font-size:16px;margin-bottom:4px;color:#3B82F6;"></i>分享</div>
+                        <div style="flex:1;padding:8px;background:#F3F4F6;border-radius:8px;text-align:center;font-size:11px;font-weight:600;color:#374151;"><i class="fa-solid fa-download" style="display:block;font-size:16px;margin-bottom:4px;color:#3B82F6;"></i>下載</div>
+                        <div style="flex:1;padding:8px;background:#F3F4F6;border-radius:8px;text-align:center;font-size:11px;font-weight:600;color:#374151;"><i class="fa-regular fa-copy" style="display:block;font-size:16px;margin-bottom:4px;color:#3B82F6;"></i>複製</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SHOWCASE 3: Contact Mgmt ===== -->
+    <section class="showcase">
+        <div class="showcase-inner">
+            <div class="showcase-text">
+                <div class="chip chip-green"><i class="fa-solid fa-tags"></i> 聯絡人管理</div>
+                <h2 class="showcase-title">智慧分類，<br>人脈一覽無遺</h2>
+                <p class="showcase-desc">
+                    標籤系統讓您輕鬆分類客戶、供應商、同事。強大搜尋功能讓您幾秒內找到任何人，
+                    統計數據讓您掌握人脈成長動態。
+                </p>
+                <ul class="showcase-bullets">
+                    <li><i class="fa-solid fa-check"></i> 自訂標籤與分類系統</li>
+                    <li><i class="fa-solid fa-check"></i> 全文即時搜尋（姓名、公司、職稱）</li>
+                    <li><i class="fa-solid fa-check"></i> CSV 批量匯出，輕鬆備份</li>
+                    <li><i class="fa-solid fa-check"></i> 人脈成長統計與分析</li>
+                </ul>
+            </div>
+            <div class="showcase-visual showcase-visual-green">
+                <div class="showcase-visual-inner">
+                    <div class="mock-stat-row">
+                        <div class="mock-stat"><div class="mock-stat-n">128</div><div class="mock-stat-l">總名片</div></div>
+                        <div class="mock-stat"><div class="mock-stat-n">47</div><div class="mock-stat-l">公司數</div></div>
+                        <div class="mock-stat"><div class="mock-stat-n">12</div><div class="mock-stat-l">本月新增</div></div>
+                    </div>
+                    <div class="mock-card">
+                        <div class="mock-avatar" style="background:#3B82F6;">王</div>
+                        <div class="mock-lines">
+                            <div class="mock-line" style="width:60%;"></div>
+                            <div class="mock-line" style="width:85%;background:#DBEAFE;"></div>
+                        </div>
+                        <span class="mock-tag">客戶</span>
+                    </div>
+                    <div class="mock-card">
+                        <div class="mock-avatar" style="background:#10B981;">李</div>
+                        <div class="mock-lines">
+                            <div class="mock-line" style="width:50%;"></div>
+                            <div class="mock-line" style="width:75%;background:#D1FAE5;"></div>
+                        </div>
+                        <span class="mock-tag" style="background:#D1FAE5;color:#059669;">供應商</span>
+                    </div>
+                    <div class="mock-card">
+                        <div class="mock-avatar" style="background:#8B5CF6;">張</div>
+                        <div class="mock-lines">
+                            <div class="mock-line" style="width:65%;"></div>
+                            <div class="mock-line" style="width:80%;background:#EDE9FE;"></div>
+                        </div>
+                        <span class="mock-tag" style="background:#EDE9FE;color:#7C3AED;">潛在客戶</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SHOWCASE 4: Enterprise ===== -->
+    <section class="showcase" id="enterprise">
+        <div class="showcase-inner reverse">
+            <div class="showcase-text">
+                <div class="chip chip-purple"><i class="fa-solid fa-building"></i> 企業版</div>
+                <h2 class="showcase-title">企業級名片管理，<br>統一品牌形象</h2>
+                <p class="showcase-desc">
+                    為企業打造的集中管理解決方案。統一員工數位名片樣式，
+                    讓每一位同仁都能以一致的品牌形象對外展示。
+                </p>
+                <ul class="showcase-bullets">
+                    <li><i class="fa-solid fa-check"></i> 企業統一名片模板管理</li>
+                    <li><i class="fa-solid fa-check"></i> 多人協作與權限控制</li>
+                    <li><i class="fa-solid fa-check"></i> CRM / ERP 系統整合</li>
+                    <li><i class="fa-solid fa-check"></i> 批量部署與管理後台</li>
+                    <li><i class="fa-solid fa-check"></i> 專屬客戶成功經理</li>
+                </ul>
+            </div>
+            <div class="showcase-visual showcase-visual-purple">
+                <div class="showcase-visual-inner">
+                    <div style="background:#7C3AED;border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:10px;color:white;">
+                        <i class="fa-solid fa-building" style="font-size:20px;opacity:0.8;"></i>
+                        <div><div style="font-size:13px;font-weight:700;">ABC 科技股份有限公司</div><div style="font-size:11px;opacity:0.7;">企業名片管理後台</div></div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;">
+                        <div style="background:#F5F3FF;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#7C3AED;">248</div><div style="font-size:10px;color:#6B7280;">員工名片</div></div>
+                        <div style="background:#F5F3FF;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#7C3AED;">12</div><div style="font-size:10px;color:#6B7280;">部門</div></div>
+                        <div style="background:#F5F3FF;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#7C3AED;">4.8K</div><div style="font-size:10px;color:#6B7280;">本月分享</div></div>
+                        <div style="background:#F5F3FF;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#7C3AED;">98%</div><div style="font-size:10px;color:#6B7280;">開通率</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== HOW IT WORKS ===== -->
+    <section class="section" style="background:var(--bg2);">
+        <div class="section-inner" style="text-align:center;">
+            <div class="section-chip"><i class="fa-solid fa-list-ol"></i> 使用流程</div>
+            <h2 class="section-title">三個步驟，輕鬆上手</h2>
+            <p class="section-sub" style="margin:0 auto;">不需要技術背景，任何人都能在三分鐘內完成設定並開始使用。</p>
+            <div class="how-steps">
+                <div class="how-step">
+                    <div class="how-connector"></div>
+                    <div class="how-step-num">1</div>
+                    <h3>拍攝名片</h3>
+                    <p>開啟相機，對準名片。標準 3.5:2 比例對焦框讓您輕鬆定位，一鍵拍攝。</p>
+                </div>
+                <div class="how-step">
+                    <div class="how-connector"></div>
+                    <div class="how-step-num">2</div>
+                    <h3>AI 自動辨識</h3>
+                    <p>AI 引擎在 3 秒內完成文字辨識，自動填入姓名、公司、電話、Email 等資訊。</p>
+                </div>
+                <div class="how-step">
+                    <div class="how-step-num">3</div>
+                    <h3>儲存並分享</h3>
+                    <p>確認資料後一鍵儲存。立即生成 QR Code 分享，或匯出 vCard 至通訊錄。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== PRICING ===== -->
+    <section class="section pricing" id="pricing">
+        <div class="section-inner" style="text-align:center;">
+            <div class="section-chip"><i class="fa-solid fa-tag"></i> 定價方案</div>
+            <h2 class="section-title">找到最適合您的方案</h2>
+            <p class="section-sub" style="margin:0 auto;">從個人用戶到大型企業，我們提供靈活的方案選擇。</p>
+            <div class="pricing-grid">
+                <!-- Free -->
+                <div class="pricing-card">
+                    <div class="pricing-name">免費版</div>
+                    <div class="pricing-price">NT$<span>0</span></div>
+                    <div class="pricing-desc">永久免費，立即開始</div>
+                    <button class="pricing-btn pricing-btn-outline" onclick="location.href='/app'">免費開始使用</button>
+                    <hr class="pricing-divider">
+                    <ul class="pricing-features">
+                        <li><i class="fa-solid fa-check"></i> 儲存最多 50 張名片</li>
+                        <li><i class="fa-solid fa-check"></i> AI OCR 辨識</li>
+                        <li><i class="fa-solid fa-check"></i> QR Code 名片分享</li>
+                        <li><i class="fa-solid fa-check"></i> CSV / vCard 匯出</li>
+                        <li><i class="fa-solid fa-check"></i> 標籤分類管理</li>
+                        <li class="muted"><i class="fa-solid fa-xmark"></i> CRM 整合</li>
+                        <li class="muted"><i class="fa-solid fa-xmark"></i> 多人協作</li>
+                    </ul>
+                </div>
+                <!-- Pro -->
+                <div class="pricing-card popular">
+                    <span class="popular-badge">⭐ 最受歡迎</span>
+                    <div class="pricing-name">專業版</div>
+                    <div class="pricing-price"><sup>NT$</sup>299<sub>/月</sub></div>
+                    <div class="pricing-desc">按年付費每月 NT$249，省 17%</div>
+                    <button class="pricing-btn pricing-btn-primary" onclick="location.href='/app'">立即升級專業版</button>
+                    <hr class="pricing-divider">
+                    <ul class="pricing-features">
+                        <li><i class="fa-solid fa-check"></i> <strong>無限</strong>名片儲存</li>
+                        <li><i class="fa-solid fa-check"></i> 進階 AI OCR（多語言）</li>
+                        <li><i class="fa-solid fa-check"></i> 自訂數位名片模板</li>
+                        <li><i class="fa-solid fa-check"></i> CSV / vCard 批量匯出</li>
+                        <li><i class="fa-solid fa-check"></i> Google Contacts 同步</li>
+                        <li><i class="fa-solid fa-check"></i> 優先技術支援</li>
+                        <li class="muted"><i class="fa-solid fa-xmark"></i> 多人協作（需企業版）</li>
+                    </ul>
+                </div>
+                <!-- Enterprise -->
+                <div class="pricing-card">
+                    <div class="pricing-name">企業版</div>
+                    <div class="pricing-price"><sup>NT$</sup>999<sub>/月起</sub></div>
+                    <div class="pricing-desc">依人數訂製，最低 5 人起</div>
+                    <button class="pricing-btn pricing-btn-dark" onclick="alert('請來信 sales@cardscan.pro 洽詢企業方案')">聯繫業務洽詢</button>
+                    <hr class="pricing-divider">
+                    <ul class="pricing-features">
+                        <li><i class="fa-solid fa-check"></i> 專業版全部功能</li>
+                        <li><i class="fa-solid fa-check"></i> 多人協作與權限管理</li>
+                        <li><i class="fa-solid fa-check"></i> Salesforce / HubSpot 整合</li>
+                        <li><i class="fa-solid fa-check"></i> 企業統一名片模板</li>
+                        <li><i class="fa-solid fa-check"></i> SSO 單一登入</li>
+                        <li><i class="fa-solid fa-check"></i> 專屬客戶成功經理</li>
+                        <li><i class="fa-solid fa-check"></i> SLA 服務保障</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SECURITY ===== -->
+    <section class="section" id="security">
+        <div class="section-inner" style="text-align:center;">
+            <div class="section-chip"><i class="fa-solid fa-lock"></i> 安全性</div>
+            <h2 class="section-title">企業級安全，您的資料受到最嚴密保護</h2>
+            <p class="section-sub" style="margin:0 auto;">我們採用與銀行相同等級的安全標準，確保您的聯絡人資料永遠安全。</p>
+            <div class="security-grid">
+                <div class="security-card">
+                    <div class="security-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                    <h4>ISO/IEC 27001 認證</h4>
+                    <p>通過國際資訊安全管理系統最高標準認證，確保資料處理流程合規。</p>
+                </div>
+                <div class="security-card">
+                    <div class="security-icon"><i class="fa-solid fa-lock"></i></div>
+                    <h4>256-bit AES 加密</h4>
+                    <p>所有資料傳輸與儲存均採用軍事級 256-bit AES 加密，防止未授權存取。</p>
+                </div>
+                <div class="security-card">
+                    <div class="security-icon"><i class="fa-solid fa-globe-europe"></i></div>
+                    <h4>GDPR 合規</h4>
+                    <p>完全符合歐盟 GDPR 個人資料保護法規，您對自己的資料擁有完全控制權。</p>
+                </div>
+                <div class="security-card">
+                    <div class="security-icon"><i class="fa-solid fa-eye-slash"></i></div>
+                    <h4>資料零售出</h4>
+                    <p>我們承諾永遠不會出售您的個人資料或聯絡人資訊給任何第三方。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CTA BANNER ===== -->
+    <section class="cta-banner">
+        <div class="cta-banner-inner">
+            <h2>立即開始，免費體驗<br>AI 名片管理</h2>
+            <p>超過 1.1 億用戶的選擇。不需要信用卡，免費使用核心功能。</p>
+            <div class="cta-banner-actions">
+                <button class="btn-cta-white" onclick="location.href='/app'">
+                    <i class="fa-solid fa-camera"></i> 免費開始使用
+                </button>
+                <button class="btn-cta-outline" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">
+                    <i class="fa-solid fa-tag"></i> 查看方案定價
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-top">
+                <div>
+                    <div class="footer-brand-logo">
+                        <div class="footer-brand-logo-icon"><i class="fa-solid fa-id-card"></i></div>
+                        <span class="footer-brand-logo-text">CardScan Pro</span>
+                    </div>
+                    <p class="footer-brand-desc">全球領先的 AI 名片辨識與管理平台。讓每一張名片都成為有價值的商業連結。</p>
+                    <div class="footer-social">
+                        <a href="#" aria-label="Twitter/X"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>產品</h4>
+                    <ul class="footer-links">
+                        <li><a href="#features">功能介紹</a></li>
+                        <li><a href="#pricing">定價方案</a></li>
+                        <li><a href="#enterprise">企業版</a></li>
+                        <li><a href="/app">立即使用</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>資源</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">使用教學</a></li>
+                        <li><a href="#">API 文件</a></li>
+                        <li><a href="#">常見問題</a></li>
+                        <li><a href="#">部落格</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>公司</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">關於我們</a></li>
+                        <li><a href="#">聯絡客服</a></li>
+                        <li><a href="#">隱私政策</a></li>
+                        <li><a href="#">服務條款</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="footer-bottom-left">© 2026 CardScan Pro. All rights reserved.</div>
+                <div class="footer-badges">
+                    <span class="footer-badge">ISO 27001</span>
+                    <span class="footer-badge">GDPR</span>
+                    <span class="footer-badge">SOC 2</span>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script>
-        let currentUser = null, cards = [], editingId = null, videoStream = null, currentCardImage = null;
-
-        function getUsers() { return JSON.parse(localStorage.getItem('cardUsers')) || {}; }
-        function saveUsers(users) { localStorage.setItem('cardUsers', JSON.stringify(users)); }
-        function getUserCards() { if (!currentUser) return []; return (JSON.parse(localStorage.getItem('businessCards')) || {})[currentUser] || []; }
-        function saveUserCards(cards) {
-            if (!currentUser) return;
-            const all = JSON.parse(localStorage.getItem('businessCards')) || {};
-            all[currentUser] = cards;
-            try { localStorage.setItem('businessCards', JSON.stringify(all)); }
-            catch (e) {
-                if (e.name === 'QuotaExceededError') showToast('儲存空間已滿，請移除部分名片圖片');
-                else showToast('儲存失敗：' + e.message);
-            }
-        }
-
-        function showTab(tab) {
-            document.getElementById('tabLogin').classList.toggle('active', tab==='login');
-            document.getElementById('tabRegister').classList.toggle('active', tab==='register');
-            document.getElementById('loginForm').style.display=tab==='login'?'block':'none';
-            document.getElementById('registerForm').style.display=tab==='register'?'block':'none';
-            hideError();
-        }
-
-        function hashPassword(raw) {
-            try { return btoa(unescape(encodeURIComponent(raw))); }
-            catch(e) { return raw; }
-        }
-
-        function register() {
-            const u = document.getElementById('regUsername').value.trim();
-            const p = document.getElementById('regPassword').value;
-            const c = document.getElementById('regConfirm').value;
-            if (!u || !p) { showError('regError', '請填寫所有欄位'); return; }
-            if (p.length < 6) { showError('regError', '密碼至少 6 碼'); return; }
-            if (p !== c) { showError('regError', '兩次密碼不一致'); return; }
-            const users = getUsers();
-            if (users[u]) { showError('regError', '帳號已被註冊'); return; }
-            users[u] = { password: hashPassword(p), createdAt: new Date().toISOString() };
-            saveUsers(users);
-            showToast('註冊成功！請登入');
-            showTab('login');
-        }
-
-        function login() {
-            const u = document.getElementById('loginUsername').value.trim();
-            const p = document.getElementById('loginPassword').value;
-            const users = getUsers();
-            const candidate = users[u];
-            const hashed = hashPassword(p);
-            if (!candidate || ![candidate.password, p].includes(hashed) && candidate.password !== p) {
-                showError('loginError', '帳號或密碼錯誤');
-                return;
-            }
-            if (candidate.password === p) { candidate.password = hashed; saveUsers(users); }
-            currentUser = u;
-            localStorage.setItem('currentUser', u);
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('header').classList.remove('hidden');
-            document.getElementById('mainContent').classList.remove('hidden');
-            document.getElementById('addBtn').classList.remove('hidden');
-            document.getElementById('tagFilterBar').style.display = 'flex';
-            document.getElementById('welcomeUser').textContent = '你好，' + u;
-            cards = getUserCards();
-            renderTagFilterBar();
-            renderCards();
-            updateStats();
-        }
-
-        function logout() {
-            currentUser = null;
-            localStorage.removeItem('currentUser');
-            document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('header').classList.add('hidden');
-            document.getElementById('mainContent').classList.add('hidden');
-            document.getElementById('addBtn').classList.add('hidden');
-            hideError();
-        }
-
-        function showError(id, msg) {
-            document.getElementById(id).textContent = msg;
-            document.getElementById(id).classList.add('show');
-        }
-        function hideError() {
-            document.getElementById('loginError').classList.remove('show');
-            document.getElementById('regError').classList.remove('show');
-        }
-
-        function updateStats() {
-            document.getElementById('totalCount').textContent = cards.length;
-            document.getElementById('companyCount').textContent = [...new Set(cards.map(c => c.company).filter(Boolean))].length;
-            const now = new Date();
-            document.getElementById('thisMonth').textContent = cards.filter(c =>
-                c.createdAt && new Date(c.createdAt).getMonth() === now.getMonth() && new Date(c.createdAt).getFullYear() === now.getFullYear()
-            ).length;
-        }
-
-        function escapeHtml(text) {
-            return String(text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
-        }
-
-        function getAvatarColor(name) {
-            const colors = ['#2563EB','#10B981','#EF4444','#8B5CF6','#F59E0B','#06B6D4','#EC4899'];
-            let hash = 0;
-            for (let i = 0; i < (name||'').length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
-            return colors[Math.abs(hash) % colors.length];
-        }
-
-        function getInitials(name) {
-            return (name || '未知').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
-        }
-
-        function getBadgeClass(cat) {
-            return { '客戶':'badge-client', '供應商':'badge-supplier', '同事':'badge-colleague', '潛在客戶':'badge-prospect', '其他':'badge-other' }[cat] || 'badge-other';
-        }
-
-        function renderCards(filter = '') {
-            const grid = document.getElementById('cardsGrid');
-            const q = (filter || '').toLowerCase();
-            const filtered = cards.filter(c =>
-                !q || (c.name||'').toLowerCase().includes(q) || (c.company||'').toLowerCase().includes(q) ||
-                (c.title||'').toLowerCase().includes(q) || (c.email||'').toLowerCase().includes(q)
-            );
-
-            const sectionTitle = document.getElementById('cardsSectionTitle');
-            sectionTitle.textContent = q ? `搜尋結果（${filtered.length}）` : `全部名片（${cards.length}）`;
-
-            if (filtered.length === 0) {
-                grid.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-address-card"></i></div><p class="title">${q ? '找不到符合的名片' : '尚無名片'}</p><p>${q ? '嘗試其他關鍵字' : '點擊「新增名片」開始建立，或使用「掃描」透過相機讀取'}</p></div>`;
-                return;
-            }
-
-            grid.innerHTML = filtered.map(c => {
-                const name = escapeHtml(c.name || '未命名');
-                const title = escapeHtml(c.title || '');
-                const company = escapeHtml(c.company || '');
-                const email = escapeHtml(c.email || '');
-                const phone = escapeHtml(c.phone || '');
-                const line = escapeHtml(c.line || '');
-                const badge = getBadgeClass(c.category || '其他');
-                const initials = getInitials(c.name);
-                const color = getAvatarColor(c.name);
-                const thumb = c.image ? `<img src="${c.image}" class="card-image-thumb" alt="名片圖片">` : '';
-
-                return `<div class="card-item">
-                    <div class="card-avatar" style="background:${color}">${initials}</div>
-                    <div class="card-body">
-                        <div class="card-name-row">
-                            <span class="card-name">${name}</span>
-                            <span class="card-badge ${badge}">${escapeHtml(c.category || '其他')}</span>
-                        </div>
-                        <div class="card-meta">
-                            ${title ? `<div class="card-meta-item"><i class="fa-solid fa-briefcase"></i>${title}</div>` : ''}
-                            ${company ? `<div class="card-meta-item"><i class="fa-solid fa-building"></i>${company}</div>` : ''}
-                            ${phone ? `<div class="card-meta-item"><i class="fa-solid fa-phone"></i>${phone}</div>` : ''}
-                            ${email ? `<div class="card-meta-item"><i class="fa-solid fa-envelope"></i>${email}</div>` : ''}
-                            ${line ? `<div class="card-meta-item"><i class="fa-brands fa-line"></i>${line}</div>` : ''}
-                        </div>
-                    </div>
-                    ${thumb}
-                    <div class="card-actions">
-                        <button onclick="editCard('${c.id}')" title="編輯"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button onclick="showShareModal('${c.id}')" title="分享"><i class="fa-solid fa-share-nodes"></i></button>
-                        <button class="btn-delete-action" onclick="deleteCard('${c.id}')" title="刪除"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        function filterCards() { renderCards(document.getElementById('searchInput').value); }
-
-        function openModal(card) {
-            editingId = card?.id || null;
-            document.getElementById('modalTitle').innerHTML = `<i class="fa-solid fa-pen-to-square"></i>${card ? '編輯名片' : '新增名片'}`;
-            document.getElementById('inputName').value = card?.name || '';
-            document.getElementById('inputTitle').value = card?.title || '';
-            document.getElementById('inputCompany').value = card?.company || '';
-            document.getElementById('inputPhone').value = card?.phone || '';
-            document.getElementById('inputEmail').value = card?.email || '';
-            document.getElementById('inputLine').value = card?.line || '';
-            document.getElementById('inputCategory').value = card?.category || '客戶';
-            document.getElementById('inputAddress').value = card?.address || '';
-            if (card?.image) {
-                currentCardImage = card.image;
-                document.getElementById('imagePreview').src = card.image;
-                document.getElementById('imagePreviewContainer').style.display = 'inline-block';
-            } else {
-                clearCardImage();
-            }
-            document.getElementById('cardModal').classList.add('show');
-        }
-
-        function closeModal() {
-            document.getElementById('cardModal').classList.remove('show');
-            editingId = null;
-            clearCardImage();
-        }
-
-        function saveCard() {
-            const name = document.getElementById('inputName').value.trim();
-            if (!name) { showToast('請輸入姓名'); return; }
-            const existingCard = editingId ? cards.find(x => x.id === editingId) : null;
-            const cardData = {
-                id: editingId || Date.now().toString(),
-                name,
-                title: document.getElementById('inputTitle').value.trim(),
-                company: document.getElementById('inputCompany').value.trim(),
-                phone: document.getElementById('inputPhone').value.trim(),
-                email: document.getElementById('inputEmail').value.trim(),
-                line: document.getElementById('inputLine').value.trim(),
-                category: document.getElementById('inputCategory').value,
-                address: document.getElementById('inputAddress').value.trim(),
-                image: currentCardImage || existingCard?.image || null,
-                createdAt: editingId ? cards.find(x => x.id === editingId)?.createdAt : new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            };
-            if (editingId) {
-                cards[cards.findIndex(x => x.id === editingId)] = cardData;
-                showToast('名片已更新');
-            } else {
-                cards.unshift(cardData);
-                showToast('名片已新增');
-            }
-            saveUserCards(cards);
-            renderCards();
-            updateStats();
-            closeModal();
-        }
-
-        function editCard(id) { const c = cards.find(x => x.id === id); if (c) openModal(c); }
-
-        function deleteCard(id) {
-            if (confirm('確定要刪除這張名片嗎？')) {
-                cards = cards.filter(x => x.id !== id);
-                saveUserCards(cards);
-                renderCards();
-                updateStats();
-                showToast('名片已刪除');
-            }
-        }
-
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.innerHTML = msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2500);
-        }
-
-        // Share
-        let currentShareCard = null;
-        function showShareModal(id) {
-            currentShareCard = cards.find(c => c.id === id);
-            if (!currentShareCard) return;
-            const container = document.getElementById('qrContainer');
-            container.innerHTML = '';
-            const vcard = generateVCard(currentShareCard);
-            QRCode.toCanvas(vcard, { width: 200, margin: 2, color: { dark: '#0F1117', light: '#FFFFFF' } }, (err, canvas) => {
-                if (!err) container.appendChild(canvas);
-            });
-            document.getElementById('shareModal').classList.add('show');
-        }
-        function closeShare() { document.getElementById('shareModal').classList.remove('show'); currentShareCard = null; }
-        function generateVCard(card) {
-            return `BEGIN:VCARD\nVERSION:3.0\nFN:${card.name||''}\nTITLE:${card.title||''}\nORG:${card.company||''}\nTEL:${card.phone||''}\nEMAIL:${card.email||''}\nADR:${card.address||''}\nEND:VCARD`;
-        }
-        function downloadVCard() {
-            if (!currentShareCard) return;
-            const blob = new Blob([generateVCard(currentShareCard)], { type: 'text/vcard' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${currentShareCard.name || 'contact'}.vcf`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('已下載 vCard');
-        }
-        function copyVCard() {
-            if (!currentShareCard) return;
-            navigator.clipboard.writeText(generateVCard(currentShareCard)).then(() => showToast('已複製 vCard'));
-        }
-
-        // Camera / Scan
-        async function startScan() { await openScanCamera(); }
-        async function startScanFromModal() { await openScanCamera(); }
-        async function openScanCamera() {
-            document.getElementById('scanModal').classList.add('show');
-            const v = document.getElementById('video');
-            try {
-                v.srcObject = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                videoStream = v.srcObject;
-            } catch(e) {
-                showToast('無法開啟相機：' + e.message);
-                closeScan();
-            }
-        }
-        function closeScan() {
-            document.getElementById('scanModal').classList.remove('show');
-            if (videoStream) { videoStream.getTracks().forEach(t => t.stop()); videoStream = null; }
-            document.getElementById('scanProgress').classList.remove('show');
-        }
-        // ===== Client-side OCR with Tesseract.js =====
-        let tesseractWorker = null;
-
-        async function getTesseractWorker() {
-            if (!tesseractWorker) {
-                tesseractWorker = await Tesseract.createWorker('eng+chi_tra', 1, {
-                    logger: (m) => {
-                        if (m.status === 'recognizing text') {
-                            const pct = Math.round(m.progress * 100);
-                            document.getElementById('scanPercent').textContent = pct + '%';
-                        }
-                    },
-                });
-            }
-            return tesseractWorker;
-        }
-
-        async function runClientOcr(imageDataUrl) {
-            const worker = await getTesseractWorker();
-            const { data: { text } } = await worker.recognize(imageDataUrl);
-            return text;
-        }
-
-        async function captureImage() {
-            const v = document.getElementById('video'), c = document.getElementById('canvas'), ctx = c.getContext('2d');
-            c.width = v.videoWidth; c.height = v.videoHeight;
-            ctx.drawImage(v, 0, 0);
-            closeScan();
-            const progress = document.getElementById('scanProgress'), percent = document.getElementById('scanPercent');
-            progress.classList.add('show');
-            percent.textContent = '0%';
-            try {
-                const imageData = c.toDataURL('image/jpeg');
-                const text = await runClientOcr(imageData);
-                parseCardInfo(text);
-            } catch(e) { showToast('辨識失敗：' + e.message); }
-            progress.classList.remove('show');
-        }
-        function parseCardInfo(text) {
-            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            let name = '', title = '', company = '', phone = '', email = '', address = '';
-            const phoneRegex = /(\+?886|0)[-\s]?[0-9]{1,4}[-\s]?[0-9]{3,4}[-\s]?[0-9]{3,4}/;
-            const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
-            lines.forEach(l => {
-                if (phoneRegex.test(l) && !phone) phone = l.match(phoneRegex)[0];
-                else if (emailRegex.test(l) && !email) email = l.match(emailRegex)[0];
-                else if (!name) name = l;
-                else if (!title) title = l;
-                else if (!company) company = l;
-                else address += l + ' ';
-            });
-            document.getElementById('inputName').value = name;
-            document.getElementById('inputTitle').value = title;
-            document.getElementById('inputCompany').value = company;
-            document.getElementById('inputPhone').value = phone;
-            document.getElementById('inputEmail').value = email;
-            document.getElementById('inputAddress').value = address.trim();
-            showToast('已自動填入名片資訊');
-            document.getElementById('cardModal').classList.add('show');
-        }
-
-        // Telegram Sync
-        function openSyncModal() { document.getElementById('syncModal').classList.add('show'); renderTelegramLink(); }
-        function closeSyncModal() { document.getElementById('syncModal').classList.remove('show'); }
-        function getTelegramLink() { return JSON.parse(localStorage.getItem('telegramLink')) || {}; }
-        function saveTelegramLink(data) { localStorage.setItem('telegramLink', JSON.stringify(data)); }
-        function renderTelegramLink() {
-            const link = getTelegramLink();
-            document.getElementById('telegramStatus').innerHTML = link.username
-                ? `<span style="color:var(--green);font-weight:600;"><i class="fa-solid fa-circle-check" style="margin-right:5px;"></i>@${link.username}</span>`
-                : `<span style="color:var(--text3);">尚未綁定</span>`;
-        }
-        function linkTelegram() {
-            const username = document.getElementById('telegramUsername').value.trim();
-            if (!username) { showToast('請輸入 Telegram 使用者名稱'); return; }
-            saveTelegramLink({ username, linkedAt: new Date().toISOString() });
-            showToast('已綁定 Telegram');
-            renderTelegramLink();
-        }
-        async function syncFromTelegram() {
-            const link = getTelegramLink();
-            if (!link.username) { showToast('請先綁定 Telegram'); return; }
-            showToast('正在同步...');
-            const saved = localStorage.getItem('telegramCards_' + currentUser);
-            if (saved) {
-                const tCards = JSON.parse(saved);
-                if (tCards.length > 0) {
-                    cards = [...tCards, ...cards];
-                    saveUserCards(cards);
-                    renderCards();
-                    updateStats();
-                    showToast('同步了 ' + tCards.length + ' 張名片');
-                } else { showToast('沒有新名片'); }
-            } else { showToast('沒有 Telegram 名片資料'); }
-        }
-
-        // Image compression helper
-        async function compressImage(file, maxWidth = 800, quality = 0.7) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.onload = function() {
-                        const canvas = document.createElement('canvas');
-                        let w = img.width, h = img.height;
-                        if (w > maxWidth) { h = Math.round((maxWidth / w) * h); w = maxWidth; }
-                        canvas.width = w; canvas.height = h;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, w, h);
-                        resolve(canvas.toDataURL('image/jpeg', quality));
-                    };
-                    img.onerror = reject;
-                    img.src = e.target.result;
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
-
-        // Drag & Drop for upload zone
-        function initUploadZone() {
-            const zone = document.getElementById('uploadZone');
-            if (!zone) return;
-            zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
-            zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-            zone.addEventListener('drop', e => {
-                e.preventDefault();
-                zone.classList.remove('drag-over');
-                const file = e.dataTransfer.files[0];
-                if (file && file.type.startsWith('image/')) {
-                    handleFileUpload({ target: { files: [file] } });
-                } else {
-                    showToast('請上傳圖片檔案');
-                }
-            });
-        }
-        document.addEventListener('DOMContentLoaded', function() {
-            initUploadZone();
-            initTheme();
-            renderTagFilterBar();
+        // Sticky nav shadow
+        window.addEventListener('scroll', () => {
+            document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 10);
         });
 
-        async function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            if (!file.type.startsWith('image/')) { showToast('請上傳圖片檔案'); return; }
-            const progress = document.getElementById('scanProgress'), percent = document.getElementById('scanPercent');
-            progress.classList.add('show');
-            percent.textContent = '0%';
-            try {
-                const compressed = await compressImage(file);
-                currentCardImage = compressed;
-                document.getElementById('imagePreview').src = compressed;
-                document.getElementById('imagePreviewContainer').style.display = 'inline-block';
-                const text = await runClientOcr(compressed);
-                parseCardInfo(text);
-                showToast('圖片上傳成功');
-            } catch(e) { showToast('上傳失敗：' + e.message); }
-            progress.classList.remove('show');
-            event.target.value = '';
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('open');
         }
 
-        function clearCardImage() {
-            currentCardImage = null;
-            document.getElementById('imagePreviewContainer').style.display = 'none';
-            document.getElementById('imagePreview').src = '';
-        }
-
-        // ===== vCard Import =====
-        function handleVCardImport(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const text = e.target.result;
-                const card = parseVCard(text);
-                if (!card.name && !card.company) {
-                    showToast('無法解析 vCard，請確認格式');
-                    event.target.value = '';
-                    return;
-                }
-                // Pre-fill form and open modal for new card
-                openModal(); // opens blank modal first
-                setTimeout(function() {
-                    document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-file-import"></i> 匯入vCard';
-                    document.getElementById('inputName').value = card.name || '';
-                    document.getElementById('inputTitle').value = card.title || '';
-                    document.getElementById('inputCompany').value = card.company || '';
-                    document.getElementById('inputPhone').value = card.phone || '';
-                    document.getElementById('inputEmail').value = card.email || '';
-                    document.getElementById('inputAddress').value = card.address || '';
-                    showToast('vCard 已匯入，確認資料後點擊儲存');
-                }, 50);
-            };
-            reader.readAsText(file);
-            event.target.value = '';
-        }
-
-        function parseVCard(vcfText) {
-            var card = { name: '', title: '', company: '', phone: '', email: '', address: '' };
-            var lines = vcfText.split(/\r?\n/);
-            var currentKey = '';
-            for (var i = 0; i < lines.length; i++) {
-                var line = lines[i];
-                // Handle continuation lines that start with space or tab
-                if (/^[ \t]/.test(line) && currentKey) {
-                    // Append to previous field (e.g. ADR or NOTE)
-                    card[currentKey] = (card[currentKey] + ' ' + line.trim()).trim();
-                    continue;
-                }
-                var match = line.match(/^([A-Z0-9-]+)(?::(.*))?$/i);
-                if (!match) continue;
-                var key = match[1].toUpperCase();
-                var rawValue = match[2] || '';
-                // ===== Theme Toggle =====
-        function initTheme() {
-            const saved = localStorage.getItem('theme');
-            if (saved === 'light') {
-                document.documentElement.setAttribute('data-theme', 'light');
-                document.getElementById('themeIcon').className = 'fa-solid fa-sun';
-            } else if (saved === 'dark') {
-                document.documentElement.removeAttribute('data-theme');
-                document.getElementById('themeIcon').className = 'fa-solid fa-moon';
-            } else {
-                // Follow system preference
-                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-                    document.documentElement.setAttribute('data-theme', 'light');
-                    document.getElementById('themeIcon').className = 'fa-solid fa-sun';
-                }
-            }
-        }
-
-        function toggleTheme() {
-            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-            if (isLight) {
-                document.documentElement.removeAttribute('data-theme');
-                localStorage.setItem('theme', 'dark');
-                document.getElementById('themeIcon').className = 'fa-solid fa-moon';
-            } else {
-                document.documentElement.setAttribute('data-theme', 'light');
-                localStorage.setItem('theme', 'light');
-                document.getElementById('themeIcon').className = 'fa-solid fa-sun';
-            }
-        }
-
-        // ===== OCR Confidence Helpers =====
-        function getOCRClass(score) {
-            if (score >= 85) return 'high';
-            if (score >= 75) return 'medium';
-            return 'low';
-        }
-
-        function getOCRConfidenceHTML(score) {
-            const cls = getOCRClass(score);
-            const labels = { high: '高', medium: '中', low: '低' };
-            return `<span class="card-confidence"><span class="ocr-dot ${cls}"></span><span class="ocr-text ${cls}">${score}% ${labels[cls]}</span></span>`;
-        }
-
-        // ===== Tag Color =====
-        const TAG_COLORS = ['tag-blue','tag-yellow','tag-green','tag-purple','tag-red','tag-gray'];
-        function getTagColor(tag) {
-            let hash = 0;
-            for (let i = 0; i < (tag||'').length; i++) hash = tag.charCodeAt(i) + ((hash << 5) - hash);
-            return TAG_COLORS[Math.abs(hash) % TAG_COLORS.length];
-        }
-
-        // ===== Tag Filter Bar =====
-        let activeTag = '全部';
-
-        function getAllTags() {
-            const tagSet = new Set(['全部']);
-            cards.forEach(c => {
-                if (c.tags && Array.isArray(c.tags)) {
-                    c.tags.forEach(t => tagSet.add(t));
-                }
-                if (c.category) tagSet.add(c.category);
-            });
-            return Array.from(tagSet);
-        }
-
-        function renderTagFilterBar() {
-            const scroll = document.getElementById('tagFilterScroll');
-            const moreMenu = document.getElementById('tagMoreMenu');
-            if (!scroll) return;
-            const allTags = getAllTags();
-            const visible = allTags.slice(0, 8);
-            const hidden = allTags.slice(8);
-
-            scroll.innerHTML = allTags.map(tag =>
-                `<button class="tag-filter-btn${tag === activeTag ? ' active' : ''}" onclick="filterByTag('${tag}')" aria-label="篩選：${tag}">${tag}</button>`
-            ).join('');
-
-            if (hidden.length > 0) {
-                document.getElementById('tagFilterMore').style.display = 'flex';
-                moreMenu.innerHTML = hidden.map(tag =>
-                    `<div class="tag-more-item" onclick="filterByTag('${tag}'); toggleTagMoreMenu()">${tag}</div>`
-                ).join('');
-            } else {
-                document.getElementById('tagFilterMore').style.display = 'none';
-            }
-        }
-
-        function toggleTagMoreMenu() {
-            const menu = document.getElementById('tagMoreMenu');
-            menu.classList.toggle('show');
-        }
-
-        function filterByTag(tag) {
-            activeTag = tag;
-            document.querySelectorAll('.tag-filter-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.textContent.trim() === tag);
-            });
-            document.getElementById('tagMoreMenu').classList.remove('show');
-            applyFilters();
-        }
-
-        function applyFilters() {
-            const q = document.getElementById('searchInput').value.toLowerCase();
-            let filtered = cards.filter(c =>
-                (!q || (c.name||'').toLowerCase().includes(q) || (c.company||'').toLowerCase().includes(q) ||
-                 (c.title||'').toLowerCase().includes(q) || (c.email||'').toLowerCase().includes(q)) &&
-                (activeTag === '全部' || (c.tags && c.tags.includes(activeTag)) || c.category === activeTag)
-            );
-            renderFilteredCards(filtered, q);
-        }
-
-        function renderFilteredCards(filtered, q) {
-            const grid = document.getElementById('cardsGrid');
-            const sectionTitle = document.getElementById('cardsSectionTitle');
-            sectionTitle.textContent = q ? `搜尋「${q}」結果（${filtered.length}）` : (activeTag !== '全部' ? `${activeTag}（${filtered.length}）` : `全部名片（${cards.length}）`);
-
-            if (filtered.length === 0) {
-                grid.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-address-card"></i></div><p class="title">${q ? '找不到符合的名片' : '尚無名片'}</p><p>${q ? '嘗試其他關鍵字' : '點擊「新增名片」開始建立'}</p></div>`;
-                return;
-            }
-
-            grid.innerHTML = filtered.map(c => {
-                const name = escapeHtml(c.name || '未命名');
-                const title = escapeHtml(c.title || '');
-                const company = escapeHtml(c.company || '');
-                const email = escapeHtml(c.email || '');
-                const phone = escapeHtml(c.phone || '');
-                const line = escapeHtml(c.line || '');
-                const initials = getInitials(c.name);
-                const color = getAvatarColor(c.name);
-                const thumb = c.image ? `<img src="${c.image}" class="card-image-thumb" alt="名片圖片">` : '';
-                const score = c.ocrConfidence || Math.floor(Math.random() * 20 + 80);
-                const confHTML = getOCRConfidenceHTML(score);
-
-                // Build colorful tags
-                const tagList = (c.tags && c.tags.length) ? c.tags : (c.category ? [c.category] : []);
-                const tagsHTML = tagList.map(t => `<span class="tag-colorful ${getTagColor(t)}">${escapeHtml(t)}</span>`).join('');
-
-                return `<div class="card-item">
-                    <div class="card-avatar" style="background:${color}" aria-label="頭像：${name}">${initials}</div>
-                    <div class="card-body">
-                        <div class="card-name-row">
-                            <span class="card-name">${name}</span>
-                            ${tagsHTML}
-                        </div>
-                        <div class="card-meta">
-                            ${title ? `<div class="card-meta-item"><i class="fa-solid fa-briefcase"></i>${title}</div>` : ''}
-                            ${company ? `<div class="card-meta-item"><i class="fa-solid fa-building"></i>${company}</div>` : ''}
-                            ${phone ? `<div class="card-meta-item"><i class="fa-solid fa-phone"></i>${phone}</div>` : ''}
-                            ${email ? `<div class="card-meta-item"><i class="fa-solid fa-envelope"></i>${email}</div>` : ''}
-                            ${line ? `<div class="card-meta-item"><i class="fa-brands fa-line"></i>${line}</div>` : ''}
-                        </div>
-                    </div>
-                    ${thumb}
-                    ${confHTML}
-                    <div class="card-actions">
-                        <button onclick="editCard('${c.id}')" aria-label="編輯名片：${name}"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button onclick="showShareModal('${c.id}')" aria-label="分享名片：${name}"><i class="fa-solid fa-share-nodes"></i></button>
-                        <button class="btn-delete-action" onclick="deleteCard('${c.id}')" aria-label="刪除名片：${name}"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        // ===== CSV Export =====
-        function exportCSV() {
-            const rows = [['姓名','公司','職稱','電話','Email','LINE','地址','標籤','新增日期','OCR信心']];
-            cards.forEach(c => {
-                const tagList = (c.tags && c.tags.length) ? c.tags.join(';') : (c.category || '');
-                rows.push([
-                    c.name || '', c.company || '', c.title || '', c.phone || '',
-                    c.email || '', c.line || '', c.address || '', tagList,
-                    c.createdAt ? new Date(c.createdAt).toLocaleDateString('zh-TW') : '',
-                    (c.ocrConfidence || '') + '%'
-                ]);
-            });
-            // UTF-8 BOM for Excel compatibility
-            const BOM = '\uFEFF';
-            const csvContent = BOM + rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `名片匯出_${new Date().toISOString().slice(0,10).replace(/-/g,'')}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('CSV 匯出成功！');
-        }
-
-        // Override renderCards to use new filtering
-        function renderCards(filter) {
-            applyFilters();
-        }
-
-        // Override filterCards
-        function filterCards() {
-            applyFilters();
-        }
+        // Close mobile menu on nav link click
+        document.querySelectorAll('.nav-mobile-menu a').forEach(a => {
+            a.addEventListener('click', () => document.getElementById('mobileMenu').classList.remove('open'));
+        });
     </script>
 </body>
 </html>

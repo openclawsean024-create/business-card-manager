@@ -1,0 +1,27 @@
+{
+  "name": "CardScan Pro — AI 名片辨識",
+  "short_name": "CardScan Pro",
+  "description": "AI 智慧名片辨識與管理平台",
+  "start_url": "/app",
+  "display": "standalone",
+  "background_color": "#F9FAFB",
+  "theme_color": "#3B82F6",
+  "orientation": "portrait-primary",
+  "lang": "zh-TW",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%233B82F6'/><text x='96' y='130' font-size='100' text-anchor='middle' fill='white'>📇</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["business", "productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "新增名片",
+      "short_name": "新增",
+      "description": "快速新增名片",
+      "url": "/app"
+    }
+  ]
+}

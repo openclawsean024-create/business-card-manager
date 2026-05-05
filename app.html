@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CardScan Pro — 名片管理後台</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#3B82F6">
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <style>
+        /* ===== Design System — Light Theme (Default per SPEC v2.0) ===== */
+        :root {
+          --primary: #3B82F6;
+          --primary-dark: #2563EB;
+          --primary-light: #DBEAFE;
+          --accent: #EF4444;
+          --accent-light: #FEE2E2;
+          --green: #10B981;
+          --green-light: #D1FAE5;
+          --orange: #F97316;
+          --text: #1F2937;
+          --text2: #374151;
+          --text3: #9CA3AF;
+          --bg: #F9FAFB;
+          --bg2: #F3F4F6;
+          --card: #FFFFFF;
+          --card-hover: #F9FAFB;
+          --border: #E5E7EB;
+          --border-strong: #D1D5DB;
+          --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
+          --shadow-sm: 0 1px 4px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+          --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.05);
+          --shadow-lg: 0 8px 28px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
+          --shadow-fab: 0 4px 16px rgba(59,130,246,0.35);
+          --radius-sm: 6px;
+          --radius-md: 10px;
+          --radius-lg: 14px;
+          --header-bg: #FFFFFF;
+          --header-border: #E5E7EB;
+          --font-main: 'Inter', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        /* Dark theme overrides */
+        [data-theme="dark"] {
+          --primary: #3B82F6;
+          --primary-dark: #2563EB;
+          --primary-light: rgba(59,130,246,0.15);
+          --accent: #EF4444;
+          --accent-light: rgba(239,68,68,0.12);
+          --green: #10B981;
+          --green-light: rgba(16,185,129,0.12);
+          --text: #F0F2F5;
+          --text2: #9CA3AF;
+          --text3: #6B7280;
+          --bg: #0F1117;
+          --bg2: #161B27;
+          --card: #1A1F2E;
+          --card-hover: #232A3B;
+          --border: #2A2F3C;
+          --border-strong: #3A4050;
+          --shadow-xs: 0 1px 2px rgba(0,0,0,0.4);
+          --shadow-sm: 0 1px 4px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.25);
+          --shadow-md: 0 4px 12px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.25);
+          --shadow-lg: 0 8px 28px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3);
+          --shadow-fab: 0 4px 16px rgba(59,130,246,0.4);
+          --header-bg: #1A1F2E;
+          --header-border: #2A2F3C;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+          font-family: var(--font-main);
+          background: var(--bg);
+          color: var(--text);
+          min-height: 100vh;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+        *, *::before, *::after { transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease; }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+        :focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+        /* ===== Login Screen ===== */
+        .login-screen {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 100vh;
+          padding: 20px;
+          background: linear-gradient(145deg, #EFF6FF 0%, #F9FAFB 50%, #EFF6FF 100%);
+        }
+        [data-theme="dark"] .login-screen {
+          background: linear-gradient(145deg, #1A1F2E 0%, #0F1117 50%, #1A1F2E 100%);
+        }
+        .login-screen.hidden { display: none; }
+        .login-box {
+          background: var(--card);
+          border-radius: var(--radius-lg);
+          padding: 44px 40px;
+          width: 100%;
+          max-width: 420px;
+          box-shadow: var(--shadow-lg);
+          border: 1px solid var(--border);
+        }
+        .login-logo {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 8px;
+        }
+        .login-logo-icon {
+          width: 42px;
+          height: 42px;
+          background: var(--primary);
+          border-radius: var(--radius-md);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #fff;
+          font-size: 18px;
+        }
+        .login-logo-text {
+          font-size: 20px;
+          font-weight: 700;
+          color: var(--text);
+          letter-spacing: -0.3px;
+        }
+        .login-subtitle {
+          color: var(--text3);
+          font-size: 13px;
+          margin-bottom: 28px;
+          padding-left: 54px;
+          letter-spacing: 0.2px;
+        }
+        .login-home-link {
+          display: block;
+          text-align: center;
+          margin-top: 20px;
+          font-size: 13px;
+          color: var(--text3);
+          text-decoration: none;
+        }
+        .login-home-link:hover { color: var(--primary); }
+        .login-tabs {
+          display: flex;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-md);
+          overflow: hidden;
+          margin-bottom: 28px;
+        }
+        .login-tabs button {
+          flex: 1;
+          padding: 11px;
+          border: none;
+          background: transparent;
+          font-size: 13.5px;
+          font-weight: 500;
+          cursor: pointer;
+          color: var(--text2);
+          font-family: inherit;
+          transition: all 0.15s;
+        }
+        .login-tabs button.active {
+          background: var(--primary);
+          color: #fff;
+        }
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+          display: block;
+          font-size: 12px;
+          font-weight: 600;
+          color: var(--text3);
+          margin-bottom: 6px;
+          letter-spacing: 0.5px;
+          text-transform: uppercase;
+        }
+        .form-group input, .form-group select {
+          width: 100%;
+          padding: 11px 14px;
+          border: 1.5px solid var(--border);
+          border-radius: var(--radius-sm);
+          font-size: 14px;
+          font-family: inherit;
+          background: var(--card);
+          color: var(--text);
+          transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .form-group input:focus, .form-group select:focus {
+          outline: none;
+          border-color: var(--primary);
+          box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+        }
+        .form-group input::placeholder { color: var(--text3); }
+        .btn { width: 100%; padding: 12px 20px; border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; letter-spacing: 0.2px; transition: all 0.15s; }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-accent { background: var(--accent); color: #fff; }
+        .btn-accent:hover { background: #DC2626; }
+        .btn-ghost { background: var(--bg); color: var(--text2); border: 1px solid var(--border); }
+        .btn-ghost:hover { background: var(--bg2); }
+        .error-msg { color: var(--accent); font-size: 12px; margin-top: 6px; display: none; font-weight: 500; }
+        .error-msg.show { display: block; }
+
+        /* ===== Header ===== */
+        .header {
+          background: var(--header-bg);
+          border-bottom: 1px solid var(--header-border);
+          padding: 0 24px;
+          height: 60px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          position: sticky;
+          top: 0;
+          z-index: 50;
+          box-shadow: var(--shadow-xs);
+        }
+        .header.hidden { display: none; }
+        .header-left { display: flex; align-items: center; gap: 14px; }
+        .header-logo {
+          width: 34px;
+          height: 34px;
+          background: var(--primary);
+          border-radius: var(--radius-sm);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #fff;
+          font-size: 16px;
+          flex-shrink: 0;
+        }
+        .header-title {
+          font-size: 15px;
+          font-weight: 700;
+          color: var(--text);
+          letter-spacing: -0.2px;
+        }
+        .header-right { display: flex; align-items: center; gap: 8px; }
+        .header-user {
+          font-size: 13px;
+          color: var(--text2);
+          margin-right: 4px;
+        }
+        .header-btn {
+          padding: 7px 14px;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-sm);
+          background: transparent;
+          font-size: 12.5px;
+          font-weight: 500;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          color: var(--text2);
+          font-family: inherit;
+          transition: all 0.15s;
+          text-decoration: none;
+        }
+        .header-btn:hover { background: var(--bg2); border-color: var(--border-strong); color: var(--text); }
+        .header-btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .header-btn.primary:hover { background: var(--primary-dark); }
+        .header-btn.theme-toggle { cursor: pointer; font-size: 15px; padding: 7px 10px; }
+        .header-btn.theme-toggle:hover { background: var(--bg2); }
+
+        /* ===== Container ===== */
+        .container { max-width: 1100px; margin: 0 auto; padding: 28px 24px 120px; }
+        .container.hidden { display: none; }
+
+        /* ===== Toolbar ===== */
+        .toolbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          margin-bottom: 24px;
+          flex-wrap: wrap;
+        }
+        .search-box {
+          background: var(--card);
+          border: 1.5px solid var(--border);
+          border-radius: var(--radius-md);
+          padding: 10px 14px;
+          display: flex;
+          gap: 8px;
+          flex: 1;
+          min-width: 240px;
+          max-width: 480px;
+          box-shadow: var(--shadow-xs);
+          transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .search-box:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+        .search-box input {
+          flex: 1;
+          border: none;
+          outline: none;
+          font-size: 13.5px;
+          font-family: inherit;
+          color: var(--text);
+          background: transparent;
+        }
+        .search-box input::placeholder { color: var(--text3); }
+        .search-box i { color: var(--text3); font-size: 13px; align-self: center; }
+        .toolbar-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .toolbar-btn {
+          padding: 9px 16px;
+          border: 1.5px solid var(--border);
+          border-radius: var(--radius-sm);
+          background: var(--card);
+          font-size: 13px;
+          font-weight: 500;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          color: var(--text2);
+          font-family: inherit;
+          box-shadow: var(--shadow-xs);
+          transition: all 0.15s;
+        }
+        .toolbar-btn:hover { background: var(--bg2); border-color: var(--border-strong); color: var(--text); }
+        .toolbar-btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: var(--shadow-sm); }
+        .toolbar-btn.primary:hover { background: var(--primary-dark); border-color: var(--primary-dark); }
+
+        /* ===== Tag Filter Bar ===== */
+        .tag-filter-bar {
+          display: none;
+          align-items: center;
+          background: var(--header-bg);
+          border-bottom: 1px solid var(--border);
+          padding: 0 24px;
+          position: sticky;
+          top: 60px;
+          z-index: 45;
+          overflow: hidden;
+        }
+        .tag-filter-scroll {
+          display: flex;
+          align-items: center;
+          gap: 0;
+          overflow-x: auto;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+          flex: 1;
+          padding: 10px 0;
+        }
+        .tag-filter-scroll::-webkit-scrollbar { display: none; }
+        .tag-filter-btn {
+          flex-shrink: 0;
+          padding: 6px 14px;
+          border: none;
+          background: transparent;
+          font-size: 13px;
+          font-weight: 500;
+          color: var(--text2);
+          cursor: pointer;
+          font-family: inherit;
+          border-bottom: 2px solid transparent;
+          margin-bottom: -1px;
+          white-space: nowrap;
+          transition: all 0.15s;
+        }
+        .tag-filter-btn.active {
+          color: var(--primary);
+          border-bottom-color: var(--primary);
+          font-weight: 600;
+        }
+        .tag-filter-btn:hover:not(.active) { color: var(--text); }
+        .tag-filter-more {
+          flex-shrink: 0;
+          width: 32px;
+          height: 32px;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-sm);
+          background: transparent;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          color: var(--text2);
+          margin-left: 8px;
+        }
+        .tag-filter-more:hover { background: var(--bg2); }
+        .tag-more-menu {
+          display: none;
+          position: fixed;
+          top: 120px;
+          right: 24px;
+          background: var(--card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-md);
+          box-shadow: var(--shadow-lg);
+          z-index: 300;
+          min-width: 160px;
+          overflow: hidden;
+        }
+        .tag-more-menu.show { display: block; }
+        .tag-more-item {
+          padding: 10px 14px;
+          font-size: 13px;
+          color: var(--text2);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          transition: background 0.1s;
+        }
+        .tag-more-item:hover { background: var(--bg2); color: var(--text); }
+
+        /* ===== OCR Confidence ===== */
+        .ocr-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .ocr-dot.high { background: var(--green); }
+        .ocr-dot.medium { background: #F59E0B; }
+        .ocr-dot.low { background: var(--accent); }
+        .ocr-text.high { color: var(--green); }
+        .ocr-text.medium { color: #F59E0B; }
+        .ocr-text.low { color: var(--accent); }
+        .card-confidence {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 11px;
+          font-weight: 600;
+          margin-left: auto;
+          flex-shrink: 0;
+        }
+
+        /* ===== Colorful Tags ===== */
+        .tag-colorful {
+          display: inline-flex;
+          align-items: center;
+          padding: 2px 8px;
+          border-radius: 6px;
+          font-size: 11px;
+          font-weight: 500;
+          height: 22px;
+        }
+        .tag-blue { background: #DBEAFE; color: #2563EB; }
+        .tag-yellow { background: #FEF3C7; color: #D97706; }
+        .tag-green { background: #D1FAE5; color: #059669; }
+        .tag-purple { background: #EDE9FE; color: #7C3AED; }
+        .tag-red { background: #FEE2E2; color: #DC2626; }
+        .tag-gray { background: #F3F4F6; color: #6B7280; }
+        [data-theme="dark"] .tag-blue { background: rgba(37,99,235,0.2); color: #60A5FA; }
+        [data-theme="dark"] .tag-yellow { background: rgba(245,158,11,0.2); color: #FCD34D; }
+        [data-theme="dark"] .tag-green { background: rgba(16,185,129,0.2); color: #34D399; }
+        [data-theme="dark"] .tag-purple { background: rgba(139,92,246,0.2); color: #A78BFA; }
+        [data-theme="dark"] .tag-red { background: rgba(239,68,68,0.2); color: #F87171; }
+        [data-theme="dark"] .tag-gray { background: rgba(100,116,139,0.2); color: #94A3B8; }
+
+        /* ===== Stats Row ===== */
+        .stats-row {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
+          margin-bottom: 28px;
+        }
+        .stat-card {
+          background: var(--card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-md);
+          padding: 20px 22px;
+          box-shadow: var(--shadow-xs);
+          display: flex;
+          align-items: center;
+          gap: 16px;
+        }
+        .stat-icon {
+          width: 42px;
+          height: 42px;
+          border-radius: var(--radius-sm);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+          flex-shrink: 0;
+        }
+        .stat-icon.blue { background: var(--primary-light); color: var(--primary); }
+        .stat-icon.green { background: var(--green-light); color: var(--green); }
+        .stat-icon.orange { background: #FEF3C7; color: #D97706; }
+        [data-theme="dark"] .stat-icon.orange { background: rgba(245,158,11,0.15); color: #F59E0B; }
+        .stat-info .stat-num { font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; line-height: 1; }
+        .stat-info .stat-label { font-size: 12px; color: var(--text3); margin-top: 4px; font-weight: 500; }
+
+        /* ===== Section Header ===== */
+        .section-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 14px;
+        }
+        .section-title { font-size: 12px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.8px; }
+
+        /* ===== Cards List ===== */
+        .cards-list { display: flex; flex-direction: column; gap: 10px; }
+        .card-item {
+          background: var(--card);
+          border: 1px solid var(--border);
+          border-left: 3px solid var(--primary);
+          border-radius: var(--radius-md);
+          padding: 18px 20px;
+          box-shadow: var(--shadow-xs);
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          transition: box-shadow 0.15s, border-color 0.15s;
+        }
+        .card-item:hover { border-color: var(--primary); box-shadow: var(--shadow-sm); }
+        .card-avatar {
+          width: 42px;
+          height: 42px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          font-size: 15px;
+          color: #fff;
+          flex-shrink: 0;
+          letter-spacing: -0.3px;
+        }
+        .card-body { flex: 1; min-width: 0; }
+        .card-name-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+        .card-name { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
+        .card-meta { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+        .card-meta-item { display: flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--text2); }
+        .card-meta-item i { width: 13px; text-align: center; color: var(--text3); font-size: 11px; }
+        .card-image-thumb {
+          width: 60px;
+          height: 40px;
+          object-fit: cover;
+          border-radius: var(--radius-sm);
+          border: 1px solid var(--border);
+          flex-shrink: 0;
+        }
+        .card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .card-actions button {
+          width: 34px;
+          height: 34px;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-sm);
+          background: transparent;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12.5px;
+          color: var(--text2);
+          transition: all 0.15s;
+        }
+        .card-actions button:hover { background: var(--bg2); color: var(--text); border-color: var(--border-strong); }
+        .card-actions .btn-delete-action:hover { background: var(--accent-light); color: var(--accent); border-color: #FECACA; }
+
+        /* ===== FAB ===== */
+        .fab {
+          position: fixed;
+          bottom: 24px;
+          right: 24px;
+          width: 56px;
+          height: 56px;
+          background: var(--primary);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 24px;
+          color: #fff;
+          box-shadow: var(--shadow-fab);
+          cursor: pointer;
+          z-index: 100;
+          border: none;
+          transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+        }
+        .fab:hover { background: var(--primary-dark); box-shadow: 0 6px 24px rgba(59,130,246,0.45); transform: scale(1.08); }
+        .fab:active { transform: scale(0.96); }
+        .fab.hidden { display: none; }
+
+        /* ===== Modal & Bottom Sheet ===== */
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+        .modal.show { display: flex; }
+        .modal.bottom-sheet { align-items: flex-end; padding: 0; }
+        .modal.bottom-sheet .modal-content {
+          border-radius: 20px 20px 0 0;
+          max-width: 100%;
+          max-height: 92vh;
+          padding: 12px 24px 36px;
+          animation: sheetIn 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        @keyframes sheetIn { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .sheet-handle {
+          width: 40px;
+          height: 4px;
+          border-radius: 2px;
+          background: var(--border-strong);
+          margin: 0 auto 20px;
+          cursor: grab;
+        }
+        .modal-content {
+          background: var(--card);
+          border-radius: var(--radius-lg);
+          padding: 32px;
+          width: 100%;
+          max-width: 540px;
+          max-height: 90vh;
+          overflow-y: auto;
+          box-shadow: var(--shadow-lg);
+          border: 1px solid var(--border);
+          animation: modalIn 0.22s cubic-bezier(0.34, 1.4, 0.64, 1);
+        }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+        .modal-header h2 { font-size: 16px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+        .modal-header h2 i { color: var(--primary); }
+        .modal-close {
+          width: 30px;
+          height: 30px;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-sm);
+          background: transparent;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+          color: var(--text2);
+          transition: all 0.15s;
+        }
+        .modal-close:hover { background: var(--bg2); color: var(--text); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+        .modal-actions button { flex: 1; padding: 12px; border: none; border-radius: var(--radius-sm); font-size: 13.5px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+        .btn-save { background: var(--primary); color: #fff; }
+        .btn-save:hover { background: var(--primary-dark); }
+        .btn-cancel { background: var(--bg2); color: var(--text2); border: 1px solid var(--border); }
+        .btn-cancel:hover { background: var(--bg2); color: var(--text); }
+
+        /* ===== Upload Zone ===== */
+        .upload-zone {
+          border: 2px dashed var(--border-strong);
+          border-radius: var(--radius-lg);
+          padding: 28px 20px;
+          text-align: center;
+          cursor: pointer;
+          background: var(--bg);
+          margin-top: 4px;
+          transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+          position: relative;
+        }
+        .upload-zone:hover, .upload-zone.drag-over {
+          border-color: var(--primary);
+          background: var(--primary-light);
+          box-shadow: 0 0 0 4px rgba(59,130,246,0.08);
+        }
+        .upload-zone-icon { font-size: 32px; color: var(--text3); margin-bottom: 10px; }
+        .upload-zone:hover .upload-zone-icon { color: var(--primary); }
+        .upload-zone-text { font-size: 14px; font-weight: 500; color: var(--text2); }
+        .upload-zone-text span { color: var(--primary); text-decoration: underline; }
+        .upload-zone-hint { font-size: 12px; color: var(--text3); margin-top: 6px; }
+        .upload-zone-divider { display: flex; align-items: center; gap: 12px; margin: 14px 0; color: var(--text3); font-size: 12px; }
+        .upload-zone-divider::before, .upload-zone-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+        .upload-zone-actions { display: flex; gap: 10px; justify-content: center; }
+        .upload-zone-actions button {
+          flex: 0 0 auto;
+          padding: 9px 18px;
+          border: 1.5px solid var(--border);
+          border-radius: var(--radius-sm);
+          background: var(--card);
+          font-size: 13px;
+          font-weight: 500;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          color: var(--text2);
+          font-family: inherit;
+          transition: all 0.15s;
+        }
+        .upload-zone-actions button:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+        .upload-zone-actions .btn-camera:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+        #fileUpload { display: none; }
+        #imagePreviewContainer { display: none; margin-top: 14px; }
+        .image-preview-wrap { position: relative; display: inline-block; }
+        .image-preview-wrap img { display: block; max-width: 100%; max-height: 200px; border-radius: var(--radius-md); border: 1px solid var(--border); }
+        .image-preview-wrap .remove-img {
+          position: absolute; top: -10px; right: -10px;
+          width: 26px; height: 26px;
+          background: var(--accent); color: #fff;
+          border: none; border-radius: 50%; font-size: 13px; cursor: pointer;
+          display: flex; align-items: center; justify-content: center;
+          box-shadow: var(--shadow-sm);
+        }
+
+        /* ===== Scan Modal ===== */
+        .scan-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 300; }
+        .scan-modal.show { display: block; }
+        .scan-view { width: 100%; height: 100%; position: relative; }
+        .scan-view video { width: 100%; height: 100%; object-fit: cover; }
+        /* Fixed to 3.5:2 standard business card ratio */
+        .scan-frame {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: min(80vw, 360px);
+          aspect-ratio: 1.75 / 1;
+          border: 2px solid rgba(255,255,255,0.6);
+          border-radius: 8px;
+        }
+        .scan-corner { position: absolute; width: 24px; height: 24px; border-color: #fff; border-style: solid; }
+        .scan-corner.tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
+        .scan-corner.tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; border-radius: 0 4px 0 0; }
+        .scan-corner.bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; border-radius: 0 0 0 4px; }
+        .scan-corner.br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
+        .scan-hint { position: absolute; bottom: 140px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.85); font-size: 13px; white-space: nowrap; letter-spacing: 0.3px; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+        .scan-buttons { position: absolute; bottom: 48px; left: 0; right: 0; display: flex; justify-content: center; gap: 20px; align-items: center; }
+        .scan-btn { width: 64px; height: 64px; border-radius: 50%; border: 2.5px solid rgba(255,255,255,0.5); background: transparent; cursor: pointer; }
+        .scan-btn.capture { width: 74px; height: 74px; background: #fff; border-color: #fff; }
+        .scan-btn.close-btn { position: absolute; top: 20px; left: 20px; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.45); color: #fff; border: none; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        .scan-progress { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.92); z-index: 350; align-items: center; justify-content: center; flex-direction: column; color: #fff; }
+        .scan-progress.show { display: flex; }
+        .scan-progress .spinner { width: 52px; height: 52px; border: 3px solid rgba(255,255,255,0.15); border-top-color: #3B82F6; border-radius: 50%; animation: spin 0.9s linear infinite; }
+        .scan-progress .text { margin-top: 18px; font-size: 14px; color: rgba(255,255,255,0.7); }
+        .scan-progress .percent { margin-top: 10px; font-size: 28px; font-weight: 700; color: #fff; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ===== Share Modal ===== */
+        .share-qr { display: flex; justify-content: center; margin: 20px 0; }
+        .share-qr canvas, .share-qr img { width: 200px !important; height: 200px !important; border-radius: var(--radius-md); }
+        .share-actions { display: flex; gap: 10px; justify-content: center; margin-top: 16px; }
+        .share-actions button { flex: 1; max-width: 160px; padding: 11px; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; transition: all 0.15s; }
+        .btn-download { background: var(--primary); color: #fff; }
+        .btn-download:hover { background: var(--primary-dark); }
+        .btn-copy { background: var(--bg2); color: var(--text2); border: 1px solid var(--border); }
+        .btn-copy:hover { background: var(--bg2); color: var(--text); }
+
+        /* ===== Sync Modal ===== */
+        .sync-info-block { background: var(--bg); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px; border: 1px solid var(--border); }
+        .sync-info-block .row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; color: var(--text2); }
+        .sync-info-block .row:last-child { margin-bottom: 0; }
+        .sync-info-block .row i { width: 14px; text-align: center; color: var(--text3); }
+        .sync-divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+        /* ===== Empty State ===== */
+        .empty-state { text-align: center; padding: 80px 20px; color: var(--text3); }
+        .empty-icon {
+          width: 64px; height: 64px;
+          background: var(--bg2); border-radius: var(--radius-md);
+          display: flex; align-items: center; justify-content: center;
+          margin: 0 auto 18px; font-size: 26px; color: var(--text3);
+          border: 1.5px dashed var(--border-strong);
+        }
+        .empty-state p { font-size: 14px; }
+        .empty-state p.title { font-size: 15px; font-weight: 600; color: var(--text2); margin-bottom: 4px; }
+
+        /* ===== Toast ===== */
+        .toast {
+          position: fixed; bottom: 96px; left: 50%;
+          transform: translateX(-50%) translateY(80px);
+          background: var(--card); color: var(--text);
+          padding: 12px 22px; border-radius: var(--radius-md);
+          font-size: 13px; opacity: 0;
+          transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+          z-index: 400; box-shadow: var(--shadow-lg);
+          pointer-events: none; display: flex; align-items: center; gap: 8px;
+          white-space: nowrap; border: 1px solid var(--border);
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* ===== Upgrade Badge ===== */
+        .upgrade-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          padding: 4px 10px;
+          background: linear-gradient(135deg, #F97316, #EF4444);
+          color: #fff;
+          border-radius: 100px;
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.3px;
+          cursor: pointer;
+          transition: opacity 0.15s;
+        }
+        .upgrade-badge:hover { opacity: 0.9; }
+
+        /* ===== Mobile ===== */
+        @media (max-width: 700px) {
+          .cards-list { gap: 8px; }
+          .card-item { flex-wrap: wrap; padding: 14px 16px; }
+          .card-body { flex: 1 0 calc(100% - 66px); }
+          .card-image-thumb { display: none; }
+          .card-actions { margin-left: 0; width: 100%; justify-content: flex-end; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+          .stats-row { grid-template-columns: 1fr; gap: 10px; }
+          .form-row { grid-template-columns: 1fr; }
+          .toolbar { flex-direction: column; align-items: stretch; }
+          .search-box { max-width: 100%; }
+          .toolbar-right { justify-content: flex-end; flex-wrap: wrap; }
+          .login-box { padding: 32px 24px; }
+          .login-subtitle { padding-left: 0; }
+          .modal-content { padding: 24px 18px; }
+          .header-user { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== Login Screen ===== -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <div class="login-logo">
+                <div class="login-logo-icon"><i class="fa-solid fa-id-card"></i></div>
+                <span class="login-logo-text">CardScan Pro</span>
+            </div>
+            <p class="login-subtitle">專業 AI 名片管理平台</p>
+            <div class="login-tabs">
+                <button class="active" id="tabLogin" onclick="showTab('login')">登入</button>
+                <button id="tabRegister" onclick="showTab('register')">註冊</button>
+            </div>
+            <div id="loginForm">
+                <div class="form-group"><label>帳號</label><input type="text" id="loginUsername" placeholder="輸入帳號" autocomplete="username"></div>
+                <div class="form-group"><label>密碼</label><input type="password" id="loginPassword" placeholder="輸入密碼" autocomplete="current-password"></div>
+                <div class="error-msg" id="loginError"></div>
+                <button class="btn btn-primary" onclick="login()"><i class="fa-solid fa-arrow-right-to-bracket" style="margin-right:6px;"></i>登入</button>
+            </div>
+            <div id="registerForm" style="display:none;">
+                <div class="form-group"><label>帳號</label><input type="text" id="regUsername" placeholder="設定帳號" autocomplete="username"></div>
+                <div class="form-group"><label>密碼</label><input type="password" id="regPassword" placeholder="設定密碼（至少 6 碼）" autocomplete="new-password"></div>
+                <div class="form-group"><label>確認密碼</label><input type="password" id="regConfirm" placeholder="再次輸入密碼" autocomplete="new-password"></div>
+                <div class="error-msg" id="regError"></div>
+                <button class="btn btn-primary" onclick="register()"><i class="fa-solid fa-user-plus" style="margin-right:6px;"></i>註冊</button>
+            </div>
+            <a class="login-home-link" href="/"><i class="fa-solid fa-arrow-left" style="margin-right:5px;font-size:11px;"></i>回到首頁</a>
+        </div>
+    </div>
+
+    <!-- ===== App Header ===== -->
+    <div class="header hidden" id="header">
+        <div class="header-left">
+            <a href="/" style="text-decoration:none;display:flex;align-items:center;gap:14px;">
+                <div class="header-logo"><i class="fa-solid fa-id-card"></i></div>
+                <span class="header-title">CardScan Pro</span>
+            </a>
+        </div>
+        <div class="header-right">
+            <span class="header-user" id="welcomeUser"></span>
+            <span class="upgrade-badge" onclick="alert('即將推出！敬請期待企業版功能。')"><i class="fa-solid fa-crown"></i> 升級專業版</span>
+            <button class="header-btn theme-toggle" id="themeToggleBtn" onclick="toggleTheme()" aria-label="切換主題"><i class="fa-solid fa-moon" id="themeIcon"></i></button>
+            <button class="header-btn" onclick="openSyncModal()" aria-label="Telegram 同步"><i class="fa-brands fa-telegram" style="font-size:12px;"></i> 同步</button>
+            <button class="header-btn" onclick="logout()" aria-label="登出"><i class="fa-solid fa-arrow-right-from-bracket" style="font-size:12px;"></i> 登出</button>
+        </div>
+    </div>
+
+    <!-- Tag Filter Bar -->
+    <div class="tag-filter-bar" id="tagFilterBar">
+        <div class="tag-filter-scroll" id="tagFilterScroll"></div>
+        <button class="tag-filter-more" id="tagFilterMore" onclick="toggleTagMoreMenu()" aria-label="更多標籤"><i class="fa-solid fa-ellipsis"></i></button>
+    </div>
+    <div class="tag-more-menu" id="tagMoreMenu"></div>
+
+    <!-- ===== Main Content ===== -->
+    <div class="container hidden" id="mainContent">
+        <div class="toolbar">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="搜尋姓名、公司、職稱..." oninput="applyFilters()">
+            </div>
+            <div class="toolbar-right">
+                <button class="toolbar-btn primary" onclick="openModal()" aria-label="新增名片"><i class="fa-solid fa-plus" style="font-size:12px;"></i> 新增名片</button>
+                <button class="toolbar-btn" onclick="startScan()" aria-label="掃描名片"><i class="fa-solid fa-camera" style="font-size:12px;"></i> 掃描</button>
+                <button class="toolbar-btn" onclick="exportCSV()" aria-label="匯出 CSV"><i class="fa-solid fa-file-csv" style="font-size:12px;"></i> CSV</button>
+                <button class="toolbar-btn" onclick="document.getElementById('vcfUpload').click()" aria-label="匯入 vCard"><i class="fa-solid fa-file-import" style="font-size:12px;"></i> 匯入</button>
+            </div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="fa-solid fa-id-card"></i></div>
+                <div class="stat-info"><div class="stat-num" id="totalCount">0</div><div class="stat-label">總名片數</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="fa-solid fa-building"></i></div>
+                <div class="stat-info"><div class="stat-num" id="companyCount">0</div><div class="stat-label">公司數</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange"><i class="fa-solid fa-calendar-plus"></i></div>
+                <div class="stat-info"><div class="stat-num" id="thisMonth">0</div><div class="stat-label">本月新增</div></div>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <span class="section-title" id="cardsSectionTitle">全部名片</span>
+        </div>
+        <div class="cards-list" id="cardsGrid">
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fa-solid fa-address-card"></i></div>
+                <p class="title">尚無名片</p>
+                <p>點擊「新增名片」開始建立，或使用「掃描」透過相機讀取</p>
+            </div>
+        </div>
+    </div>
+
+    <button class="fab hidden" id="addBtn" aria-label="新增名片" onclick="openModal()"><i class="fa-solid fa-plus"></i></button>
+    <div class="toast" id="toast"></div>
+
+    <!-- ===== Share Modal ===== -->
+    <div class="modal" id="shareModal">
+        <div class="modal-content" style="text-align:center; max-width:420px;">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-share-nodes"></i> 分享名片</h2>
+                <button class="modal-close" onclick="closeShare()" aria-label="關閉">×</button>
+            </div>
+            <div id="qrContainer" class="share-qr"></div>
+            <div class="share-actions">
+                <button class="btn-download" onclick="downloadVCard()"><i class="fa-solid fa-download"></i> 下載 vCard</button>
+                <button class="btn-copy" onclick="copyVCard()"><i class="fa-regular fa-copy"></i> 複製</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Card Modal (Bottom Sheet) ===== -->
+    <div class="modal bottom-sheet" id="cardModal">
+        <div class="modal-content">
+            <div class="sheet-handle" id="sheetHandle"></div>
+            <div class="modal-header">
+                <h2 id="modalTitle"><i class="fa-solid fa-pen-to-square"></i> 新增名片</h2>
+                <button class="modal-close" onclick="closeModal()" aria-label="關閉">×</button>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>姓名 *</label><input type="text" id="inputName" placeholder="王大明"></div>
+                <div class="form-group"><label>職稱</label><input type="text" id="inputTitle" placeholder="業務經理"></div>
+            </div>
+            <div class="form-group"><label>公司</label><input type="text" id="inputCompany" placeholder="ABC 股份有限公司"></div>
+            <div class="form-row">
+                <div class="form-group"><label>電話</label><input type="tel" id="inputPhone" placeholder="+886 912 345 678"></div>
+                <div class="form-group"><label>Email</label><input type="email" id="inputEmail" placeholder="example@company.com"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>LINE</label><input type="text" id="inputLine" placeholder="lineid"></div>
+                <div class="form-group"><label>分類</label>
+                    <select id="inputCategory">
+                        <option value="客戶">客戶</option>
+                        <option value="供應商">供應商</option>
+                        <option value="同事">同事</option>
+                        <option value="潛在客戶">潛在客戶</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group"><label>地址</label><input type="text" id="inputAddress" placeholder="台北市信義區忠孝東路一段"></div>
+            <div id="imagePreviewContainer">
+                <div class="image-preview-wrap">
+                    <img id="imagePreview" alt="名片圖片" />
+                    <button class="remove-img" onclick="clearCardImage()" aria-label="移除圖片">×</button>
+                </div>
+            </div>
+            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileUpload').click()">
+                <div class="upload-zone-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                <div class="upload-zone-text">拖放圖片到此處，或 <span>點擊上傳</span></div>
+                <div class="upload-zone-hint">支援 JPG、PNG，檔案大小上限 10MB</div>
+                <div class="upload-zone-divider">或</div>
+                <div class="upload-zone-actions">
+                    <button class="btn-camera" onclick="event.stopPropagation(); startScanFromModal()"><i class="fa-solid fa-camera"></i> 相機掃描</button>
+                    <button onclick="event.stopPropagation(); document.getElementById('fileUpload').click()"><i class="fa-solid fa-image"></i> 從相簿選擇</button>
+                </div>
+            </div>
+            <input type="file" id="fileUpload" accept="image/*" onchange="handleFileUpload(event)">
+            <input type="file" id="vcfUpload" accept=".vcf,text/vcard" onchange="handleVCardImport(event)" style="display:none;">
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal()">取消</button>
+                <button class="btn-save" onclick="saveCard()"><i class="fa-solid fa-floppy-disk" style="margin-right:5px;"></i>儲存名片</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Scan Modal ===== -->
+    <div class="scan-modal" id="scanModal">
+        <div class="scan-view">
+            <video id="video" autoplay playsinline></video>
+            <canvas id="canvas" style="display:none;"></canvas>
+            <div class="scan-frame">
+                <div class="scan-corner tl"></div>
+                <div class="scan-corner tr"></div>
+                <div class="scan-corner bl"></div>
+                <div class="scan-corner br"></div>
+            </div>
+            <div class="scan-hint">將名片置於框內，保持光線充足</div>
+            <div class="scan-buttons">
+                <button class="scan-btn close-btn" onclick="closeScan()" aria-label="關閉相機">×</button>
+                <button class="scan-btn capture" onclick="captureImage()" aria-label="拍攝名片"></button>
+            </div>
+        </div>
+    </div>
+    <div class="scan-progress" id="scanProgress">
+        <div class="spinner"></div>
+        <div class="text">AI 正在辨識名片...</div>
+        <div class="percent" id="scanPercent">0%</div>
+    </div>
+
+    <!-- ===== Sync Modal ===== -->
+    <div class="modal" id="syncModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fa-brands fa-telegram" style="color:#229ED9;"></i> Telegram 同步</h2>
+                <button class="modal-close" onclick="closeSyncModal()" aria-label="關閉">×</button>
+            </div>
+            <div style="font-size:14px;color:var(--text2);margin-bottom:16px;line-height:1.6;">
+                綁定 Telegram Bot，可將名片照片自動辨識並同步至此帳戶。
+            </div>
+            <div class="sync-info-block">
+                <div class="row"><i class="fa-solid fa-link"></i><span>綁定狀態：</span><span id="telegramStatus">載入中...</span></div>
+            </div>
+            <div class="form-group"><label>Telegram 使用者名稱</label>
+                <input type="text" id="telegramUsername" placeholder="輸入 @username（不含 @）">
+            </div>
+            <button class="btn btn-primary" onclick="linkTelegram()"><i class="fa-solid fa-link" style="margin-right:6px;"></i>綁定帳戶</button>
+            <hr class="sync-divider">
+            <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:12px;">同步名片</div>
+            <button class="btn btn-accent" onclick="syncFromTelegram()"><i class="fa-solid fa-rotate" style="margin-right:6px;"></i>從 Telegram 同步名片</button>
+            <div style="font-size:12px;color:var(--text3);margin-top:12px;">
+                或在 Telegram 搜尋 <b>@CardScanProBot</b> 上傳名片照片
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null, cards = [], editingId = null, videoStream = null, currentCardImage = null;
+
+        // ===== Data Storage =====
+        function getUsers() { return JSON.parse(localStorage.getItem('cardUsers')) || {}; }
+        function saveUsers(u) { localStorage.setItem('cardUsers', JSON.stringify(u)); }
+        function getUserCards() {
+            if (!currentUser) return [];
+            return (JSON.parse(localStorage.getItem('businessCards')) || {})[currentUser] || [];
+        }
+        function saveUserCards(c) {
+            if (!currentUser) return;
+            const all = JSON.parse(localStorage.getItem('businessCards')) || {};
+            all[currentUser] = c;
+            try { localStorage.setItem('businessCards', JSON.stringify(all)); }
+            catch (e) {
+                if (e.name === 'QuotaExceededError') showToast('儲存空間已滿，請移除部分名片圖片');
+                else showToast('儲存失敗：' + e.message);
+            }
+        }
+
+        // ===== Auth =====
+        function hashPassword(raw) {
+            try { return btoa(unescape(encodeURIComponent(raw))); }
+            catch(e) { return raw; }
+        }
+
+        function showTab(tab) {
+            document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+            document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+            document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+            document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+            clearErrors();
+        }
+
+        function register() {
+            const u = document.getElementById('regUsername').value.trim();
+            const p = document.getElementById('regPassword').value;
+            const c = document.getElementById('regConfirm').value;
+            if (!u || !p) { showError('regError', '請填寫所有欄位'); return; }
+            if (p.length < 6) { showError('regError', '密碼至少 6 碼'); return; }
+            if (p !== c) { showError('regError', '兩次密碼不一致'); return; }
+            const users = getUsers();
+            if (users[u]) { showError('regError', '帳號已被註冊'); return; }
+            users[u] = { password: hashPassword(p), createdAt: new Date().toISOString() };
+            saveUsers(users);
+            showToast('✓ 註冊成功！請登入');
+            showTab('login');
+        }
+
+        function login() {
+            const u = document.getElementById('loginUsername').value.trim();
+            const p = document.getElementById('loginPassword').value;
+            const users = getUsers();
+            const candidate = users[u];
+            const hashed = hashPassword(p);
+            if (!candidate || (candidate.password !== hashed && candidate.password !== p)) {
+                showError('loginError', '帳號或密碼錯誤');
+                return;
+            }
+            if (candidate.password === p) { candidate.password = hashed; saveUsers(users); }
+            activateApp(u);
+        }
+
+        function activateApp(u) {
+            currentUser = u;
+            localStorage.setItem('currentUser', u);
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('header').classList.remove('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+            document.getElementById('addBtn').classList.remove('hidden');
+            document.getElementById('tagFilterBar').style.display = 'flex';
+            document.getElementById('welcomeUser').textContent = '你好，' + u;
+            cards = getUserCards();
+            renderTagFilterBar();
+            applyFilters();
+            updateStats();
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('header').classList.add('hidden');
+            document.getElementById('mainContent').classList.add('hidden');
+            document.getElementById('addBtn').classList.add('hidden');
+            document.getElementById('tagFilterBar').style.display = 'none';
+            clearErrors();
+        }
+
+        function showError(id, msg) {
+            const el = document.getElementById(id);
+            el.textContent = msg;
+            el.classList.add('show');
+        }
+        function clearErrors() {
+            ['loginError', 'regError'].forEach(id => document.getElementById(id).classList.remove('show'));
+        }
+
+        // ===== Stats =====
+        function updateStats() {
+            document.getElementById('totalCount').textContent = cards.length;
+            document.getElementById('companyCount').textContent = [...new Set(cards.map(c => c.company).filter(Boolean))].length;
+            const now = new Date();
+            document.getElementById('thisMonth').textContent = cards.filter(c =>
+                c.createdAt && new Date(c.createdAt).getMonth() === now.getMonth() &&
+                new Date(c.createdAt).getFullYear() === now.getFullYear()
+            ).length;
+        }
+
+        // ===== Helpers =====
+        function escapeHtml(t) {
+            return String(t || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function getAvatarColor(name) {
+            const colors = ['#3B82F6','#10B981','#EF4444','#8B5CF6','#F59E0B','#06B6D4','#EC4899'];
+            let hash = 0;
+            for (let i = 0; i < (name||'').length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            return colors[Math.abs(hash) % colors.length];
+        }
+
+        function getInitials(name) {
+            return (name || '未').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+        }
+
+        // ===== Render Cards =====
+        const TAG_COLORS = ['tag-blue','tag-yellow','tag-green','tag-purple','tag-red','tag-gray'];
+        function getTagColor(tag) {
+            let hash = 0;
+            for (let i = 0; i < (tag||'').length; i++) hash = tag.charCodeAt(i) + ((hash << 5) - hash);
+            return TAG_COLORS[Math.abs(hash) % TAG_COLORS.length];
+        }
+
+        function getOCRClass(score) {
+            if (score >= 85) return 'high';
+            if (score >= 70) return 'medium';
+            return 'low';
+        }
+
+        function getOCRConfidenceHTML(score) {
+            const cls = getOCRClass(score);
+            const labels = { high: '高', medium: '中', low: '低' };
+            return `<span class="card-confidence"><span class="ocr-dot ${cls}"></span><span class="ocr-text ${cls}" style="font-size:11px;font-weight:600;">${score}% ${labels[cls]}</span></span>`;
+        }
+
+        // ===== Tag Filter =====
+        let activeTag = '全部';
+
+        function getAllTags() {
+            const tagSet = new Set(['全部']);
+            cards.forEach(c => {
+                if (c.tags && Array.isArray(c.tags)) c.tags.forEach(t => tagSet.add(t));
+                if (c.category) tagSet.add(c.category);
+            });
+            return Array.from(tagSet);
+        }
+
+        function renderTagFilterBar() {
+            const scroll = document.getElementById('tagFilterScroll');
+            const moreMenu = document.getElementById('tagMoreMenu');
+            if (!scroll) return;
+            const allTags = getAllTags();
+            const hidden = allTags.slice(8);
+            scroll.innerHTML = allTags.map(tag =>
+                `<button class="tag-filter-btn${tag === activeTag ? ' active' : ''}" onclick="filterByTag('${escapeHtml(tag)}')">${escapeHtml(tag)}</button>`
+            ).join('');
+            if (hidden.length > 0) {
+                document.getElementById('tagFilterMore').style.display = 'flex';
+                moreMenu.innerHTML = hidden.map(tag =>
+                    `<div class="tag-more-item" onclick="filterByTag('${escapeHtml(tag)}'); toggleTagMoreMenu()">${escapeHtml(tag)}</div>`
+                ).join('');
+            } else {
+                document.getElementById('tagFilterMore').style.display = 'none';
+            }
+        }
+
+        function toggleTagMoreMenu() {
+            document.getElementById('tagMoreMenu').classList.toggle('show');
+        }
+
+        function filterByTag(tag) {
+            activeTag = tag;
+            document.querySelectorAll('.tag-filter-btn').forEach(btn =>
+                btn.classList.toggle('active', btn.textContent.trim() === tag)
+            );
+            document.getElementById('tagMoreMenu').classList.remove('show');
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
+            let filtered = cards.filter(c =>
+                (!q || (c.name||'').toLowerCase().includes(q) || (c.company||'').toLowerCase().includes(q) ||
+                 (c.title||'').toLowerCase().includes(q) || (c.email||'').toLowerCase().includes(q)) &&
+                (activeTag === '全部' || (c.tags && c.tags.includes(activeTag)) || c.category === activeTag)
+            );
+            renderFilteredCards(filtered, q);
+        }
+
+        function renderFilteredCards(filtered, q) {
+            const grid = document.getElementById('cardsGrid');
+            const sectionTitle = document.getElementById('cardsSectionTitle');
+            sectionTitle.textContent = q
+                ? `搜尋「${q}」— ${filtered.length} 筆`
+                : (activeTag !== '全部' ? `${activeTag}（${filtered.length}）` : `全部名片（${cards.length}）`);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-address-card"></i></div><p class="title">${q ? '找不到符合的名片' : '尚無名片'}</p><p>${q ? '嘗試其他關鍵字' : '點擊「新增名片」開始建立，或使用「掃描」透過相機讀取'}</p></div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(c => {
+                const name = escapeHtml(c.name || '未命名');
+                const title = escapeHtml(c.title || '');
+                const company = escapeHtml(c.company || '');
+                const email = escapeHtml(c.email || '');
+                const phone = escapeHtml(c.phone || '');
+                const line = escapeHtml(c.line || '');
+                const thumb = c.image ? `<img src="${c.image}" class="card-image-thumb" alt="名片">` : '';
+                const score = c.ocrConfidence || 0;
+                const confHTML = score > 0 ? getOCRConfidenceHTML(score) : '';
+                const tagList = (c.tags && c.tags.length) ? c.tags : (c.category ? [c.category] : []);
+                const tagsHTML = tagList.map(t => `<span class="tag-colorful ${getTagColor(t)}">${escapeHtml(t)}</span>`).join('');
+
+                return `<div class="card-item">
+                    <div class="card-avatar" style="background:${getAvatarColor(c.name)}">${getInitials(c.name)}</div>
+                    <div class="card-body">
+                        <div class="card-name-row">
+                            <span class="card-name">${name}</span>
+                            ${tagsHTML}
+                        </div>
+                        <div class="card-meta">
+                            ${title ? `<div class="card-meta-item"><i class="fa-solid fa-briefcase"></i>${title}</div>` : ''}
+                            ${company ? `<div class="card-meta-item"><i class="fa-solid fa-building"></i>${company}</div>` : ''}
+                            ${phone ? `<div class="card-meta-item"><i class="fa-solid fa-phone"></i>${phone}</div>` : ''}
+                            ${email ? `<div class="card-meta-item"><i class="fa-solid fa-envelope"></i>${email}</div>` : ''}
+                            ${line ? `<div class="card-meta-item"><i class="fa-brands fa-line"></i>${line}</div>` : ''}
+                        </div>
+                    </div>
+                    ${thumb}
+                    ${confHTML}
+                    <div class="card-actions">
+                        <button onclick="editCard('${c.id}')" title="編輯"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="showShareModal('${c.id}')" title="分享"><i class="fa-solid fa-share-nodes"></i></button>
+                        <button class="btn-delete-action" onclick="deleteCard('${c.id}')" title="刪除"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // ===== Card CRUD =====
+        function openModal(card) {
+            editingId = card?.id || null;
+            document.getElementById('modalTitle').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> ${card ? '編輯名片' : '新增名片'}`;
+            document.getElementById('inputName').value = card?.name || '';
+            document.getElementById('inputTitle').value = card?.title || '';
+            document.getElementById('inputCompany').value = card?.company || '';
+            document.getElementById('inputPhone').value = card?.phone || '';
+            document.getElementById('inputEmail').value = card?.email || '';
+            document.getElementById('inputLine').value = card?.line || '';
+            document.getElementById('inputCategory').value = card?.category || '客戶';
+            document.getElementById('inputAddress').value = card?.address || '';
+            if (card?.image) {
+                currentCardImage = card.image;
+                document.getElementById('imagePreview').src = card.image;
+                document.getElementById('imagePreviewContainer').style.display = 'inline-block';
+            } else {
+                clearCardImage();
+            }
+            document.getElementById('cardModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('cardModal').classList.remove('show');
+            editingId = null;
+            clearCardImage();
+        }
+
+        function saveCard() {
+            const name = document.getElementById('inputName').value.trim();
+            if (!name) { showToast('請輸入姓名'); return; }
+            const existing = editingId ? cards.find(x => x.id === editingId) : null;
+            const cardData = {
+                id: editingId || Date.now().toString(),
+                name,
+                title: document.getElementById('inputTitle').value.trim(),
+                company: document.getElementById('inputCompany').value.trim(),
+                phone: document.getElementById('inputPhone').value.trim(),
+                email: document.getElementById('inputEmail').value.trim(),
+                line: document.getElementById('inputLine').value.trim(),
+                category: document.getElementById('inputCategory').value,
+                address: document.getElementById('inputAddress').value.trim(),
+                image: currentCardImage || existing?.image || null,
+                createdAt: editingId ? existing?.createdAt : new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                ocrConfidence: existing?.ocrConfidence || 0
+            };
+            if (editingId) {
+                cards[cards.findIndex(x => x.id === editingId)] = cardData;
+                showToast('✓ 名片已更新');
+            } else {
+                cards.unshift(cardData);
+                showToast('✓ 名片已新增');
+            }
+            saveUserCards(cards);
+            renderTagFilterBar();
+            applyFilters();
+            updateStats();
+            closeModal();
+        }
+
+        function editCard(id) { const c = cards.find(x => x.id === id); if (c) openModal(c); }
+
+        function deleteCard(id) {
+            if (confirm('確定要刪除這張名片嗎？')) {
+                cards = cards.filter(x => x.id !== id);
+                saveUserCards(cards);
+                renderTagFilterBar();
+                applyFilters();
+                updateStats();
+                showToast('名片已刪除');
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerHTML = msg;
+            t.classList.add('show');
+            clearTimeout(t._timer);
+            t._timer = setTimeout(() => t.classList.remove('show'), 2600);
+        }
+
+        // ===== Share =====
+        let currentShareCard = null;
+        function showShareModal(id) {
+            currentShareCard = cards.find(c => c.id === id);
+            if (!currentShareCard) return;
+            const container = document.getElementById('qrContainer');
+            container.innerHTML = '';
+            const vcard = generateVCard(currentShareCard);
+            QRCode.toCanvas(vcard, { width: 200, margin: 2, color: { dark: '#1F2937', light: '#FFFFFF' } }, (err, canvas) => {
+                if (!err) container.appendChild(canvas);
+            });
+            document.getElementById('shareModal').classList.add('show');
+        }
+        function closeShare() { document.getElementById('shareModal').classList.remove('show'); currentShareCard = null; }
+        function generateVCard(card) {
+            return `BEGIN:VCARD\nVERSION:3.0\nFN:${card.name||''}\nTITLE:${card.title||''}\nORG:${card.company||''}\nTEL:${card.phone||''}\nEMAIL:${card.email||''}\nADR:;;${card.address||''};;;;\nEND:VCARD`;
+        }
+        function downloadVCard() {
+            if (!currentShareCard) return;
+            const blob = new Blob([generateVCard(currentShareCard)], { type: 'text/vcard' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `${currentShareCard.name || 'contact'}.vcf`; a.click();
+            URL.revokeObjectURL(url);
+            showToast('已下載 vCard');
+        }
+        function copyVCard() {
+            if (!currentShareCard) return;
+            navigator.clipboard.writeText(generateVCard(currentShareCard)).then(() => showToast('✓ 已複製 vCard'));
+        }
+
+        // ===== Camera / OCR =====
+        async function startScan() { await openScanCamera(); }
+        async function startScanFromModal() { await openScanCamera(); }
+        async function openScanCamera() {
+            document.getElementById('scanModal').classList.add('show');
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } } });
+                document.getElementById('video').srcObject = stream;
+                videoStream = stream;
+            } catch(e) {
+                showToast('無法開啟相機：' + e.message);
+                closeScan();
+            }
+        }
+        function closeScan() {
+            document.getElementById('scanModal').classList.remove('show');
+            if (videoStream) { videoStream.getTracks().forEach(t => t.stop()); videoStream = null; }
+            document.getElementById('scanProgress').classList.remove('show');
+        }
+
+        let tesseractWorker = null;
+        async function getTesseractWorker() {
+            if (!tesseractWorker) {
+                tesseractWorker = await Tesseract.createWorker('eng+chi_tra', 1, {
+                    logger: m => {
+                        if (m.status === 'recognizing text') {
+                            document.getElementById('scanPercent').textContent = Math.round(m.progress * 100) + '%';
+                        }
+                    }
+                });
+            }
+            return tesseractWorker;
+        }
+
+        async function runClientOcr(imageDataUrl) {
+            const worker = await getTesseractWorker();
+            const { data: { text, confidence } } = await worker.recognize(imageDataUrl);
+            return { text, confidence: Math.round(confidence) };
+        }
+
+        async function captureImage() {
+            const v = document.getElementById('video'), c = document.getElementById('canvas');
+            c.width = v.videoWidth; c.height = v.videoHeight;
+            c.getContext('2d').drawImage(v, 0, 0);
+            closeScan();
+            const progress = document.getElementById('scanProgress');
+            progress.classList.add('show');
+            document.getElementById('scanPercent').textContent = '0%';
+            try {
+                const imageData = c.toDataURL('image/jpeg', 0.9);
+                const { text, confidence } = await runClientOcr(imageData);
+                parseCardInfo(text, confidence, imageData);
+            } catch(e) { showToast('辨識失敗：' + e.message); }
+            progress.classList.remove('show');
+        }
+
+        function parseCardInfo(text, confidence, imageData) {
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 1);
+            let name = '', title = '', company = '', phone = '', email = '', address = '';
+            const phoneRe = /(\+?886|0)[- ]?[0-9]{1,4}[- ]?[0-9]{3,4}[- ]?[0-9]{3,4}/;
+            const emailRe = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+            lines.forEach(l => {
+                if (phoneRe.test(l) && !phone) phone = l.match(phoneRe)[0];
+                else if (emailRe.test(l) && !email) email = l.match(emailRe)[0];
+                else if (!name) name = l;
+                else if (!title) title = l;
+                else if (!company) company = l;
+                else address += (address ? ' ' : '') + l;
+            });
+            if (imageData) currentCardImage = imageData;
+            document.getElementById('inputName').value = name;
+            document.getElementById('inputTitle').value = title;
+            document.getElementById('inputCompany').value = company;
+            document.getElementById('inputPhone').value = phone;
+            document.getElementById('inputEmail').value = email;
+            document.getElementById('inputAddress').value = address;
+            if (imageData) {
+                document.getElementById('imagePreview').src = imageData;
+                document.getElementById('imagePreviewContainer').style.display = 'inline-block';
+            }
+            showToast('✓ AI 已自動填入名片資訊');
+            document.getElementById('cardModal').classList.add('show');
+            if (editingId) {
+                const idx = cards.findIndex(x => x.id === editingId);
+                if (idx > -1) cards[idx].ocrConfidence = confidence;
+            }
+        }
+
+        // ===== Image Upload =====
+        async function compressImage(file, maxWidth = 800, quality = 0.75) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let w = img.width, h = img.height;
+                        if (w > maxWidth) { h = Math.round((maxWidth / w) * h); w = maxWidth; }
+                        canvas.width = w; canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) { showToast('請上傳圖片檔案'); return; }
+            const progress = document.getElementById('scanProgress');
+            progress.classList.add('show');
+            document.getElementById('scanPercent').textContent = '0%';
+            try {
+                const compressed = await compressImage(file);
+                currentCardImage = compressed;
+                document.getElementById('imagePreview').src = compressed;
+                document.getElementById('imagePreviewContainer').style.display = 'inline-block';
+                const { text, confidence } = await runClientOcr(compressed);
+                parseCardInfo(text, confidence, null);
+                showToast('✓ 圖片上傳並辨識完成');
+            } catch(e) { showToast('上傳失敗：' + e.message); }
+            progress.classList.remove('show');
+            event.target.value = '';
+        }
+
+        function clearCardImage() {
+            currentCardImage = null;
+            document.getElementById('imagePreviewContainer').style.display = 'none';
+            const img = document.getElementById('imagePreview');
+            if (img) img.src = '';
+        }
+
+        // ===== Drag & Drop =====
+        function initUploadZone() {
+            const zone = document.getElementById('uploadZone');
+            if (!zone) return;
+            zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+            zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+            zone.addEventListener('drop', e => {
+                e.preventDefault();
+                zone.classList.remove('drag-over');
+                const file = e.dataTransfer.files[0];
+                if (file?.type.startsWith('image/')) handleFileUpload({ target: { files: [file] } });
+                else showToast('請上傳圖片檔案');
+            });
+        }
+
+        // ===== vCard Import =====
+        function handleVCardImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                const card = parseVCard(e.target.result);
+                if (!card.name && !card.company) {
+                    showToast('無法解析 vCard，請確認格式');
+                    event.target.value = '';
+                    return;
+                }
+                openModal();
+                setTimeout(() => {
+                    document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-file-import"></i> 匯入 vCard';
+                    document.getElementById('inputName').value = card.name || '';
+                    document.getElementById('inputTitle').value = card.title || '';
+                    document.getElementById('inputCompany').value = card.company || '';
+                    document.getElementById('inputPhone').value = card.phone || '';
+                    document.getElementById('inputEmail').value = card.email || '';
+                    document.getElementById('inputAddress').value = card.address || '';
+                    showToast('vCard 已匯入，確認資料後點擊儲存');
+                }, 50);
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function parseVCard(vcfText) {
+            const card = { name: '', title: '', company: '', phone: '', email: '', address: '' };
+            const lines = vcfText.split(/\r?\n/);
+            for (const line of lines) {
+                const match = line.match(/^([A-Z0-9-]+)(?:[^:]*)?:(.*)$/i);
+                if (!match) continue;
+                const key = match[1].toUpperCase();
+                const val = (match[2] || '').trim();
+                switch (key) {
+                    case 'FN': if (!card.name) card.name = val; break;
+                    case 'TITLE': case 'ROLE': if (!card.title) card.title = val; break;
+                    case 'ORG': if (!card.company) card.company = val.replace(/;/g, ' ').trim(); break;
+                    case 'TEL': if (!card.phone) card.phone = val; break;
+                    case 'EMAIL': if (!card.email) card.email = val; break;
+                    case 'ADR': if (!card.address) card.address = val.replace(/;/g, ' ').trim(); break;
+                }
+            }
+            return card;
+        }
+
+        // ===== CSV Export =====
+        function exportCSV() {
+            const rows = [['姓名','公司','職稱','電話','Email','LINE','地址','分類','新增日期']];
+            cards.forEach(c => {
+                rows.push([
+                    c.name||'', c.company||'', c.title||'', c.phone||'',
+                    c.email||'', c.line||'', c.address||'', c.category||'',
+                    c.createdAt ? new Date(c.createdAt).toLocaleDateString('zh-TW') : ''
+                ]);
+            });
+            const BOM = '﻿';
+            const csv = BOM + rows.map(r => r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `名片匯出_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+            URL.revokeObjectURL(url);
+            showToast('✓ CSV 匯出成功');
+        }
+
+        // ===== Telegram Sync =====
+        function openSyncModal() { document.getElementById('syncModal').classList.add('show'); renderTelegramLink(); }
+        function closeSyncModal() { document.getElementById('syncModal').classList.remove('show'); }
+        function getTelegramLink() { return JSON.parse(localStorage.getItem('telegramLink')) || {}; }
+        function saveTelegramLink(data) { localStorage.setItem('telegramLink', JSON.stringify(data)); }
+        function renderTelegramLink() {
+            const link = getTelegramLink();
+            document.getElementById('telegramStatus').innerHTML = link.username
+                ? `<span style="color:var(--green);font-weight:600;"><i class="fa-solid fa-circle-check" style="margin-right:5px;"></i>@${link.username}</span>`
+                : '<span style="color:var(--text3);">尚未綁定</span>';
+        }
+        function linkTelegram() {
+            const username = document.getElementById('telegramUsername').value.trim();
+            if (!username) { showToast('請輸入 Telegram 使用者名稱'); return; }
+            saveTelegramLink({ username, linkedAt: new Date().toISOString() });
+            showToast('✓ 已綁定 Telegram');
+            renderTelegramLink();
+        }
+        async function syncFromTelegram() {
+            const link = getTelegramLink();
+            if (!link.username) { showToast('請先綁定 Telegram'); return; }
+            const saved = localStorage.getItem('telegramCards_' + currentUser);
+            if (saved) {
+                const tCards = JSON.parse(saved);
+                if (tCards.length > 0) {
+                    cards = [...tCards, ...cards];
+                    saveUserCards(cards);
+                    renderTagFilterBar();
+                    applyFilters();
+                    updateStats();
+                    showToast('✓ 同步了 ' + tCards.length + ' 張名片');
+                } else showToast('沒有新名片');
+            } else showToast('沒有 Telegram 名片資料');
+        }
+
+        // ===== Theme =====
+        function initTheme() {
+            const saved = localStorage.getItem('theme');
+            if (saved === 'dark' || (!saved && window.matchMedia?.('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.getElementById('themeIcon').className = 'fa-solid fa-sun';
+            }
+        }
+        function toggleTheme() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            if (isDark) {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+                document.getElementById('themeIcon').className = 'fa-solid fa-moon';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                document.getElementById('themeIcon').className = 'fa-solid fa-sun';
+            }
+        }
+
+        // ===== Init =====
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            initUploadZone();
+            // Auto-login if session exists
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser && getUsers()[savedUser]) {
+                activateApp(savedUser);
+            }
+        });
+    </script>
+</body>
+</html>
