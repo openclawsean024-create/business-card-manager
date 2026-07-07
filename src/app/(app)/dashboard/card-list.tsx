@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition, useRef } from "react";
-import { createCardAction, deleteCardAction, updateCardAction } from "./actions";
+import { useState, useRef } from "react";
+import { createCardAction, deleteCardAction } from "./actions";
 
 interface Card {
   id: string;
@@ -29,11 +29,9 @@ export default function CardList({
 }) {
   const [cards, setCards] = useState<Card[]>(initialCards);
   const [search, setSearch] = useState("");
-  const [editingId, setEditingId] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [ocrLoading, setOcrLoading] = useState(false);
   const [ocrProgress, setOcrProgress] = useState(0);
-  const [, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -58,10 +56,8 @@ export default function CardList({
     setOcrProgress(0);
 
     try {
-      // @ts-expect-error - Tesseract loaded from CDN
-      const Tesseract = window.Tesseract;
-      if (!Tesseract) {
-        // 動態載入
+      // 動態載入 Tesseract.js
+      if (!(window as any).Tesseract) {
         await new Promise<void>((resolve, reject) => {
           const s = document.createElement("script");
           s.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
@@ -71,8 +67,7 @@ export default function CardList({
         });
       }
 
-      // @ts-expect-error - dynamic load
-      const worker = await window.Tesseract.createWorker("eng+chi_tra", 1, {
+      const worker = await (window as any).Tesseract.createWorker("eng+chi_tra", 1, {
         logger: (m: any) => {
           if (m.status === "recognizing text") setOcrProgress(Math.round(m.progress * 100));
         },
@@ -82,21 +77,21 @@ export default function CardList({
       await worker.terminate();
 
       const rawText = data.text;
-      const confidence = data.confidence / 100;
-
-      // 簡易解析（中文 + 英文名片通用啟發式）
       const parsed = parseCardHeuristic(rawText);
 
-      startTransition(async () => {
-        await createCardAction({
-          ...parsed,
-          tags: ["OCR"],
-        });
-        setOcrLoading(false);
-        setOcrProgress(0);
-        // 重新整理頁面 — revalidatePath in server action
-        window.location.reload();
-      });
+      const fd = new FormData();
+      if (parsed.name) fd.set("name", parsed.name);
+      if (parsed.company) fd.set("company", parsed.company);
+      if (parsed.jobTitle) fd.set("jobTitle", parsed.jobTitle);
+      if (parsed.phone) fd.set("phone", parsed.phone);
+      if (parsed.email) fd.set("email", parsed.email);
+      fd.set("tags", JSON.stringify(["OCR"]));
+
+      const result = await createCardAction(fd);
+      setOcrLoading(false);
+      setOcrProgress(0);
+      if (result.error) { alert(result.error); return; }
+      window.location.reload();
     } catch (e) {
       console.error(e);
       alert("OCR 失敗：" + (e as Error).message);
@@ -108,6 +103,18 @@ export default function CardList({
   function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
     if (f) handleOcr(f);
+  }
+
+  async function handleDelete(id: string, name: string) {
+    if (!confirm(`刪除「${name || "未命名"}」？`)) return;
+    const fd = new FormData();
+    fd.set("id", id);
+    const result = await deleteCardAction(fd);
+    if (result.error) {
+      alert(result.error);
+      return;
+    }
+    setCards(cards.filter((c) => c.id !== id));
   }
 
   return (
@@ -125,7 +132,7 @@ export default function CardList({
             />
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => cameraInputRef.current?.click()}
               disabled={ocrLoading}
@@ -148,7 +155,6 @@ export default function CardList({
             </button>
           </div>
 
-          {/* 隱藏的 input */}
           <input
             ref={cameraInputRef}
             type="file"
@@ -187,15 +193,7 @@ export default function CardList({
             <CardItem
               key={card.id}
               card={card}
-              onDelete={() => {
-                if (confirm(`刪除「${card.name ?? "未命名"}」？`)) {
-                  startTransition(async () => {
-                    await deleteCardAction(card.id);
-                    setCards(cards.filter(c => c.id !== card.id));
-                  });
-                }
-              }}
-              onEdit={() => setEditingId(card.id)}
+              onDelete={() => handleDelete(card.id, card.name ?? "")}
             />
           ))}
         </div>
@@ -205,16 +203,9 @@ export default function CardList({
       {showCreate && (
         <CreateCardModal
           onClose={() => setShowCreate(false)}
-          onCreate={(data) => {
-            startTransition(async () => {
-              try {
-                await createCardAction(data);
-                setShowCreate(false);
-                window.location.reload();
-              } catch (e: any) {
-                alert(e.message || "新增失敗");
-              }
-            });
+          onSuccess={() => {
+            setShowCreate(false);
+            window.location.reload();
           }}
         />
       )}
@@ -222,18 +213,26 @@ export default function CardList({
   );
 }
 
-function CardItem({ card, onDelete, onEdit }: { card: Card; onDelete: () => void; onEdit: () => void }) {
+function CardItem({ card, onDelete }: { card: Card; onDelete: () => void }) {
   const initials = (card.name ?? "?").slice(0, 1).toUpperCase();
   return (
     <div className="card p-5 hover:border-[var(--border-strong)] transition-colors">
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--gold)] flex items-center justify-center text-white font-semibold flex-shrink-0">
+          <div
+            className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0"
+            style={{ background: "linear-gradient(135deg, var(--accent), var(--gold))" }}
+          >
             {initials}
           </div>
           <div className="min-w-0">
             <div className="font-semibold truncate">{card.name ?? "未命名"}</div>
-            {card.company && <div className="text-xs text-[var(--text-tertiary)] truncate">{card.company} · {card.jobTitle}</div>}
+            {card.company && (
+              <div className="text-xs text-[var(--text-tertiary)] truncate">
+                {card.company}
+                {card.jobTitle ? ` · ${card.jobTitle}` : ""}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -247,16 +246,25 @@ function CardItem({ card, onDelete, onEdit }: { card: Card; onDelete: () => void
       {card.tags.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mt-3">
           {card.tags.map((t) => (
-            <span key={t} className="px-2 py-0.5 rounded text-xs bg-[var(--accent-soft)] text-[var(--accent-hover)]">
+            <span
+              key={t}
+              className="px-2 py-0.5 rounded text-xs"
+              style={{ background: "var(--accent-soft)", color: "var(--accent-hover)" }}
+            >
               {t}
             </span>
           ))}
         </div>
       )}
 
-      <div className="flex gap-2 mt-4 pt-3 border-t border-[var(--border-subtle)]">
-        <button onClick={onEdit} className="text-xs text-[var(--text-secondary)] hover:text-[var(--accent-hover)]">編輯</button>
-        <button onClick={onDelete} className="text-xs text-[var(--danger)] hover:underline">刪除</button>
+      <div className="flex gap-3 mt-4 pt-3 border-t border-[var(--border-subtle)]">
+        <button
+          onClick={onDelete}
+          className="text-xs"
+          style={{ color: "var(--danger)" }}
+        >
+          刪除
+        </button>
       </div>
     </div>
   );
@@ -264,56 +272,81 @@ function CardItem({ card, onDelete, onEdit }: { card: Card; onDelete: () => void
 
 function CreateCardModal({
   onClose,
-  onCreate,
+  onSuccess,
 }: {
   onClose: () => void;
-  onCreate: (data: any) => void;
+  onSuccess: () => void;
 }) {
-  const [data, setData] = useState({
-    name: "",
-    company: "",
-    jobTitle: "",
-    phone: "",
-    email: "",
-    address: "",
-    website: "",
-    notes: "",
-    tags: [] as string[],
-  });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (submitting) return;
+    setSubmitting(true);
+    setError(null);
+
+    const fd = new FormData(e.currentTarget);
+    fd.set("tags", "[]");
+
+    try {
+      const result = await createCardAction(fd);
+      if (result.error) {
+        setError(result.error);
+        setSubmitting(false);
+        return;
+      }
+      onSuccess();
+    } catch (e: any) {
+      const msg = e?.message || "建立失敗";
+      setError(msg);
+      setSubmitting(false);
+    }
+  }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm" onClick={onClose}>
-      <div className="card max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-6"
+      style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)" }}
+      onClick={onClose}
+    >
+      <div
+        className="card max-w-2xl w-full p-6"
+        style={{ maxHeight: "90vh", overflowY: "auto" }}
+        onClick={(e) => e.stopPropagation()}
+      >
         <h3 className="text-xl font-semibold mb-4">新增名片</h3>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            onCreate(data);
-          }}
-          className="space-y-3"
-        >
+        <form method="post" onSubmit={handleSubmit} className="space-y-3">
           <div className="grid md:grid-cols-2 gap-3">
-            <Field label="姓名" v={data.name} onChange={(v) => setData({ ...data, name: v })} />
-            <Field label="公司" v={data.company} onChange={(v) => setData({ ...data, company: v })} />
-            <Field label="職稱" v={data.jobTitle} onChange={(v) => setData({ ...data, jobTitle: v })} />
-            <Field label="電話" v={data.phone} onChange={(v) => setData({ ...data, phone: v })} />
-            <Field label="Email" v={data.email} onChange={(v) => setData({ ...data, email: v })} />
-            <Field label="網站" v={data.website} onChange={(v) => setData({ ...data, website: v })} />
+            <Field label="姓名" name="name" />
+            <Field label="公司" name="company" />
+            <Field label="職稱" name="jobTitle" />
+            <Field label="電話" name="phone" />
+            <Field label="Email" name="email" type="email" />
+            <Field label="網站" name="website" />
           </div>
-          <Field label="地址" v={data.address} onChange={(v) => setData({ ...data, address: v })} />
+          <Field label="地址" name="address" />
           <div>
-            <label className="block text-sm font-medium mb-1.5">備註</label>
-            <textarea
-              value={data.notes}
-              onChange={(e) => setData({ ...data, notes: e.target.value })}
-              rows={3}
-              className="input"
-            />
+            <label className="label">備註</label>
+            <textarea name="notes" rows={3} className="textarea" />
           </div>
 
+          {error && (
+            <div
+              className="text-sm px-3 py-2 rounded"
+              style={{ color: "var(--danger)", background: "var(--danger-soft)" }}
+            >
+              {error}
+            </div>
+          )}
+
           <div className="flex justify-end gap-2 pt-3">
-            <button type="button" onClick={onClose} className="btn-secondary">取消</button>
-            <button type="submit" className="btn-primary">新增</button>
+            <button type="button" onClick={onClose} className="btn-secondary">
+              取消
+            </button>
+            <button type="submit" disabled={submitting} className="btn-primary">
+              {submitting ? "建立中..." : "新增"}
+            </button>
           </div>
         </form>
       </div>
@@ -321,22 +354,24 @@ function CreateCardModal({
   );
 }
 
-function Field({ label, v, onChange }: { label: string; v: string; onChange: (v: string) => void }) {
+function Field({
+  label,
+  name,
+  type = "text",
+}: {
+  label: string;
+  name: string;
+  type?: string;
+}) {
   return (
     <div>
-      <label className="block text-sm font-medium mb-1.5">{label}</label>
-      <input
-        type="text"
-        value={v}
-        onChange={(e) => onChange(e.target.value)}
-        className="input"
-      />
+      <label className="label">{label}</label>
+      <input type={type} name={name} className="input" />
     </div>
   );
 }
 
 // ============ 簡易名片解析啟發式 ============
-// 不依賴雲端 LLM，免費、隱私、永遠可用
 function parseCardHeuristic(text: string): {
   name?: string;
   email?: string;
@@ -344,30 +379,25 @@ function parseCardHeuristic(text: string): {
   company?: string;
   jobTitle?: string;
 } {
-  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
 
-  // Email regex
   const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
   const email = emailMatch?.[0];
 
-  // Phone regex (含台灣 +886、03-、手機 09xx)
   const phoneMatch = text.match(/(?:\+?\d{1,3}[-.\s]?)?(?:\(?\d{2,4}\)?[-.\s]?)?\d{3,4}[-.\s]?\d{3,4}/);
   const phone = phoneMatch?.[0];
 
-  // 找姓名 — 通常是前 1-3 行，最長不超過 30 字
   const nameCandidates = lines
-    .filter(l => l.length >= 2 && l.length <= 30 && !/[a-z]/.test(l))  // 排除全英文
+    .filter((l) => l.length >= 2 && l.length <= 30 && !/[a-z]/.test(l))
     .slice(0, 3);
   const name = nameCandidates[0];
 
-  // 找公司 — 通常包含「有限公司」「公司」「Co., Ltd」「Inc」「Corp」或英文開頭
-  const companyMatch = lines.find(l =>
+  const companyMatch = lines.find((l) =>
     /公司|有限公司|Co\.?|Ltd\.?|Inc\.?|Corp\.?|Corporation/i.test(l)
   );
   const company = companyMatch;
 
-  // 找職稱 — 通常含「長」「經理」「工程師」「Manager」「Engineer」「CEO」「CTO」「Director」「Designer」「Architect」
-  const jobMatch = lines.find(l =>
+  const jobMatch = lines.find((l) =>
     /長|經理|工程師|總監|顧問|Manager|Engineer|Director|Designer|Architect|CEO|CTO|CMO|COO|CFO|Founder|President|VP/i.test(l)
   );
   const jobTitle = jobMatch;
