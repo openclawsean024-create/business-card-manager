@@ -1,0 +1,141 @@
+// Prisma schema for 名片王 Pro (SQLite for dev, Postgres for prod)
+// 注意：SQLite 不支援 String[] / Json / @db.Text → 用 String (serialize JSON) 或 長度調整
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// =============== NextAuth.js v5 (Auth.js) ===============
+model User {
+  id            String          @id @default(cuid())
+  name          String?
+  email         String          @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  cards         BusinessCard[]
+  subscription  Subscription?
+  telegramLink  TelegramLink?
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  @@unique([identifier, token])
+}
+
+// =============== 名片王 Pro 核心 ===============
+model BusinessCard {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // OCR-extracted 欄位
+  name          String?
+  company       String?
+  jobTitle      String?
+  phone         String?
+  email         String?
+  address       String?
+  website       String?
+  notes         String?
+
+  // Tags — SQLite 用 String 存 JSON 序列化（"['客戶','VIP']"）
+  tags          String   @default("[]")
+
+  // OCR metadata
+  imageUrl      String?
+  ocrConfidence Float?
+  ocrRawText    String?
+  ocrEngine     String?
+
+  // Source: "manual" | "ocr" | "vcard-import" | "telegram"
+  source        String   @default("manual")
+  sourceMeta    String?  // JSON serialized
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId, createdAt])
+}
+
+// =============== Stripe 訂閱 ===============
+model Subscription {
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  stripeCustomerId     String?  @unique
+  stripeSubscriptionId String?  @unique
+  stripePriceId        String?
+  stripeStatus         String   @default("incomplete")
+
+  plan                 String   @default("free")
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean  @default(false)
+
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+// =============== Telegram 整合 ===============
+model TelegramLink {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  botToken     String
+  chatId       String
+  lastSyncAt   DateTime?
+  enabled      Boolean  @default(true)
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// =============== 客服聯絡 ===============
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  status    String   @default("new")
+  repliedAt DateTime?
+  createdAt DateTime @default(now())
+}
