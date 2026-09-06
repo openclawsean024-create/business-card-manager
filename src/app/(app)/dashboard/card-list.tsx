@@ -3,6 +3,26 @@
 import { useState, useRef } from "react";
 import { createCardAction, deleteCardAction } from "./actions";
 
+// Minimal Tesseract.js shape (from CDN global) — only fields we use.
+interface TesseractLoggerMessage {
+  status?: string;
+  progress?: number;
+}
+interface TesseractWorker {
+  recognize: (file: File) => Promise<{ data: { text: string } }>;
+  terminate: () => Promise<void>;
+}
+interface TesseractGlobal {
+  createWorker: (
+    lang: string,
+    oem: number,
+    options: { logger?: (m: TesseractLoggerMessage) => void }
+  ) => Promise<TesseractWorker>;
+}
+interface WindowWithTesseract extends Window {
+  Tesseract?: TesseractGlobal;
+}
+
 interface Card {
   id: string;
   name: string | null;
@@ -57,7 +77,8 @@ export default function CardList({
 
     try {
       // 動態載入 Tesseract.js
-      if (!(window as any).Tesseract) {
+      const w = window as WindowWithTesseract;
+      if (!w.Tesseract) {
         await new Promise<void>((resolve, reject) => {
           const s = document.createElement("script");
           s.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
@@ -67,9 +88,11 @@ export default function CardList({
         });
       }
 
-      const worker = await (window as any).Tesseract.createWorker("eng+chi_tra", 1, {
-        logger: (m: any) => {
-          if (m.status === "recognizing text") setOcrProgress(Math.round(m.progress * 100));
+      const worker = await w.Tesseract!.createWorker("eng+chi_tra", 1, {
+        logger: (m: TesseractLoggerMessage) => {
+          if (m.status === "recognizing text" && typeof m.progress === "number") {
+            setOcrProgress(Math.round(m.progress * 100));
+          }
         },
       });
 
@@ -297,8 +320,8 @@ function CreateCardModal({
         return;
       }
       onSuccess();
-    } catch (e: any) {
-      const msg = e?.message || "建立失敗";
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "建立失敗";
       setError(msg);
       setSubmitting(false);
     }

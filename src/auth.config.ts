@@ -2,6 +2,10 @@
 // 與 auth.ts 配對：config 是 Edge-safe，auth.ts 是 Node-only
 import type { NextAuthConfig } from "next-auth";
 
+type AppUser = { id?: string; plan?: string };
+type AppToken = { id?: string; plan?: string } & Record<string, unknown>;
+type AppSessionUser = { id?: string; plan?: string } & Record<string, unknown>;
+
 export default {
   pages: {
     signIn: "/login",
@@ -18,15 +22,17 @@ export default {
     },
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
-        token.plan = (user as any).plan ?? "free";
+        const u = user as AppUser;
+        (token as AppToken).id = u.id;
+        (token as AppToken).plan = u.plan ?? "free";
       }
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
-        (session.user as any).id = token.id as string;
-        (session.user as any).plan = token.plan as string;
+        const t = token as AppToken;
+        (session.user as unknown as AppSessionUser).id = t.id;
+        (session.user as unknown as AppSessionUser).plan = t.plan;
       }
       return session;
     },

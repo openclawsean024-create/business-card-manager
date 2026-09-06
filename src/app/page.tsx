@@ -302,7 +302,7 @@ function Step({ n, title, description }: { n: string; title: string; description
 function Quote({ body, name, role }: { body: string; name: string; role: string }) {
   return (
     <div className="card p-6">
-      <p className="text-[var(--text-primary)] mb-4 leading-relaxed">"{body}"</p>
+      <p className="text-[var(--text-primary)] mb-4 leading-relaxed">&ldquo;{body}&rdquo;</p>
       <div className="text-sm">
         <div className="font-medium">{name}</div>
         <div className="text-[var(--text-tertiary)]">{role}</div>

@@ -30,7 +30,7 @@ export async function contactAction(prevState: ActionState | null, formData: For
   try {
     await db.contactMessage.create({ data: parsed.data });
     return { success: "訊息已送出！我們會在 1-2 個工作天內回覆。" };
-  } catch (e) {
+  } catch {
     return { error: "送出失敗，請稍後再試或直接 Email 給 support@card-pro.com" };
   }
 }

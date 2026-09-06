@@ -6,7 +6,7 @@ export default function TermsPage() {
   return (
     <ArticlePage title="使用條款" updated="2026-07-07">
       <Section title="1. 接受條款">
-        <p>當你註冊、登入或使用名片王 Pro（"本服務"），即代表你同意本條款。如不同意，請停止使用。</p>
+        <p>當你註冊、登入或使用名片王 Pro（&ldquo;本服務&rdquo;），即代表你同意本條款。如不同意，請停止使用。</p>
       </Section>
 
       <Section title="2. 帳號">

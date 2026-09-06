@@ -2,7 +2,6 @@
 
 import { z } from "zod";
 import bcrypt from "bcryptjs";
-import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { signIn, signOut } from "@/auth";
 
@@ -79,12 +78,13 @@ export async function loginAction(prevState: ActionState | null, formData: FormD
       password: parsed.data.password,
       redirectTo: "/dashboard",
     });
-  } catch (e: any) {
+  } catch (e: unknown) {
     // Auth.js v5 redirect 會 throw 一個特殊物件，不要 catch
-    if (e?.digest?.startsWith?.("NEXT_REDIRECT") || e?.message === "NEXT_REDIRECT") {
+    const err = e as { digest?: string; message?: string; type?: string; code?: string };
+    if (err?.digest?.startsWith?.("NEXT_REDIRECT") || err?.message === "NEXT_REDIRECT") {
       throw e;  // 讓 redirect 通過
     }
-    if (e.type === "CredentialsSignin" || e?.code === "credentials") {
+    if (err?.type === "CredentialsSignin" || err?.code === "credentials") {
       return { error: "Email 或密碼錯誤" };
     }
     throw e;

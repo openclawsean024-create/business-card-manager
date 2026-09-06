@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { auth } from "@/auth";
 
@@ -52,12 +51,13 @@ export async function createCardAction(formData: FormData): Promise<ActionResult
 
     revalidatePath("/dashboard");
     return { ok: true };
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error("createCardAction error:", e);
-    if (e?.message === "UNAUTHORIZED") {
+    if (e instanceof Error && e.message === "UNAUTHORIZED") {
       return { error: "請先登入" };
     }
-    return { error: e?.message || "建立名片失敗" };
+    const msg = e instanceof Error ? e.message : "建立名片失敗";
+    return { error: msg };
   }
 }
 
@@ -73,9 +73,12 @@ export async function deleteCardAction(formData: FormData): Promise<ActionResult
     });
     revalidatePath("/dashboard");
     return { ok: true };
-  } catch (e: any) {
-    if (e?.code === "P2025") return { error: "名片不存在或無權限" };
+  } catch (e: unknown) {
+    if (typeof e === "object" && e && "code" in e && (e as { code?: string }).code === "P2025") {
+      return { error: "名片不存在或無權限" };
+    }
     console.error("deleteCardAction error:", e);
-    return { error: e?.message || "刪除失敗" };
+    const msg = e instanceof Error ? e.message : "刪除失敗";
+    return { error: msg };
   }
 }

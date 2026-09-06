@@ -12,7 +12,7 @@ export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
-  const userId = (session.user as any).id as string;
+  const userId = (session.user as { id?: string }).id as string;
   const [cards, sub] = await Promise.all([
     db.businessCard.findMany({
       where: { userId },
